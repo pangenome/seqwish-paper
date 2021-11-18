@@ -1,0 +1,109 @@
+\PassOptionsToPackage{utf8}{inputenc}
+\documentclass{bioinfo}
+
+\usepackage[draft]{hyperref}
+\usepackage{makecell}
+\usepackage{comment}
+
+\usepackage{floatrow}
+
+% singlelinecheck=false puts subcaptions on the left
+\usepackage[singlelinecheck=false]{subcaption}
+
+\usepackage{algorithm2e}
+\usepackage[usenames,dvipsnames]{xcolor}
+
+% we squeeze our figures even more together
+\captionsetup{belowskip=-2pt}
+
+\SetAlgoLined
+\SetKwProg{MyStruct}{Struct}{ contains}{end}
+
+\newcommand{\vocab}{\textbf}
+\newcommand{\red}[1]{{\textcolor{Red}{#1}}}
+\newcommand{\FIXME}[1]{\red{[FIXME: #1]}}
+
+\def\labelitemi{--}
+
+\copyrightyear{2021} \pubyear{XXXX}
+
+\access{Advance Access Publication Date: Day Month Year}
+\appnotes{Genome Analysis}
+
+\begin{document}
+    \firstpage{1}
+
+    \subtitle{Genome Analysis}
+
+    \title[ODGI: understanding pangenome graphs]{seqwish: very large variation graph inducer}
+    \author[Garrison \textit{et~al}.]{
+        Erik~Garrison\,$^{\text{\sfb 1} \dagger*}$
+    }
+
+    \address{
+        $^{\text{\sf 1}}$University of Tennessee Health Science Center, Memphis, TN, USA
+    }
+
+    \corresp{$^\ast$To whom correspondence should be addressed. \\
+        $^\dagger$Contributed equally.}
+
+    \history{Received on XXXXX; revised on XXXXX; accepted on XXXXX}
+
+    \editor{Associate Editor: XXXXXXX}
+
+    \abstract{
+        \textbf{Motivation:}
+        ... \\
+        \textbf{Results:}
+        We wrote seqwish, a novel ... \\
+        \textbf{Availability:}
+        seqwish is published as free software under the MIT open source license.
+        Source code and documentation are available at \url{https://github.com/ekg/seqwish}.
+        seqwish can be installed via Bioconda \url{https://bioconda.github.io/recipes/seqwish/README.html} or GNU Guix \url{https://github.com/ekg/guix-genomics/blob/master/seqwish.scm}. \\
+        \textbf{Contact:} \href{egarris5@uthsc.edu}{egarris5@uthsc.edu} \\
+%\textbf{Supplementary information:} Supplementary data are available at \textit{Bioinformatics} online.
+    }
+
+    \maketitle
+
+    \section{Introduction}
+    \label{sec:introduction}
+    \FIXME{to do}
+
+    \section{Model}
+    \label{sec:model}
+    \FIXME{to do}
+
+    \section{Implementation}
+    \label{sec:implementation}
+    \FIXME{to do}
+
+    \section{Results}
+    \label{sec:results}
+    \FIXME{to do}
+
+    \subsection{subsection 1}
+    \label{subsec:subsec1}
+    \FIXME{to do}
+
+    \section{Discussion}
+    \label{sec:discussion}
+    \FIXME{to do}
+
+    \section*{Acknowledgements}
+
+    We thank members of the HPRC production teams for their development of resources used in our exposition.
+
+    \section*{Funding}
+
+    We gratefully acknowledge support from NIH/NIDA U01DA047638 (EG).
+
+    \section*{Data availability}
+
+    Code and links to data resources used to build this manuscript and its figures, can be found in the paper's public repository: \url{https://github.com/pangenome/seqwish-paper}.
+
+    \bibliographystyle{natbib}
+
+    \bibliography{document}
+
+\end{document}

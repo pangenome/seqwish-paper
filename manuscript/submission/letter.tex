@@ -1,0 +1,112 @@
+\documentclass[12pt,hidelinks,letterpaper]{article}
+\usepackage[margin=0.75in,top=0.75in,footskip=0.5in]{geometry}
+\usepackage{comment}
+
+\usepackage{helvet}
+\renewcommand{\familydefault}{\sfdefault}
+
+% use Unicode characters - try changing the option if you run into troubles with special characters (e.g. umlauts)
+\usepackage[utf8]{inputenc}
+
+% clean citations
+\usepackage{cite}
+
+% hyperref makes references clicky. use \url{www.example.com} or \href{www.example.com}{description} to add a clicky url
+\usepackage{nameref,hyperref}
+
+% line numbers
+%\usepackage[right]{lineno}
+
+% improves typesetting in LaTeX
+\usepackage{microtype}
+\DisableLigatures[f]{encoding = *, family = * }
+
+% Remove % for double line spacing
+%\usepackage{setspace} 
+%\doublespacing
+
+% use adjustwidth environment to exceed text width (see examples in text)
+\usepackage{changepage}
+
+% use \textcolor{color}{text} for colored text (e.g. highlight to-do areas)
+\usepackage{color}
+
+% this is required to include graphics
+\usepackage{graphicx}
+
+% use for have text wrap around figures
+\usepackage{wrapfig}
+
+%\usepackage{setspace}
+%\doublespacing
+\usepackage{multicol}
+
+% document begins here
+\begin{document}
+
+
+    \begin{flushright}
+        Erik Garrison \\
+        egarris5@uthsc.edu \\
+        %+1 502 382 6005 \\
+        %+39 320 244 2758 \\
+        Department of Genetics, Genomics, and Informatics \\
+        University of Tennessee Health Science Center \\
+        Memphis, TN 38163, USA
+    \end{flushright}
+
+%\hfill \break
+
+    \begin{flushleft}
+        % madlib: replace with address
+        Bioinformatics \\
+        Oxford University Press \\
+        Great Clarendon Street \\
+        Oxford OX2 6DP, UK
+    \end{flushleft}
+
+%\hfill \break
+%\hfill \break
+
+    Dear editors,
+    \hfill \break
+%\hfill \break
+
+    In the included manuscript, we present the seqwish variation graph inducer.
+
+    xxx TO WRITE xxx
+
+%\hfill \break
+
+    \hfill \break
+
+%\begin{flushright}
+%\hspace*{100mm}
+    \indent Sincerely,\\
+%\hfill \break
+    \includegraphics[width=0.34\textwidth]{signature_Erik_Garrison.pdf}
+    \hfill \break
+    \indent Erik Garrison
+%\end{flushright}
+
+    \begin{comment}
+        \hfill \break
+        \begingroup
+        \let\oldthebibliography\thebibliography
+        \let\endoldthebibliography\endthebibliography
+        \renewenvironment{thebibliography}[1]{
+            \begin{oldthebibliography}{#1}
+                \setlength{\itemsep}{0em}
+                \setlength{\parskip}{0em}
+                }
+                {
+            \end{oldthebibliography}
+        }
+        \renewcommand{\section}[2]{}%
+        \bibliographystyle{unsrt}
+%\subsection*{References}
+        {\small \bibliography{references}}
+        \endgroup
+    \end{comment}
+
+\end{document}
