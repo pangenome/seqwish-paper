@@ -53,9 +53,9 @@
 
     \abstract{
         \textbf{Motivation:}
-        ... \\
+        ...  \\
         \textbf{Results:}
-        We wrote seqwish, a novel ... \\
+        We wrote seqwish, a novel tool to build a pangenome graph from a set of sequences and alignments between them. \\
         \textbf{Availability:}
         seqwish is published as free software under the MIT open source license.
         Source code and documentation are available at \url{https://github.com/ekg/seqwish}.
@@ -69,22 +69,46 @@
 
     \section{Introduction}
     \label{sec:introduction}
-    \FIXME{to do}
+    A pangenome models the full genomic information of a species or clase~\FIXME{PMID:32034321}.
+    These models encode the mutual relationships between all the genomes represented, in contrast to reference-based approaches which relate sequences only to a particular genome, chosen as reference.
+    A class of methods to represent pangenomes involves the \texttt{sequence graphs} \FIXME{PMID:2488477}, where similar orthologous regions between genomes collapse into a single representative sequence.
+    In \texttt{node-labeled} sequence graphs, nodes indicate DNA sequences, with edges connecting the nodes that are concatenated in the sequences represented in the graph.
+    A \texttt{bidirected} sequence graph represents both strands of DNA.
+    On this model, variation graphs add the concept of \texttt{path} to embed linear sequences (e.g., genomes or haplotypes) into the graph\citep{Garrison:2018}.
+    Paths provide a stable coordinate system, allowing graph annotations and interoperability between different graphs.
 
 
     \section{Model}
     \label{sec:model}
+    A pangenome graph is a sequence model that encodes the mutual alignment of many genomes~\citep{Garrison_2019_thesis,Eizenga_2020}.
+    In the variation graph, $V = (N, E, P)$, nodes $N = n_1\ldots n_{|N|}$ contain sequences of DNA.
+    Each node $n_i$ has an identifier $i$ and an implicit reverse complement $\bar{n_i}$, and a node strand $s$ corresponds to one such orientations.
+    Edges $E = e_1\ldots e_{|E|}$ represent ordered pairs of node strands: $e_i = ( s_a, s_b )$.
+    Paths $P = p_1\ldots p_{|P|}$ describe walks over node strands: $p_i = s_1 \ldots s_{|p_i|}$.
 
-    A set of pairwise alignments imply a variation graph, however I know of no contained method that will generate the variation graph or lossless string graph from these alignments.
-    To explore this, I developed an algorithm to do so that operates in external memory, which I here present in detail.
-    It operates by conversion of the alignment set into an alignment graph and the subsequent use of this graph in the elaboration of the variation graph including paths representing the input sequences.
+    A set of pairwise alignments imply a variation graph, however, to our knowledge, there is no contained method that can
+    generate the variation graph or lossless string graph from large input alignments.
+    To explore this, we developed an algorithm to do so that operates in external memory by conversion of the alignment
+    set into an alignment graph and the subsequent use of this graph in the elaboration of the variation graph including paths representing the input sequences.
     The resulting graph is a lossless representation of the input and the alignments between them.
-    To distinguish the approach from string graphs, which imply error correction, I call this variation graph induction model the \emph{squish graph}.
+    To distinguish the approach from string graphs, which imply error correction, we call this variation graph induction model the \emph{squish graph}.
+
+    \FIXME{To integrate to the text} The alignment graph formalizes the collection of alignments between genomes.
+    In this graph, each base pair in the input genomes is represented by a node.
+    Two kinds of edges connect these nodes.
+    The first `precedence' edge type indicates successive pairs of base pairs in the input,
+    linking together the input genomes within the alignment graph.
+    The second “match” type of edge links nodes that alignment has asserted to be matches.
+    The alignment graph may be converted into a basic sequence graph by condensing all sets of nodes that are transitively linked by match edges.
+    By recording the relationship between sequence graph and alignment graph nodes, we are able to trace the paths of pangenome sequences through the
+    graph, producing our target: a pangenome variation graph that completely describes both the input assemblies and their alignments (Fig.~\ref{fig:from_alignment_to_variation_graph}).
 
     \texttt{seqwish} implements a lossless conversion from pairwise alignments between sequences to a variation graph encoding the sequences and their alignments.
     As input, we typically take all-versus-all alignments, but the exact structure of the alignment set may be defined in an application specific way.
     \texttt{seqwish} uses a series of disk-backed sorts and passes over the alignment and sequence inputs to allow the graph to be constructed in low memory relative to the size of the input sequence set.
     Memory usage during construction and traversal is limited by the use of sorted disk-backed arrays and succinct rank/select dictionaries to record a queryable version of the graph.
+
+    \input{fig_from_alignment_to_variation_graph.tex}
 
 
     \section{Implementation}
@@ -119,6 +143,14 @@
     Given the id space encoded by $S_{id}$ we can materialize the graph in a variety of interchange formats, or provide id-based interfaces to the indexed squish graph.
     To generate graphs in \texttt {vg} or GFA format, we want to decompose the graph into its nodes ($S$), edges ($L$) and paths ($P$).
     The nodes are given by $S$ and $S_{id}$, and similarly we project $L$ and $P$ through $S_{id}$ to obtain a compressed variation graph.
+
+    \FIXME{To integrate to the text}
+    To support this kind of data scale, we implement \texttt{seqwish}'s algorithm using disk-backed memory.
+    We write the alignment graph into a disk-backed implicit interval tree, wherein each match in the input alignments is a queryable range.
+    A lock-free, parallel union-find algorithm \FIXME{Wait-free parallel algorithms for the union-find problem} allows us to, for each base pair of input sequence, collect all other base pairs in the pangenome that are aligned to it.
+    By processing this transitive closure operation in chunks (\textit{e.g.} 10Mbp at a time), we limit the maximum working memory (RAM) requirements of the process without affecting the output.
+    After the transitive closure, we write our final graph on disk in a set of arrays, then augment it with the paths of our input sequences,
+    finally emitting the resulting graph in the standard Graphical Fragment Assembly (GFA) format~\citep{GFA}.
 
 
     \section{Results}
