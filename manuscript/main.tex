@@ -113,6 +113,9 @@
 
     \section{Implementation}
     \label{sec:implementation}
+
+    \FIXME{The algorithm validates some aspects of itself, we should point that out}
+
     As input, we have $Q$, which is a concatenation of the sequences from which we will build the graph.
     We build a compressed suffix array (CSA) mapping sequence names to offsets in $Q$, and also the inverse using a rank/select dictionary on a bitvector marking the starts of sequences in $Q$.
     This allows us to map between positions in the sequences of $Q$, which is the format in which alignment algorithms typically express alignments, and positions in $Q$ itself, which is the coordinate space we will use as a basis for the generation of our graph.
@@ -156,6 +159,11 @@
     \section{Results}
     \label{sec:results}
     \FIXME{to do}
+
+    %The alignment is taken as truth, so some of the cross validation things we do for pggb are irrelevant.
+    %The one experiment could be graph induction on many graphs, with a 2D/3D plot with input size (alignments) vs induction time and color/shape to show graph output size or something
+    %Or
+    %We go schematic with the figure to show a complex but very detailed example with the algorithm worked out
 
     \subsection{subsection 1}
     \label{subsec:subsec1}
