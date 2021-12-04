@@ -35,17 +35,19 @@
 
     \subtitle{Genome Analysis}
 
-    \title[seqwish: very large variation graph inducer]{seqwish: very large variation graph inducer}
+    \title[seqwish: inducing pangenome graphs]{seqwish: inducing pangenome graphs}
     \author[Garrison \textit{et~al}.]{
-        Erik~Garrison\,$^{\text{\sfb 1} \dagger*}$
+        Erik~Garrison\,$^{\text{\sfb 1}*}$
     }
 
     \address{
         $^{\text{\sf 1}}$University of Tennessee Health Science Center, Memphis, TN, USA
     }
 
-    \corresp{$^\ast$To whom correspondence should be addressed. \\
-        $^\dagger$Contributed equally.}
+    \corresp{
+        $^\ast$To whom correspondence should be addressed. \\
+       % $^\dagger$Contributed equally.\
+    }
 
     \history{Received on XXXXX; revised on XXXXX; accepted on XXXXX}
 
@@ -53,9 +55,14 @@
 
     \abstract{
         \textbf{Motivation:}
-        ...  \\
+        Pangenome graphs provide a complete representation of the mutual alignment of collections of genomes.
+        One of its most common forms is the variation graph model.
+        A set of pairwise alignments imply a variation graph, but, to our knowledge, there are no methods to generate such a graph or lossless string graph from these alignments.\\
         \textbf{Results:}
-        We wrote seqwish, a novel tool to build a pangenome graph from a set of sequences and alignments between them. \\
+        We wrote seqwish, a novel tool to induce a variation graph from a set of sequences and alignments between them.
+        seqwish operates in external memory, by conversion of the alignment set into an alignment graph and the subsequent
+        use of this graph in the elaboration of the variation graph including paths representing the input sequences.
+        The resulting graph is a lossless representation of the input and its alignments.\\
         \textbf{Availability:}
         seqwish is published as free software under the MIT open source license.
         Source code and documentation are available at \url{https://github.com/ekg/seqwish}.
