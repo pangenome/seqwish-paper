@@ -1,0 +1,16 @@
+ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/211/275/GCA_000211275.1_ASM21127v1/GCA_000211275.1_ASM21127v1_genomic.fna.gz
+ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/001/651/475/GCA_001651475.1_Ler_Assembly/GCA_001651475.1_Ler_Assembly_genomic.fna.gz
+ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/900/660/825/GCA_900660825.1_Ath.Ler-0.MPIPZ.v1.0/GCA_900660825.1_Ath.Ler-0.MPIPZ.v1.0_genomic.fna.gz
+ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/902/460/265/GCA_902460265.3_Arabidopsis_thaliana_An-1_chrom/GCA_902460265.3_Arabidopsis_thaliana_An-1_chrom_genomic.fna.gz
+ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/902/460/275/GCA_902460275.1_Arabidopsis_thaliana_Cvi-0/GCA_902460275.1_Arabidopsis_thaliana_Cvi-0_genomic.fna.gz
+ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/902/460/285/GCA_902460285.1_Arabidopsis_thaliana_Ler/GCA_902460285.1_Arabidopsis_thaliana_Ler_genomic.fna.gz
+ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/902/460/295/GCA_902460295.1_Arabidopsis_thaliana_Sha/GCA_902460295.1_Arabidopsis_thaliana_Sha_genomic.fna.gz
+ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/902/460/305/GCA_902460305.1_Arabidopsis_thaliana_Kyo/GCA_902460305.1_Arabidopsis_thaliana_Kyo_genomic.fna.gz
+ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/902/460/315/GCA_902460315.1_Arabidopsis_thaliana_Eri-1/GCA_902460315.1_Arabidopsis_thaliana_Eri-1_genomic.fna.gz
+ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/902/825/305/GCA_902825305.1_AT6909.Col-0.PacBio/GCA_902825305.1_AT6909.Col-0.PacBio_genomic.fna.gz
+ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/903/064/275/GCA_903064275.1_AT7213.Ler-0.PacBio/GCA_903064275.1_AT7213.Ler-0.PacBio_genomic.fna.gz
+ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/903/064/285/GCA_903064285.1_AT1741.KBS-Mac-74.PacBio/GCA_903064285.1_AT1741.KBS-Mac-74.PacBio_genomic.fna.gz
+ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/903/064/295/GCA_903064295.1_AT5784.Ty-1.PacBio/GCA_903064295.1_AT5784.Ty-1.PacBio_genomic.fna.gz
+ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/903/064/325/GCA_903064325.1_AT7186.Kn-0.PacBio/GCA_903064325.1_AT7186.Kn-0.PacBio_genomic.fna.gz
+ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/904/420/315/GCA_904420315.1_AT9943.Cdm-0.scaffold/GCA_904420315.1_AT9943.Cdm-0.scaffold_genomic.fna.gz
+ftp://ftp.ncbi.nlm.nih.gov/genomes/all/GCA/000/001/735/GCA_000001735.2_TAIR10.1/GCA_000001735.2_TAIR10.1_genomic.fna.gz
