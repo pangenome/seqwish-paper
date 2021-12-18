@@ -43,7 +43,7 @@ done
 Put all together:
 
 ```shell
-zcat *.fa.gz | cut -f 1 | bgzip -@ 48 -c > athaliana16.fasta.gz; samtools faidx athaliana16.fasta.gz
+zcat *.fa.gz | bgzip -@ 48 -c > athaliana16.fasta.gz; samtools faidx athaliana16.fasta.gz
 ```
 
 
@@ -112,7 +112,7 @@ for s in 100000 50000 20000; do
     PAF=/lizardfs/guarracino/seqwish-paper/arabidopsis/alignment/arabidopsis.s$s.l$l.p$p.n9.paf
     for k in 79 29 7 0; do
       GFA=/lizardfs/guarracino/seqwish-paper/arabidopsis/graphs/arabidopsis.s$s.l$l.p$p.n9.k$k.B50M.gfa
-      sbatch -p workers -c 48 --wrap 'cd /scratch; \time -v ~/tools/wfmash/build/bin/wfmash-09e73eb3fcf24b8b7312b8890dd0741933f0d1cd '$ASSEMBLIES' '$ASSEMBLIES' -X -s '$s' -l '$l' -p '$p' -n 9 -t 48 > '$PAF'; \time -v ~/tools/seqwish/bin/seqwish-ccfefb016fcfc9937817ce61dc06bbcf382be75e -f '$ASSEMBLIES' -p '$PAF' -g '$GFA' -k '$k' -B50M -P'
+      sbatch -p workers -c 48 --wrap 'cd /scratch; \time -v ~/tools/wfmash/build/bin/wfmash-7fe6c05b57c030d71c64c586d8135d49d3a27528 '$ASSEMBLIES' '$ASSEMBLIES' -X -s '$s' -l '$l' -p '$p' -n 9 -t 48 > '$PAF'; \time -v ~/tools/seqwish/bin/seqwish-ccfefb016fcfc9937817ce61dc06bbcf382be75e -f '$ASSEMBLIES' -p '$PAF' -g '$GFA' -k '$k' -B50M -P'
     done
   done
 done

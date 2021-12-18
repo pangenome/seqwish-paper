@@ -30,9 +30,9 @@ cd ..
 
 git clone --recursive https://github.com/ekg/wfmash.git
 cd wfmash
-git checkout 09e73eb3fcf24b8b7312b8890dd0741933f0d1cd
+git checkout 7fe6c05b57c030d71c64c586d8135d49d3a27528
 cmake -H. -Bbuild && cmake --build build -- -j 48
-mv build/bin/wfmash build/bin/wfmash-09e73eb3fcf24b8b7312b8890dd0741933f0d1cd
+mv build/bin/wfmash build/bin/wfmash-7fe6c05b57c030d71c64c586d8135d49d3a27528
 cd ..
 
 git clone --recursive https://github.com/ekg/seqwish.git

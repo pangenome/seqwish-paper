@@ -44,8 +44,7 @@ done
 Put all together:
 
 ```shell
-# cut -f 1 to trim the headers
-zcat *.fa.gz | cut -f 1 | bgzip -@ 48 -c > zmays41.fasta.gz; samtools faidx zmays41.fasta.gz
+zcat *.fa.gz | bgzip -@ 48 -c > zmays41.fasta.gz; samtools faidx zmays41.fasta.gz
 ```
 
 ## Explore the assemblies
