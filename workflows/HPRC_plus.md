@@ -1,44 +1,15 @@
-# Scalability test
+# HPRC plus
 
-## Tools
+## Resources
 
-```shell
-mkdir -p ~/tools $$ cd ~/tools
-
-git clone --recursive https://github.com/ekg/fastix.git
-cd fastix
-git checkout 331c1159ea16625ee79d1a82522e800c99206834
-cargo build --release
-mv target/release/fastix target/release/fastix-331c1159ea16625ee79d1a82522e800c99206834
-cd ..
-
-git clone --recursive https://github.com/ekg/wfmash.git
-cd wfmash
-git checkout 09e73eb3fcf24b8b7312b8890dd0741933f0d1cd
-cmake -H. -Bbuild && cmake --build build -- -j 48
-mv build/bin/wfmash build/bin/wfmash-09e73eb3fcf24b8b7312b8890dd0741933f0d1cd
-cd ..
-
-git clone --recursive https://github.com/ekg/seqwish.git
-cd seqwish
-git checkout ccfefb016fcfc9937817ce61dc06bbcf382be75e
-cmake -H. -Bbuild && cmake --build build -- -j 48
-mv bin/seqwish bin/seqwish-ccfefb016fcfc9937817ce61dc06bbcf382be75e
-cd ..
-
-git clone --recursive https://github.com/pangenome/odgi.git
-cd odgi
-git checkout 67a7e5bb2f328888e194845a362cef9c8ccc488f
-mv bin/odgi bin/odgi-67a7e5bb2f328888e194845a362cef9c8ccc488f
-cmake -H. -Bbuild && cmake --build build -- -j 48
-cd ..
-```
+The *de novo* assemblies can be found at https://github.com/human-pangenomics/HPP_Year1_Data_Freeze_v1.0.
+To obtain from these assemblies the input FASTA files used in `seqwish` analyses, follow the instructions at https://github.com/pangenome/HPRCyear1v2genbank.
 
 ## Preparation and preprocessing
 
 ```shell
-mkdir -p /lizardfs/guarracino/seqwish-paper/assemblies
-cd /lizardfs/guarracino/seqwish-paper/assemblies
+mkdir -p /lizardfs/guarracino/seqwish-paper/hprc_plus/assemblies
+cd /lizardfs/guarracino/seqwish-paper/hprc_plus/assemblies
 ```
 
 Get the URLs of the assemblies (**only HPRC+ samples**):
@@ -85,7 +56,7 @@ rm chm13.draft_v1.1.fasta.gz chm13.fa.gz GCA_000001405.15_GRCh38_no_alt_analysis
 ## Alignment
 
 ```shell
-mkdir -p /lizardfs/guarracino/seqwish-paper/alignment
+mkdir -p /lizardfs/guarracino/seqwish-paper/hprc_plus/alignment
 ```
 
 Generate all-vs-all mapping:
@@ -95,7 +66,7 @@ Generate all-vs-all mapping:
 [comment]: <> (```)
 
 ```shell
-sbatch -p lowmem -c 48 --wrap 'cd /scratch && ~/tools/wfmash/build/bin/wfmash-09e73eb3fcf24b8b7312b8890dd0741933f0d1cd -X -s 100k -l 300k -p 98 -n 90 -k 16 -t 48 /lizardfs/guarracino/seqwish-paper/assemblies/HPRC_plus.fa.gz /lizardfs/guarracino/seqwish-paper/assemblies/HPRC_plus.fa.gz -m > HPRC_plus.s100k.l300k.p98.n90.k16.approx.paf && mv HPRC_plus.s100k.l300k.p98.n90.k16.approx.paf /lizardfs/guarracino/seqwish-paper/alignment/'
+sbatch -p lowmem -c 48 --wrap 'cd /scratch && ~/tools/wfmash/build/bin/wfmash-09e73eb3fcf24b8b7312b8890dd0741933f0d1cd -X -s 100k -l 300k -p 98 -n 90 -k 16 -t 48 /lizardfs/guarracino/seqwish-paper/hprc_plus/assemblies/HPRC_plus.fa.gz /lizardfs/guarracino/seqwish-paper/hprc_plus/assemblies/HPRC_plus.fa.gz -m > HPRC_plus.s100k.l300k.p98.n90.k16.approx.paf && mv HPRC_plus.s100k.l300k.p98.n90.k16.approx.paf /lizardfs/guarracino/seqwish-paper/hprc_plus/alignment/'
 ```
 
 Split the mappings in chunks:
@@ -105,7 +76,7 @@ Split the mappings in chunks:
 [comment]: <> ```
 
 ```shell
-python3 ~/tools/wfmash/split_approx_mappings_in_chunks.py /lizardfs/guarracino/seqwish-paper/alignment/HPRC_plus.s100k.l300k.p98.n90.k16.approx.paf 5
+python3 ~/tools/wfmash/split_approx_mappings_in_chunks.py /lizardfs/guarracino/seqwish-paper/hprc_plus/alignment/HPRC_plus.s100k.l300k.p98.n90.k16.approx.paf 5
 ```
 
 Run the alignments on multiple nodes:
@@ -115,13 +86,13 @@ Run the alignments on multiple nodes:
 [comment]: <> ```
 
 ```shell
-seq 0 4 | while read i; do sbatch -p lowmem -c 48 --wrap 'cd /scratch && ~/tools/wfmash/build/bin/wfmash-09e73eb3fcf24b8b7312b8890dd0741933f0d1cd -X -s 100k -l 300k -p 98 -n 90 -k 16 -t 48 /lizardfs/guarracino/seqwish-paper/assemblies/HPRC_plus.fa.gz /lizardfs/guarracino/seqwish-paper/assemblies/HPRC_plus.fa.gz -i /lizardfs/guarracino/seqwish-paper/alignment/HPRC_plus.s100k.l300k.p98.n90.k16.approx.paf.chunk_'$i'.paf | pigz -c > HPRC_plus.s100k.l300k.p98.n90.k16.chunk_'$i'.paf.gz && mv HPRC_plus.s100k.l300k.p98.n90.k16.chunk_'$i'.paf.gz lizardfs/guarracino/seqwish-paper/alignment/' ; done >>alignment.jobids
+seq 0 4 | while read i; do sbatch -p lowmem -c 48 --wrap 'cd /scratch && ~/tools/wfmash/build/bin/wfmash-09e73eb3fcf24b8b7312b8890dd0741933f0d1cd -X -s 100k -l 300k -p 98 -n 90 -k 16 -t 48 /lizardfs/guarracino/seqwish-paper/hprc_plus/assemblies/HPRC_plus.fa.gz /lizardfs/guarracino/seqwish-paper/hprc_plus/assemblies/HPRC_plus.fa.gz -i /lizardfs/guarracino/seqwish-paper/hprc_plus/alignment/HPRC_plus.s100k.l300k.p98.n90.k16.approx.paf.chunk_'$i'.paf | pigz -c > HPRC_plus.s100k.l300k.p98.n90.k16.chunk_'$i'.paf.gz && mv HPRC_plus.s100k.l300k.p98.n90.k16.chunk_'$i'.paf.gz lizardfs/guarracino/seqwish-paper/hprc_plus/alignment/' ; done >>alignment.jobids
 ```
 
 ## Graph induction
 
 ```shell
-mkdir -p /lizardfs/guarracino/seqwish-paper/graphs
+mkdir -p /lizardfs/guarracino/seqwish-paper/hprc_plus/graphs
 ```
 
 Run `seqwish`:
@@ -131,18 +102,17 @@ Run `seqwish`:
 [comment]: <> ```
 
 ```shell
-# list all base-level alignment PAFs
-PAFS=$(ls /lizardfs/guarracino/seqwish-paper/alignment/HPRC_plus.s100k.l300k.p98.n90.k16.approx.paf.chunk_*.paf | tr '\n' ',')
+PAFS=$(ls /lizardfs/guarracino/seqwish-paper/hprc_plus/alignment/HPRC_plus.s100k.l300k.p98.n90.k16.approx.paf.chunk_*.paf | tr '\n' ',')
 PAFS=${PAFS::-1}
 
-sbatch -p workers -w octopus03 -c 48 --wrap '(echo 311; echo 229; echo 179; echo 127; echo 79; echo 29; echo 11) | while read k; do cd /scratch && \time -v ~/tools/seqwish/bin/seqwish-ccfefb016fcfc9937817ce61dc06bbcf382be75e -t 48 -s /lizardfs/guarracino/seqwish-paper/assemblies/HPRC_plus.fa.gz -p '$PAFS' -k $k -B 50M -g HPRC_plus.s100k.l300k.p98.n90.k16.seqwish.k$k.B50M.gfa -P && mv HPRC_plus.s100k.l300k.p98.n90.k16.seqwish.k$k.B50M.gfa /lizardfs/guarracino/seqwish-paper/graphs/ ; done'
+sbatch -p workers -w octopus03 -c 48 --wrap '(echo 311; echo 229; echo 179; echo 127; echo 79; echo 29; echo 11) | while read k; do cd /scratch && \time -v ~/tools/seqwish/bin/seqwish-ccfefb016fcfc9937817ce61dc06bbcf382be75e -t 48 -s /lizardfs/guarracino/seqwish-paper/hprc_plus/assemblies/HPRC_plus.fa.gz -p '$PAFS' -k $k -B 50M -g HPRC_plus.s100k.l300k.p98.n90.k16.seqwish.k$k.B50M.gfa -P && mv HPRC_plus.s100k.l300k.p98.n90.k16.seqwish.k$k.B50M.gfa /lizardfs/guarracino/seqwish-paper/hprc_plus/graphs/ ; done'
 ```
 
 ## Statistics
 
 ```shell
 (echo 311; echo 229; echo 179; echo 127; echo 79; echo 29; echo 11) | while read k; do
-  g=/lizardfs/guarracino/seqwish-paper/graphs/HPRC_plus.s100k.l300k.p98.n90.k16.seqwish.k$k.B50M.gfa
-  sbatch -p workers -c 48 --wrap 'cd /scratch && ~/tools/odgi/bin/odgi-67a7e5bb2f328888e194845a362cef9c8ccc488f build -g '$g' -o '$g'.og -t 48 -P; ~/tools/odgi/bin/odgi-67a7e5bb2f328888e194845a362cef9c8ccc488f stats -S -W -L -N -b  -t 48 -P > '$g'.og.stats.txt';
+  g=/lizardfs/guarracino/seqwish-paper/hprc_plus/graphs/HPRC_plus.s100k.l300k.p98.n90.k16.seqwish.k$k.B50M.gfa
+  sbatch -p workers -c 48 --wrap 'cd /scratch && ~/tools/odgi/bin/odgi-67a7e5bb2f328888e194845a362cef9c8ccc488f build -g '$g' -o '$g'.og -t 48 -P; ~/tools/odgi/bin/odgi-67a7e5bb2f328888e194845a362cef9c8ccc488f stats -i '$g'.og -S -W -L -N -b -t 48 -P > '$g'.og.stats.txt';
 done
 ```
