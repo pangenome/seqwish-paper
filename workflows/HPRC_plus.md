@@ -60,7 +60,7 @@ Generate all-vs-all mapping:
 ```shell
 mkdir -p /lizardfs/guarracino/seqwish-paper/hprc_plus/alignment
 
-sbatch -p lowmem -c 48 --wrap 'cd /scratch && ~/tools/wfmash/build/bin/wfmash-7fe6c05b57c030d71c64c586d8135d49d3a27528 -X -s 100k -l 300k -p 98 -n 90 -k 16 -t 48 /lizardfs/guarracino/seqwish-paper/hprc_plus/assemblies/HPRC_plus.fa.gz /lizardfs/guarracino/seqwish-paper/hprc_plus/assemblies/HPRC_plus.fa.gz -m > HPRC_plus.s100k.l300k.p98.n90.k16.approx.paf && mv HPRC_plus.s100k.l300k.p98.n90.k16.approx.paf /lizardfs/guarracino/seqwish-paper/hprc_plus/alignment/'
+sbatch -p lowmem -c 48 --wrap 'cd /scratch && ~/tools/wfmash/build/bin/wfmash-948f1683d14927745aef781cdabeb66ac6c7880b -X -s 100k -l 300k -p 98 -n 90 -k 16 -t 48 /lizardfs/guarracino/seqwish-paper/hprc_plus/assemblies/HPRC_plus.fa.gz /lizardfs/guarracino/seqwish-paper/hprc_plus/assemblies/HPRC_plus.fa.gz -m > HPRC_plus.s100k.l300k.p98.n90.k16.approx.paf && mv HPRC_plus.s100k.l300k.p98.n90.k16.approx.paf /lizardfs/guarracino/seqwish-paper/hprc_plus/alignment/'
 ```
 
 [comment]: <> (```shell)
@@ -84,7 +84,7 @@ Run the alignments on multiple nodes:
 [comment]: <> ```
 
 ```shell
-seq 0 4 | while read i; do sbatch -p lowmem -c 48 --wrap 'cd /scratch && ~/tools/wfmash/build/bin/wfmash-7fe6c05b57c030d71c64c586d8135d49d3a27528 -X -s 100k -l 300k -p 98 -n 90 -k 16 -t 48 /lizardfs/guarracino/seqwish-paper/hprc_plus/assemblies/HPRC_plus.fa.gz /lizardfs/guarracino/seqwish-paper/hprc_plus/assemblies/HPRC_plus.fa.gz -i /lizardfs/guarracino/seqwish-paper/hprc_plus/alignment/HPRC_plus.s100k.l300k.p98.n90.k16.approx.paf.chunk_'$i'.paf | pigz -c > HPRC_plus.s100k.l300k.p98.n90.k16.chunk_'$i'.paf.gz && mv HPRC_plus.s100k.l300k.p98.n90.k16.chunk_'$i'.paf.gz lizardfs/guarracino/seqwish-paper/hprc_plus/alignment/' ; done >>alignment.jobids
+seq 0 4 | while read i; do sbatch -p lowmem -c 48 --wrap 'cd /scratch && ~/tools/wfmash/build/bin/wfmash-948f1683d14927745aef781cdabeb66ac6c7880b -X -s 100k -l 300k -p 98 -n 90 -k 16 -t 48 /lizardfs/guarracino/seqwish-paper/hprc_plus/assemblies/HPRC_plus.fa.gz /lizardfs/guarracino/seqwish-paper/hprc_plus/assemblies/HPRC_plus.fa.gz -i /lizardfs/guarracino/seqwish-paper/hprc_plus/alignment/HPRC_plus.s100k.l300k.p98.n90.k16.approx.paf.chunk_'$i'.paf | pigz -c > HPRC_plus.s100k.l300k.p98.n90.k16.chunk_'$i'.paf.gz && mv HPRC_plus.s100k.l300k.p98.n90.k16.chunk_'$i'.paf.gz /lizardfs/guarracino/seqwish-paper/hprc_plus/alignment/' ; done >>alignment.jobids
 ```
 
 ## Graph induction
@@ -100,17 +100,19 @@ Run `seqwish`:
 [comment]: <> ```
 
 ```shell
-PAFS=$(ls /lizardfs/guarracino/seqwish-paper/hprc_plus/alignment/HPRC_plus.s100k.l300k.p98.n90.k16.approx.paf.chunk_*.paf | tr '\n' ',')
+PAFS=$(ls /lizardfs/guarracino/seqwish-paper/hprc_plus/alignment/HPRC_plus.s100k.l300k.p98.n90.k16.chunk_*.paf.gz | tr '\n' ',')
 PAFS=${PAFS::-1}
 
-sbatch -p workers -w octopus03 -c 48 --wrap '(echo 311; echo 229; echo 179; echo 127; echo 79; echo 29; echo 11) | while read k; do cd /scratch && \time -v ~/tools/seqwish/bin/seqwish-ccfefb016fcfc9937817ce61dc06bbcf382be75e -t 48 -s /lizardfs/guarracino/seqwish-paper/hprc_plus/assemblies/HPRC_plus.fa.gz -p '$PAFS' -k $k -B 50M -g HPRC_plus.s100k.l300k.p98.n90.k16.seqwish.k$k.B50M.gfa -P && mv HPRC_plus.s100k.l300k.p98.n90.k16.seqwish.k$k.B50M.gfa /lizardfs/guarracino/seqwish-paper/hprc_plus/graphs/ ; done'
+(echo 311; echo 229; echo 179; echo 127; echo 79; echo 49; echo 29; echo 11; echo 0;) | while read k; do
+  sbatch -p 386mem -c 48 --job-name seqwk$k --wrap 'hostname; cd /scratch && \time -v ~/tools/seqwish/bin/seqwish-ccfefb016fcfc9937817ce61dc06bbcf382be75e -t 48 -s /lizardfs/guarracino/seqwish-paper/hprc_plus/assemblies/HPRC_plus.fa.gz -p '$PAFS' -k '$k' -B 50M -g HPRC_plus.s100k.l300k.p98.n90.k16.seqwish.k'$k'.B50M.gfa -P && mv HPRC_plus.s100k.l300k.p98.n90.k16.seqwish.k'$k'.B50M.gfa /lizardfs/guarracino/seqwish-paper/hprc_plus/graphs/';
+done
 ```
 
 ## Statistics
 
 ```shell
-(echo 311; echo 229; echo 179; echo 127; echo 79; echo 29; echo 11) | while read k; do
+(echo 311; echo 229; echo 179; echo 127; echo 79; echo 29; echo 11; echo 0) | while read k; do
   g=/lizardfs/guarracino/seqwish-paper/hprc_plus/graphs/HPRC_plus.s100k.l300k.p98.n90.k16.seqwish.k$k.B50M.gfa
-  sbatch -p workers -c 48 --wrap 'cd /scratch && ~/tools/odgi/bin/odgi-67a7e5bb2f328888e194845a362cef9c8ccc488f build -g '$g' -o '$g'.og -t 48 -P; ~/tools/odgi/bin/odgi-67a7e5bb2f328888e194845a362cef9c8ccc488f stats -i '$g'.og -S -W -L -N -b -t 48 -P > '$g'.og.stats.txt';
+  sbatch -p workers -c 48 --wrap 'hostname; cd /scratch && ~/tools/odgi/bin/odgi-9e9c4811169760f64690e86619dbd1b088ec5955 build -g '$g' -o '$g'.og -t 48 -P; ~/tools/odgi/bin/odgi-67a7e5bb2f328888e194845a362cef9c8ccc488f stats -i '$g'.og -S -W -L -N -b -t 48 -P > '$g'.og.stats.txt';
 done
 ```
