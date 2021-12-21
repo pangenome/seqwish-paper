@@ -49,7 +49,7 @@ zcat *.fa.gz | bgzip -@ 48 -c > zmays41.fasta.gz; samtools faidx zmays41.fasta.g
 
 ## Explore the assemblies
 
-Number of contigs (1st column) for each assemblies:
+Number of contigs (1st column) for each assembly:
 
 ```shell
 wc *fa.gz.fai
@@ -106,3 +106,13 @@ ls *.fa.gz | while read f; do mash sketch $f; done
 mash triangle *.fa.gz >zmays.mash_triangle.txt
 ```
 
+Top distances:
+
+```shell
+sed 1,1d zmays.mash_triangle.txt | tr '\t' '\n' | grep GCA -v | grep e -v | sort -g -k 1nr | head -n 5
+0.022205
+0.0220623
+0.0219913
+0.0218499
+0.0216393
+```
