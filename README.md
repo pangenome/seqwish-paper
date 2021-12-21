@@ -30,9 +30,9 @@ cd ..
 
 git clone --recursive https://github.com/ekg/wfmash.git
 cd wfmash
-git checkout 7fe6c05b57c030d71c64c586d8135d49d3a27528
+git checkout 948f1683d14927745aef781cdabeb66ac6c7880b
 cmake -H. -Bbuild && cmake --build build -- -j 48
-mv build/bin/wfmash build/bin/wfmash-7fe6c05b57c030d71c64c586d8135d49d3a27528
+mv build/bin/wfmash build/bin/wfmash-948f1683d14927745aef781cdabeb66ac6c7880b
 cd ..
 
 git clone --recursive https://github.com/ekg/seqwish.git
@@ -44,9 +44,9 @@ cd ..
 
 git clone --recursive https://github.com/pangenome/odgi.git
 cd odgi
-git checkout 67a7e5bb2f328888e194845a362cef9c8ccc488f
-mv bin/odgi bin/odgi-67a7e5bb2f328888e194845a362cef9c8ccc488f
+git checkout 9e9c4811169760f64690e86619dbd1b088ec5955
 cmake -H. -Bbuild && cmake --build build -- -j 48
+mv bin/odgi bin/odgi-9e9c4811169760f64690e86619dbd1b088ec5955
 cd ..
 ```
 

@@ -2,6 +2,8 @@
 
 ## Download the assemblies
 
+Tips from here: https://medium.com/computational-biology/how-to-download-all-bacterial-assemblies-from-ncbi-35f4bc5435f9.
+
 ```shell
 mkdir -p /lizardfs/guarracino/seqwish-paper/bacteria/assemblies
 cd /lizardfs/guarracino/seqwish-paper/bacteria/assemblies
@@ -44,17 +46,22 @@ zcat assembly.bacteria.txt.gz | cut -f 2 | cut -f 1,2 -d ' ' | sort | uniq -c | 
 Prepare the URLs for a few species:
 
 ```shell
-for species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumoniae" "Helicobacter pylori"; do
-  echo $species
+for genus_species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumoniae" "Helicobacter pylori"; do
+  echo $genus_species
   
-  sp=$(echo $species | tr ' ' '_')
-  mkdir -p $sp
-  zgrep "$species" assembly.bacteria.txt.gz | cut -f 3 | while read f; do
+  genus_species_lower=$(echo $genus_species | tr '[:upper:]' '[:lower:]')
+  g=$(echo $genus_species_lower | cut -f 1 -d ' ')
+  g=${g:0:1} # fist letter
+  species=$(echo $genus_species_lower | cut -f 2 -d ' ')
+  gspecies=$(echo $g$species)
+  
+  mkdir -p $gspecies
+  zgrep "$genus_species" assembly.bacteria.txt.gz | cut -f 3 | while read f; do
     # Slow: name=$(basename $f);
     # Slow: name=$(echo $f | rev | cut -f 1 -d '/' | rev)
     # Slow: name=$(echo $f | grep -o '[^/]*$')
     name=$(echo $f | awk -F '/' '{print $NF}')
-    echo $f/${name}_genomic.fna.gz >> $sp/$sp.urls;
+    echo $f/${name}_genomic.fna.gz >> $gspecies/$gspecies.urls;
   done
 done
 ```
@@ -62,32 +69,47 @@ done
 Download the assemblies:
 
 ```shell
-for species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumoniae" "Helicobacter pylori"; do
-  echo $species
+for genus_species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumoniae" "Helicobacter pylori"; do
+  echo $genus_species
   
-  sp=$(echo $species | tr ' ' '_')
-  sbatch -p lowmem --wrap "cd /lizardfs/guarracino/seqwish-paper/bacteria/assemblies/'$sp'; cat *.urls | parallel -j 16 'wget -q {} && echo got {}'"
+  genus_species_lower=$(echo $genus_species | tr '[:upper:]' '[:lower:]')
+  g=$(echo $genus_species_lower | cut -f 1 -d ' ')
+  g=${g:0:1} # fist letter
+  species=$(echo $genus_species_lower | cut -f 2 -d ' ')
+  gspecies=$(echo $g$species)
+  
+  sbatch -p lowmem --wrap "cd /lizardfs/guarracino/seqwish-paper/bacteria/assemblies/'$gspecies'; cat *.urls | parallel -j 16 'wget -q {} && echo got {}'"
 done
 #sbatch -p headnode -w octopus01 --wrap 'zcat assembly.bacteria.txt.gz | cut -f 3 | while read f; do echo $f; name=$(basename $f); wget -c $f/${name}_genomic.fna.gz; done'
 
 
 # Check integrity
-for species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumoniae" "Helicobacter pylori"; do
-  echo $species
+for genus_species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumoniae" "Helicobacter pylori"; do
+  echo $genus_species
   
-  sp=$(echo $species | tr ' ' '_')
-  ls $sp/*gz | while read f; do gzip -t $f; done
+  genus_species_lower=$(echo $genus_species | tr '[:upper:]' '[:lower:]')
+  g=$(echo $genus_species_lower | cut -f 1 -d ' ')
+  g=${g:0:1} # fist letter
+  species=$(echo $genus_species_lower | cut -f 2 -d ' ')
+  gspecies=$(echo $g$species)
+  
+  ls $gspecies/*gz | while read f; do gzip -t $f; done
 done
 ```
 
 Trim headers and add prefixes:
 
 ```shell
-for species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumoniae" "Helicobacter pylori"; do
-  echo $species
+for genus_species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumoniae" "Helicobacter pylori"; do
+  echo $genus_species
   
-  sp=$(echo $species | tr ' ' '_')
-  cd $sp
+  genus_species_lower=$(echo $genus_species | tr '[:upper:]' '[:lower:]')
+  g=$(echo $genus_species_lower | cut -f 1 -d ' ')
+  g=${g:0:1} # fist letter
+  species=$(echo $genus_species_lower | cut -f 2 -d ' ')
+  gspecies=$(echo $g$species)
+  
+  cd $gspecies
   ls *.fna.gz | while read f; do
     prefix=$(echo $f | cut -f 1,2 -d '_');
     echo $prefix
@@ -103,33 +125,34 @@ done
 Put all together:
 
 ```shell
-zcat *.fa.gz | cut -f 1 | bgzip -@ 48 -c > athaliana16.fasta.gz; samtools faidx athaliana16.fasta.gz
+for genus_species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumoniae" "Helicobacter pylori"; do
+  echo $genus_species
+  
+  genus_species_lower=$(echo $genus_species | tr '[:upper:]' '[:lower:]')
+  g=$(echo $genus_species_lower | cut -f 1 -d ' ')
+  g=${g:0:1} # fist letter
+  species=$(echo $genus_species_lower | cut -f 2 -d ' ')
+  gspecies=$(echo $g$species)
+  
+  cd $gspecies
+  num_assemblies=$(ls *.fa.gz | wc -l)
+  zcat *.fa.gz | cut -f 1 | bgzip -@ 48 -c > $gspecies${num_assemblies}.fasta.gz; samtools faidx $gspecies${num_assemblies}.fasta.gz
+  cd ..
+done
 ```
 
 
 ## Explore the assemblies
 
-Number of contigs (1st column) for each assemblies:
+Number of total contigs (1st column) for each species:
 
 ```shell
-wc *fa.gz.fai
-    7    35   349 GCA_000001735.2.fa.gz.fai
-    6    30   299 GCA_000211275.1.fa.gz.fai
-   30   150  1588 GCA_001651475.1.fa.gz.fai
-  109   545  6019 GCA_900660825.1.fa.gz.fai
-  111   555  6128 GCA_902460265.3.fa.gz.fai
-  102   510  5621 GCA_902460275.1.fa.gz.fai
-  105   525  5798 GCA_902460285.1.fa.gz.fai
-   94   470  5198 GCA_902460295.1.fa.gz.fai
-  184   920 10197 GCA_902460305.1.fa.gz.fai
-  142   710  7851 GCA_902460315.1.fa.gz.fai
-    5    25   249 GCA_902825305.1.fa.gz.fai
-    5    25   249 GCA_903064275.1.fa.gz.fai
-    5    25   249 GCA_903064285.1.fa.gz.fai
-    5    25   249 GCA_903064295.1.fa.gz.fai
-    5    25   249 GCA_903064325.1.fa.gz.fai
-    7    35   350 GCA_904420315.1.fa.gz.fai
-  922  4610 50643 total
+wc */*fasta.gz.fai
+  8660  43300 440033 ecoli/ecoli2622.fasta.gz.fai
+   292   1460  14683 hpylori/hpylori250.fasta.gz.fai
+  5094  25470 256697 kpneumoniae/kpneumoniae1179.fasta.gz.fai
+  3361  16805 170949 senterica/senterica1596.fasta.gz.fai
+ 17407  87035 882362 total
 ```
 
 Distances:
@@ -137,8 +160,38 @@ Distances:
 ```shell
 # guix install mash
 
-ls *.fa.gz | while read f; do mash sketch $f; done
-mash triangle *.fa.gz >athaliana.mash_triangle.txt
+for genus_species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumoniae" "Helicobacter pylori"; do
+  echo $genus_species
+  
+  genus_species_lower=$(echo $genus_species | tr '[:upper:]' '[:lower:]')
+  g=$(echo $genus_species_lower | cut -f 1 -d ' ')
+  g=${g:0:1} # fist letter
+  species=$(echo $genus_species_lower | cut -f 2 -d ' ')
+  gspecies=$(echo $g$species)
+  
+  cd $gspecies
+  ls *.fa.gz | while read f; do mash sketch $f; done
+  mash triangle *.fa.gz >$gspecies.mash_triangle.txt
+  cd ..
+done
+```
+sbatch -p headnode -c 1 --wrap 'bash /lizardfs/guarracino/seqwish-paper/bacteria/assemblies/mash_triangle.sh'
+
+Top distances:
+
+```shell
+for genus_species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumoniae" "Helicobacter pylori"; do
+  echo $genus_species
+  
+  genus_species_lower=$(echo $genus_species | tr '[:upper:]' '[:lower:]')
+  g=$(echo $genus_species_lower | cut -f 1 -d ' ')
+  g=${g:0:1} # fist letter
+  species=$(echo $genus_species_lower | cut -f 2 -d ' ')
+  gspecies=$(echo $g$species)
+  
+  sed 1,1d $gspecies/$gspecies.mash_triangle.txt | tr '\t' '\n' | grep GCA -v | grep e -v | sort -g -k 1nr | uniq | head -n 50
+done
+
 ```
 
 
@@ -172,7 +225,7 @@ for s in 100000 50000 20000; do
     PAF=/lizardfs/guarracino/seqwish-paper/arabidopsis/alignment/arabidopsis.s$s.l$l.p$p.n9.paf
     for k in 79 29 7 0; do
       GFA=/lizardfs/guarracino/seqwish-paper/arabidopsis/graphs/arabidopsis.s$s.l$l.p$p.n9.k$k.B50M.gfa
-      sbatch -p workers -c 48 --wrap 'cd /scratch; \time -v ~/tools/wfmash/build/bin/wfmash-7fe6c05b57c030d71c64c586d8135d49d3a27528 '$ASSEMBLIES' '$ASSEMBLIES' -X -s '$s' -l '$l' -p '$p' -n 9 -t 48 > '$PAF'; \time -v ~/tools/seqwish/bin/seqwish-ccfefb016fcfc9937817ce61dc06bbcf382be75e -f '$ASSEMBLIES' -p '$PAF' -g '$GFA' -k '$k' -B50M -P'
+      sbatch -p workers -c 48 --wrap 'cd /scratch; \time -v ~/tools/wfmash/build/bin/wfmash-948f1683d14927745aef781cdabeb66ac6c7880b '$ASSEMBLIES' '$ASSEMBLIES' -X -s '$s' -l '$l' -p '$p' -n 9 -t 48 > '$PAF'; \time -v ~/tools/seqwish/bin/seqwish-ccfefb016fcfc9937817ce61dc06bbcf382be75e -f '$ASSEMBLIES' -p '$PAF' -g '$GFA' -k '$k' -B50M -P'
     done
   done
 done
