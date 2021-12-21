@@ -31,64 +31,86 @@
 \appnotes{Genome Analysis}
 
 \begin{document}
-    \firstpage{1}
+\firstpage{1}
 
-    \subtitle{Genome Analysis}
+\subtitle{Genome Analysis}
 
-    \title[seqwish: inducing pangenome graphs]{seqwish: inducing pangenome graphs}
-    \author[Garrison \textit{et~al}.]{
-        Erik~Garrison\,$^{\text{\sfb 1}*}$,
-        Andrea~Guarracino\,$^{\text{\sfb 2}}$
-    }
+\title[Multi-reference pangenome graphs]{Multi-reference pangenome graphs}
+\author[Garrison \textit{et~al}.]{
+Erik~Garrison\,$^{\text{\sfb 1}*}$,
+Andrea~Guarracino\,$^{\text{\sfb 2}}$
+}
 
-    \address{
-        $^{\text{\sf 1}}$University of Tennessee Health Science Center, Memphis, TN, USA \\
-        $^{\text{\sf 2}}$Genomics Research Centre, Human Technopole, Milan, Italy
-    }
+\address{
+$^{\text{\sf 1}}$University of Tennessee Health Science Center, Memphis, TN, USA \\
+$^{\text{\sf 2}}$Genomics Research Centre, Human Technopole, Milan, Italy
+}
 
-    \corresp{
-        $^\ast$To whom correspondence should be addressed. \\
-       % $^\dagger$Contributed equally.\
-    }
+\corresp{
+$^\ast$To whom correspondence should be addressed. \\
+% $^\dagger$Contributed equally.\
+}
 
-    \history{Received on XXXXX; revised on XXXXX; accepted on XXXXX}
+\history{Received on XXXXX; revised on XXXXX; accepted on XXXXX}
 
-    \editor{Associate Editor: XXXXXXX}
+\editor{Associate Editor: XXXXXXX}
 
-    \abstract{
-        \textbf{Motivation:}
-        Pangenome graphs provide a complete representation of the mutual alignment of collections of genomes.
-        One of its most common forms is the variation graph model.
-        A set of pairwise alignments imply a variation graph, but, to our knowledge, there are no methods to generate such a graph or lossless string graph from these alignments.\\
-        \textbf{Results:}
-        We wrote seqwish, a novel tool to induce a variation graph from a set of sequences and alignments between them.
-        seqwish operates in external memory, by conversion of the alignment set into an alignment graph and the subsequent
-        use of this graph in the elaboration of the variation graph including paths representing the input sequences.
-        The resulting graph is a lossless representation of the input and its alignments.\\
-        \textbf{Availability:}
-        seqwish is published as free software under the MIT open source license.
-        Source code and documentation are available at \url{https://github.com/ekg/seqwish}.
-        seqwish can be installed via Bioconda \url{https://bioconda.github.io/recipes/seqwish/README.html} or GNU Guix \url{https://github.com/ekg/guix-genomics/blob/master/seqwish.scm}. \\
-        \textbf{Contact:} \href{egarris5@uthsc.edu}{egarris5@uthsc.edu} \\
+\abstract{
+\textbf{Motivation:}
+Pangenome graphs provide a complete representation of the mutual alignment of collections of genomes.
+They are commonly modeled as variation graphs.
+A set of pairwise alignments imply a variation graph, but, to our knowledge, there are no methods to generate such a graph or lossless string graph from these alignments. \\
+\textbf{Results:}
+We design the \textit{seqwish} algorithm, which builds variation graph from a set of sequences and alignments between them.
+Our seqwish implementation operates in external memory, using disk-backed implicit interval trees and a lock-free parallel union find algorithm to transform the alignment set into an alignment graph, then a sequence graph, and finally a variation graph with paths representing the input sequences.
+%        use of this graph in the elaboration of the variation graph including paths representing the input sequences.
+The resulting graph is a lossless representation of the input and its alignments.\\
+\textbf{Availability:}
+seqwish is published as free software under the MIT open source license.
+Source code and documentation are available at \url{https://github.com/ekg/seqwish}.
+seqwish can be installed via Bioconda \url{https://bioconda.github.io/recipes/seqwish/README.html} or GNU Guix \url{https://github.com/ekg/guix-genomics/blob/master/seqwish.scm}. \\
+\textbf{Contact:} \href{egarris5@uthsc.edu}{egarris5@uthsc.edu} \\
 %\textbf{Supplementary information:} Supplementary data are available at \textit{Bioinformatics} online.
-    }
+}
 
-    \maketitle
-
-
-    \section{Introduction}
-    \label{sec:introduction}
-    A pangenome models the full genomic information of a species or clase~\FIXME{PMID:32034321}.
-    These models encode the mutual relationships between all the genomes represented, in contrast to reference-based approaches which relate sequences only to a particular genome, chosen as reference.
-    A class of methods to represent pangenomes involves the \texttt{sequence graphs} \FIXME{PMID:2488477}, where similar orthologous regions between genomes collapse into a single representative sequence.
-    In \texttt{node-labeled} sequence graphs, nodes indicate DNA sequences, with edges connecting the nodes that are concatenated in the sequences represented in the graph.
-    A \texttt{bidirected} sequence graph represents both strands of DNA.
-    On this model, variation graphs add the concept of \texttt{path} to embed linear sequences (e.g., genomes or haplotypes) into the graph\citep{Garrison:2018}.
-    Paths provide a stable coordinate system, allowing graph annotations and interoperability between different graphs.
+\maketitle
 
 
-    \section{Model}
+\section{Introduction}
+\label{sec:introduction}
+A pangenome models the full genomic information of a species or clade~\FIXME{PMID:32034321}.
+These models encode the mutual relationships between all the genomes represented, in contrast to reference-based approaches which relate sequences only to a particular ``reference'' genome.
+%In principle, pangenome graphs can allow for a great reduction in reference bias, allowing any part of a pangenome to be considered in biological studies. %, and may provide a simpler representation of structurally-variable regions.
+In a pangenome graph, variation can be understood in the context of any part of any included genome, which lets us avoid the problem of reference bias, or a limitation of analyses to sequences that are very similar to a chosen reference genome.
+
+Surprisingly, existing methods to build pangenome graphs from large genome assemblies are reference-based.
+Minigraph progressively builds a pangenome graph using by layering an ordered series of input genomes onto a specific reference.
+Cactus depends on a single guide tree to structure pairwise alignments between genomes.
+Both kinds of methods limit computational costs by reducing the number of pairwise comparisons, but in turn their results exhibit order and reference-dependency.
+
+Although a reference-guided approach is pragmatic when we only have a single reference genome, in humans and other species recent advances in sequencing and assembly are driving the generation of many reference-quality assemblies.
+Motivated by the need to generate ``multi-reference'' pangenome graphs, we present \textit{seqwish}, an algorithm that allows us to build pangenome graphs directly from a collection of sequences and pairwise alignments between them.
+Here, we formally describe the algorithm, evaluate its basic combinatoric bounds and costs, and present applications of the method to pangenome building problems in a variety of species.
+Our approach is both highly generic---in that we can apply it to truly any collection of sequences and alignments---but it easily scales to some of the largest species pangenome construction problems possible using publicly-available, high-quality genome assemblies.
+%Not only is our approach highly generic,but it also efficiently scales to both large and complex pangenomes.
+%with \textit{any} collection of alignments and sequences, 
+
+
+%Given recent advances in genome sequencing and assembly, we expect that soon, many species will have multiple reference-quality genomes.
+%To build a pangenome model from such genomes that is truly unbiased, we need an approach to build a multi-reference 
+%Motivated by the current availability of two reference-quality human genome assemblies 
+%The inability to build pangenome graphs from 
+
+\section{Model}
     \label{sec:model}
+
+A class of methods to represent pangenomes involves the \textit{sequence graphs} \FIXME{PMID:2488477}, where similar orthologous regions between genomes collapse into a single representative component in the graph.
+In \textit{node-labeled} sequence graphs, nodes indicate DNA sequences, with edges connecting the nodes that are concatenated in the sequences represented in the graph.
+A \textit{bidirected} sequence graph represents both strands of DNA.
+On this model, variation graphs add the concept of \textit{path} to embed linear sequences (e.g., genomes or haplotypes) into the graph\citep{Garrison:2018}.
+Paths provide a stable coordinate system, allowing graph annotations and interoperability between different graphs.
+
+
     A pangenome graph is a sequence model that encodes the mutual alignment of many genomes~\citep{Garrison_2019_thesis,Eizenga_2020}.
     In the variation graph, $V = (N, E, P)$, nodes $N = n_1\ldots n_{|N|}$ contain sequences of DNA.
     Each node $n_i$ has an identifier $i$ and an implicit reverse complement $\bar{n_i}$, and a node strand $s$ corresponds to one such orientations.
