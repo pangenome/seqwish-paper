@@ -92,41 +92,26 @@ sed 1,1d athaliana.mash_triangle.txt | tr '\t' '\n' | grep GCA -v | grep e -v | 
 0.0143027
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## All-vs-all alignment and graph induction
 
 ```shell
-mkdir -p /lizardfs/guarracino/seqwish-paper/arabidopsis/alignment/
-mkdir -p /lizardfs/guarracino/seqwish-paper/arabidopsis/graphs/
+mkdir -p /lizardfs/guarracino/seqwish-paper/athaliana/alignment/
+mkdir -p /lizardfs/guarracino/seqwish-paper/athaliana/graphs/
 
-ASSEMBLIES=/lizardfs/guarracino/seqwish-paper/arabidopsis/assemblies/arabidopsis.fasta.gz
+ASSEMBLIES=/lizardfs/guarracino/seqwish-paper/athaliana/assemblies/athaliana16.fasta.gz
 
-for s in 100000 50000 20000; do
-  for p in 95 90; do
-    l=$(echo $s '*' 3 | bc)
-    PAF=/lizardfs/guarracino/seqwish-paper/arabidopsis/alignment/arabidopsis.s$s.l$l.p$p.n9.paf
-    for k in 79 29 7 0; do
-      GFA=/lizardfs/guarracino/seqwish-paper/arabidopsis/graphs/arabidopsis.s$s.l$l.p$p.n9.k$k.B50M.gfa
-      sbatch -p workers -c 48 --wrap 'cd /scratch; \time -v ~/tools/wfmash/build/bin/wfmash-948f1683d14927745aef781cdabeb66ac6c7880b '$ASSEMBLIES' '$ASSEMBLIES' -X -s '$s' -l '$l' -p '$p' -n 9 -t 48 > '$PAF'; \time -v ~/tools/seqwish/bin/seqwish-ccfefb016fcfc9937817ce61dc06bbcf382be75e -f '$ASSEMBLIES' -p '$PAF' -g '$GFA' -k '$k' -B50M -P'
+for s in 20k 50k 100k; do
+  for p in 98 95 90; do
+    s_no_k=${s::-1}
+    l_no_k=$(echo $s_no_k '*' 3 | bc)
+    l=${l_no_k}k
+    
+    PAF=/lizardfs/guarracino/seqwish-paper/athaliana/alignment/athaliana16.s$s.l$l.p$p.n16.paf
+    for k in 311 229 179 127 79 49 29 11 0; do
+      GFA=/lizardfs/guarracino/seqwish-paper/athaliana/graphs/athaliana16.s$s.l$l.p$p.n16.k$k.B50M.gfa
+      sbatch -p 386mem -c 48 --job-name athaliana --wrap 'cd /scratch; \time -v ~/tools/wfmash/build/bin/wfmash-948f1683d14927745aef781cdabeb66ac6c7880b '$ASSEMBLIES' '$ASSEMBLIES' -X -s '$s' -l '$l' -p '$p' -n 16 -t 48 > '$PAF'; \time -v ~/tools/seqwish/bin/seqwish-ccfefb016fcfc9937817ce61dc06bbcf382be75e -f '$ASSEMBLIES' -p '$PAF' -g '$GFA' -k '$k' -B50M -P'
     done
   done
 done
-
 ```
 

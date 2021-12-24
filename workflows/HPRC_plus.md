@@ -49,9 +49,29 @@ zcat chm13.fa.gz grch38.fa.gz *genbank.fa.gz | bgzip -@ 48 -c > HPRC_plus.fa.gz 
 Cleaning:
 
 ```shell
-rm chm13.draft_v1.1.fasta.gz chm13.fa.gz GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz grch38*.fa.gz
+rm chm13.draft_v1.1.fasta.gz GCA_000001405.15_GRCh38_no_alt_analysis_set.fna.gz grch38*.fa.gz
 ```
 
+## Explore the assemblies
+
+```shell
+# guix install mash
+
+(echo grch38.fa.gz; echo chm13.fa.gz; ls *genbank.fa.gz) | while read f; do mash sketch $f; done
+assemblies=$(echo grch38.fa.gz; echo chm13.fa.gz; ls *genbank.fa.gz)
+mash triangle $assemblies > hprc_plus.mash_triangle.txt
+```
+
+Top distances:
+
+```shell
+sed 1,1d hprc_plus.mash_triangle.txt | tr '\t' '\n' | grep GCA -v | grep e -v | sort -g -k 1nr | head -n 5
+0.0026025
+0.00257463
+0.0025468
+0.00251903
+0.00251903
+```
 
 ## Alignment
 
@@ -113,6 +133,6 @@ done
 ```shell
 (echo 311; echo 229; echo 179; echo 127; echo 79; echo 29; echo 11; echo 0) | while read k; do
   g=/lizardfs/guarracino/seqwish-paper/hprc_plus/graphs/HPRC_plus.s100k.l300k.p98.n90.k16.seqwish.k$k.B50M.gfa
-  sbatch -p workers -c 48 --wrap 'hostname; cd /scratch && ~/tools/odgi/bin/odgi-9e9c4811169760f64690e86619dbd1b088ec5955 build -g '$g' -o '$g'.og -t 48 -P; ~/tools/odgi/bin/odgi-67a7e5bb2f328888e194845a362cef9c8ccc488f stats -i '$g'.og -S -W -L -N -b -t 48 -P > '$g'.og.stats.txt';
+  sbatch -p 386mem -c 48 --job-name odgik$k --wrap 'hostname; cd /scratch && ~/tools/odgi/bin/odgi-9e9c4811169760f64690e86619dbd1b088ec5955 build -g '$g' -o '$g'.og -t 48 -P; ~/tools/odgi/bin/odgi-67a7e5bb2f328888e194845a362cef9c8ccc488f stats -i '$g'.og -S -W -L -N -b -t 48 -P > '$g'.og.stats.txt';
 done
 ```
