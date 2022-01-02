@@ -1,0 +1,218 @@
+#length	nodes	edges	paths
+287036434	4668039	6410675	922
+##num_weakly_connected_components: 196
+#component	nodes	is_acyclic
+0	4663078	no
+1	865	no
+2	1	yes
+3	1	yes
+4	1	yes
+5	1	yes
+6	779	no
+7	1	yes
+8	1	yes
+9	1	yes
+10	1	yes
+11	1	yes
+12	1	yes
+13	1	yes
+14	323	yes
+15	1	yes
+16	1	yes
+17	1	yes
+18	1	yes
+19	1	yes
+20	1	yes
+21	1	yes
+22	113	no
+23	1	yes
+24	1	yes
+25	1	yes
+26	1	yes
+27	1	yes
+28	1	yes
+29	1	yes
+30	60	yes
+31	1	yes
+32	1	yes
+33	1	yes
+34	142	no
+35	1	yes
+36	1	yes
+37	83	yes
+38	1	yes
+39	1	yes
+40	1	yes
+41	1	yes
+42	1	yes
+43	1	yes
+44	1	yes
+45	1	yes
+46	1	yes
+47	1	yes
+48	1	yes
+49	44	yes
+50	1	yes
+51	1	yes
+52	1	yes
+53	1	yes
+54	1	yes
+55	1	yes
+56	1	yes
+57	1	yes
+58	1	yes
+59	1	yes
+60	1	yes
+61	39	no
+62	1	yes
+63	1	yes
+64	1	yes
+65	1	yes
+66	1	yes
+67	1	yes
+68	14	no
+69	1	yes
+70	1	yes
+71	1	yes
+72	14	no
+73	1	yes
+74	1	yes
+75	1	yes
+76	1	yes
+77	1	yes
+78	1	yes
+79	1	yes
+80	1	yes
+81	1	yes
+82	1	yes
+83	1	yes
+84	1	yes
+85	1	yes
+86	1	yes
+87	1	yes
+88	1	yes
+89	1	yes
+90	1	yes
+91	1	yes
+92	1	yes
+93	1	yes
+94	1	yes
+95	140	no
+96	1	yes
+97	1	yes
+98	1	yes
+99	309	yes
+100	1	yes
+101	1	yes
+102	1	yes
+103	998	no
+104	1	yes
+105	379	yes
+106	1	yes
+107	1	yes
+108	1	yes
+109	1	yes
+110	1	yes
+111	69	no
+112	1	yes
+113	32	yes
+114	1	yes
+115	1	yes
+116	1	yes
+117	1	yes
+118	1	yes
+119	1	yes
+120	1	yes
+121	1	yes
+122	106	no
+123	1	yes
+124	61	yes
+125	1	yes
+126	29	no
+127	1	yes
+128	1	yes
+129	1	yes
+130	1	yes
+131	1	yes
+132	1	yes
+133	1	yes
+134	1	yes
+135	1	yes
+136	1	yes
+137	1	yes
+138	1	yes
+139	1	yes
+140	134	no
+141	1	yes
+142	1	yes
+143	1	yes
+144	55	no
+145	1	yes
+146	1	yes
+147	1	yes
+148	1	yes
+149	1	yes
+150	1	yes
+151	1	yes
+152	1	yes
+153	1	yes
+154	1	yes
+155	1	yes
+156	1	yes
+157	1	yes
+158	1	yes
+159	1	yes
+160	1	yes
+161	1	yes
+162	1	yes
+163	1	yes
+164	1	yes
+165	1	yes
+166	1	yes
+167	1	yes
+168	1	yes
+169	1	yes
+170	1	yes
+171	1	yes
+172	1	yes
+173	1	yes
+174	1	yes
+175	1	yes
+176	1	yes
+177	1	yes
+178	1	yes
+179	1	yes
+180	1	yes
+181	1	yes
+182	1	yes
+183	1	yes
+184	1	yes
+185	1	yes
+186	1	yes
+187	1	yes
+188	1	yes
+189	1	yes
+190	1	yes
+191	1	yes
+192	1	yes
+193	1	yes
+194	1	yes
+195	1	yes
+#type	num
+total	16282
+unique	16282
+A	87754568
+B	7
+C	49256255
+D	21
+G	49157612
+H	17
+K	917
+M	951
+N	13308596
+R	1934
+S	638
+T	87551621
+V	9
+W	1194
+Y	2094

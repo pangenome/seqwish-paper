@@ -1,0 +1,96 @@
+octopus03
+[seqwish::seqidx] 0.001 indexing sequences
+[seqwish::seqidx] 14.127 index built
+[seqwish::alignments] 14.127 processing alignments
+[seqwish::alignments] 22.274 indexing
+[seqwish::alignments] 28.025 index built
+[seqwish::transclosure] 28.027 computing transitive closures
+[seqwish::transclosure] 28.148 0.00% 0-50000000 overlap_collect
+[seqwish::transclosure] 34.215 0.00% 0-50000000 rank_build
+[seqwish::transclosure] 38.790 0.00% 0-50000000 parallel_union_find
+[seqwish::transclosure] 42.903 0.00% 0-50000000 dset_write
+[seqwish::transclosure] 45.803 0.00% 0-50000000 dset_compression
+[seqwish::transclosure] 48.564 0.00% 0-50000000 dset_sort
+[seqwish::transclosure] 49.998 0.00% 0-50000000 dset_invert
+[seqwish::transclosure] 53.134 0.00% 0-50000000 graph_emission
+[seqwish::transclosure] 54.411 33.00% 50000000-100019061 overlap_collect
+[seqwish::transclosure] 59.977 33.00% 50000000-100019061 rank_build
+[seqwish::transclosure] 66.383 33.00% 50000000-100019061 parallel_union_find
+[seqwish::transclosure] 83.282 33.00% 50000000-100019061 dset_write
+[seqwish::transclosure] 86.552 33.00% 50000000-100019061 dset_compression
+[seqwish::transclosure] 89.426 33.00% 50000000-100019061 dset_sort
+[seqwish::transclosure] 91.006 33.00% 50000000-100019061 dset_invert
+[seqwish::transclosure] 93.435 33.00% 50000000-100019061 graph_emission
+[seqwish::transclosure] 154.386 67.29% 100019061-276006122 overlap_collect
+[seqwish::transclosure] 159.122 67.29% 100019061-276006122 rank_build
+[seqwish::transclosure] 162.279 67.29% 100019061-276006122 parallel_union_find
+[seqwish::transclosure] 168.911 67.29% 100019061-276006122 dset_write
+[seqwish::transclosure] 170.266 67.29% 100019061-276006122 dset_compression
+[seqwish::transclosure] 171.743 67.29% 100019061-276006122 dset_sort
+[seqwish::transclosure] 172.516 67.29% 100019061-276006122 dset_invert
+[seqwish::transclosure] 173.796 67.29% 100019061-276006122 graph_emission
+[seqwish::transclosure] 248.635 84.34% 276006122-557022832 overlap_collect
+[seqwish::transclosure] 252.231 84.34% 276006122-557022832 rank_build
+[seqwish::transclosure] 254.120 84.34% 276006122-557022832 parallel_union_find
+[seqwish::transclosure] 255.748 84.34% 276006122-557022832 dset_write
+[seqwish::transclosure] 256.470 84.34% 276006122-557022832 dset_compression
+[seqwish::transclosure] 257.115 84.34% 276006122-557022832 dset_sort
+[seqwish::transclosure] 257.499 84.34% 276006122-557022832 dset_invert
+[seqwish::transclosure] 258.093 84.34% 276006122-557022832 graph_emission
+[seqwish::transclosure] 292.829 91.93% 557027023-967202015 overlap_collect
+[seqwish::transclosure] 294.863 91.93% 557027023-967202015 rank_build
+[seqwish::transclosure] 296.254 91.93% 557027023-967202015 parallel_union_find
+[seqwish::transclosure] 296.530 91.93% 557027023-967202015 dset_write
+[seqwish::transclosure] 296.874 91.93% 557027023-967202015 dset_compression
+[seqwish::transclosure] 297.180 91.93% 557027023-967202015 dset_sort
+[seqwish::transclosure] 297.528 91.93% 557027023-967202015 dset_invert
+[seqwish::transclosure] 297.904 91.93% 557027023-967202015 graph_emission
+[seqwish::transclosure] 313.011 95.76% 967202015-1686224608 overlap_collect
+[seqwish::transclosure] 315.739 95.76% 967202015-1686224608 rank_build
+[seqwish::transclosure] 317.133 95.76% 967202015-1686224608 parallel_union_find
+[seqwish::transclosure] 317.231 95.76% 967202015-1686224608 dset_write
+[seqwish::transclosure] 317.476 95.76% 967202015-1686224608 dset_compression
+[seqwish::transclosure] 317.695 95.76% 967202015-1686224608 dset_sort
+[seqwish::transclosure] 317.999 95.76% 967202015-1686224608 dset_invert
+[seqwish::transclosure] 318.347 95.76% 967202015-1686224608 graph_emission
+[seqwish::transclosure] 322.983 98.62% 1686224608-1902510751 overlap_collect
+[seqwish::transclosure] 323.932 98.62% 1686224608-1902510751 rank_build
+[seqwish::transclosure] 325.372 98.62% 1686224608-1902510751 parallel_union_find
+[seqwish::transclosure] 325.384 98.62% 1686224608-1902510751 dset_write
+[seqwish::transclosure] 325.481 98.62% 1686224608-1902510751 dset_compression
+[seqwish::transclosure] 325.582 98.62% 1686224608-1902510751 dset_sort
+[seqwish::transclosure] 325.773 98.62% 1686224608-1902510751 dset_invert
+[seqwish::transclosure] 325.948 98.62% 1686224608-1902510751 graph_emission
+[seqwish::transclosure] 331.493 100.00% building node_iitree and path_iitree indexes
+[seqwish::transclosure] 334.346 100.00% done
+[seqwish::transclosure] 334.347 done with transitive closures
+[seqwish::compact] 334.347 compacting nodes
+[seqwish::compact] 338.615 done compacting
+[seqwish::compact] 338.718 built node index
+[seqwish::links] 338.719 finding graph links
+[seqwish::links] 349.419 links derived
+[seqwish::gfa] 349.419 writing graph
+[seqwish::gfa] 419.778 done
+	Command being timed: "/home/guarracino/tools/seqwish/bin/seqwish-ccfefb016fcfc9937817ce61dc06bbcf382be75e -t 48 -s /lizardfs/guarracino/seqwish-paper/athaliana/assemblies/athaliana16.fasta.gz -p /lizardfs/guarracino/seqwish-paper/athaliana/alignment/athaliana16.s20k.l60k.p90.n16.paf -g /scratch/athaliana16.s20k.l60k.p90.n16.k127.B50M.gfa -k 127 -B50M -P"
+	User time (seconds): 4196.17
+	System time (seconds): 70.04
+	Percent of CPU this job got: 1015%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 7:00.10
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 41106524
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 11034633
+	Voluntary context switches: 18000974
+	Involuntary context switches: 2820429
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 15184528
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

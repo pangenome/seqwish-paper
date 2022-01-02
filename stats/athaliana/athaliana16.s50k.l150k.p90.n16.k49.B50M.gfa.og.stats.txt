@@ -1,0 +1,139 @@
+#length	nodes	edges	paths
+241177433	5887092	8048923	922
+##num_weakly_connected_components: 117
+#component	nodes	is_acyclic
+0	5881589	no
+1	648	no
+2	1	yes
+3	1	yes
+4	1	yes
+5	1229	no
+6	1	yes
+7	1	yes
+8	1	yes
+9	1	yes
+10	1	yes
+11	1	yes
+12	1	yes
+13	45	yes
+14	1	yes
+15	204	no
+16	437	yes
+17	67	no
+18	1	yes
+19	176	no
+20	1	yes
+21	1	yes
+22	1	yes
+23	1	yes
+24	1	yes
+25	1	yes
+26	1	yes
+27	1	yes
+28	1	yes
+29	417	no
+30	1	yes
+31	1	yes
+32	17	yes
+33	11	yes
+34	1	yes
+35	1	yes
+36	1	yes
+37	326	no
+38	1	yes
+39	1	yes
+40	1	yes
+41	1	yes
+42	292	no
+43	1	yes
+44	1	yes
+45	1	yes
+46	1	yes
+47	29	yes
+48	1	yes
+49	1	yes
+50	1	yes
+51	1	yes
+52	1	yes
+53	1	yes
+54	66	no
+55	1	yes
+56	1	yes
+57	1	yes
+58	129	no
+59	37	no
+60	1	yes
+61	1	yes
+62	1	yes
+63	1	yes
+64	1	yes
+65	1	yes
+66	1	yes
+67	1	yes
+68	45	no
+69	1	yes
+70	1	yes
+71	1	yes
+72	11	yes
+73	1	yes
+74	1	yes
+75	1	yes
+76	1	yes
+77	1	yes
+78	1	yes
+79	1	yes
+80	1	yes
+81	1	yes
+82	1	yes
+83	1	yes
+84	1	yes
+85	1	yes
+86	1	yes
+87	1	yes
+88	1	yes
+89	1	yes
+90	1	yes
+91	1	yes
+92	1	yes
+93	1	yes
+94	1	yes
+95	1	yes
+96	1	yes
+97	1	yes
+98	1	yes
+99	1	yes
+100	1	yes
+101	1	yes
+102	1	yes
+103	1	yes
+104	1	yes
+105	363	yes
+106	1	yes
+107	1	yes
+108	1	yes
+109	1	yes
+110	1	yes
+111	92	no
+112	1	yes
+113	767	no
+114	1	yes
+115	1	yes
+116	1	yes
+#type	num
+total	23117
+unique	23117
+A	72842240
+B	7
+C	41193557
+D	21
+G	41153000
+H	17
+K	916
+M	949
+N	13308596
+R	1931
+S	636
+T	72672270
+V	9
+W	1190
+Y	2094

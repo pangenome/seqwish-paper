@@ -133,6 +133,9 @@ done
 ```shell
 (echo 311; echo 229; echo 179; echo 127; echo 79; echo 29; echo 11; echo 0) | while read k; do
   g=/lizardfs/guarracino/seqwish-paper/hprc_plus/graphs/HPRC_plus.s100k.l300k.p98.n90.k16.seqwish.k$k.B50M.gfa
-  sbatch -p 386mem -c 48 --job-name odgik$k --wrap 'hostname; cd /scratch && ~/tools/odgi/bin/odgi-9e9c4811169760f64690e86619dbd1b088ec5955 build -g '$g' -o '$g'.og -t 48 -P; ~/tools/odgi/bin/odgi-67a7e5bb2f328888e194845a362cef9c8ccc488f stats -i '$g'.og -S -W -L -N -b -t 48 -P > '$g'.og.stats.txt';
+  sbatch -p workers -c 48 --job-name odgik$k --wrap 'hostname; cd /scratch && ~/tools/odgi/bin/odgi-9e9c4811169760f64690e86619dbd1b088ec5955 build -g '$g' -o '$g'.og -t 48 -P; ~/tools/odgi/bin/odgi-67a7e5bb2f328888e194845a362cef9c8ccc488f stats -i '$g'.og -S -b -L -W -t 48 -P > '$g'.og.stats.txt';
 done
+
+# Compress GFA files
+ls /lizardfs/guarracino/seqwish-paper/hprc_plus/graphs/*.gfa | while read f; do echo $f; pigz $f; done
 ```
