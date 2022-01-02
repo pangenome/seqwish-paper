@@ -189,46 +189,62 @@ for genus_species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumo
   species=$(echo $genus_species_lower | cut -f 2 -d ' ')
   gspecies=$(echo $g$species)
   
-  sed 1,1d $gspecies/$gspecies.mash_triangle.txt | tr '\t' '\n' | grep GCA -v | grep e -v | sort -g -k 1nr | uniq | head -n 50
+  sed 1,1d $gspecies/$gspecies.mash_triangle.txt | tr '\t' '\n' | grep GCA -v | grep e -v | sort -g -k 1nr | uniq | head -n 5
 done
 
+Escherichia coli
+1
+0.295981
+0.263022
+0.243761
+0.23011
+Salmonella enterica
+1
+0.295981
+0.263022
+0.243761
+0.23011
+Klebsiella pneumoniae
+0.0653942
+0.0645437
+0.0642645
+0.0639874
+0.0637124
+Helicobacter pylori
+0.0794837
+0.0786628
+0.0782587
+0.0759181
+0.0755413
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## All-vs-all alignment and graph induction
+## All-vs-all alignment
 
 ```shell
-mkdir -p /lizardfs/guarracino/seqwish-paper/arabidopsis/alignment/
-mkdir -p /lizardfs/guarracino/seqwish-paper/arabidopsis/graphs/
+mkdir -p /lizardfs/guarracino/seqwish-paper/bacteria/alignment/
 
-ASSEMBLIES=/lizardfs/guarracino/seqwish-paper/arabidopsis/assemblies/arabidopsis.fasta.gz
+for genus_species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumoniae" "Helicobacter pylori"; do
+  echo $genus_species
+  
+  genus_species_lower=$(echo $genus_species | tr '[:upper:]' '[:lower:]')
+  g=$(echo $genus_species_lower | cut -f 1 -d ' ')
+  g=${g:0:1} # fist letter
+  species=$(echo $genus_species_lower | cut -f 2 -d ' ')
+  gspecies=$(echo $g$species)
+  
+  ASSEMBLIES=/lizardfs/guarracino/seqwish-paper/bacteria/assemblies/$gspecies/*fasta.gz
+  NUM_HAPLOTYPES=$(cut -f 1 -d '#' $ASSEMBLIES.fai | sort | uniq | wc -l)
+  FILENAME=$(basename $ASSEMBLIES .fasta.gz)
 
-for s in 100000 50000 20000; do
-  for p in 95 90; do
-    l=$(echo $s '*' 3 | bc)
-    PAF=/lizardfs/guarracino/seqwish-paper/arabidopsis/alignment/arabidopsis.s$s.l$l.p$p.n9.paf
-    for k in 79 29 7 0; do
-      GFA=/lizardfs/guarracino/seqwish-paper/arabidopsis/graphs/arabidopsis.s$s.l$l.p$p.n9.k$k.B50M.gfa
-      sbatch -p workers -c 48 --wrap 'cd /scratch; \time -v ~/tools/wfmash/build/bin/wfmash-948f1683d14927745aef781cdabeb66ac6c7880b '$ASSEMBLIES' '$ASSEMBLIES' -X -s '$s' -l '$l' -p '$p' -n 9 -t 48 > '$PAF'; \time -v ~/tools/seqwish/bin/seqwish-ccfefb016fcfc9937817ce61dc06bbcf382be75e -f '$ASSEMBLIES' -p '$PAF' -g '$GFA' -k '$k' -B50M -P'
-    done
+  for s in 1k 5k 10k 20k; do
+      for p in 95 90; do
+          s_no_k=${s::-1}
+          l_no_k=$(echo $s_no_k '*' 3 | bc)
+          l=${l_no_k}k
+            
+          PAF=/lizardfs/guarracino/seqwish-paper/bacteria/alignment/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.paf
+          sbatch -p workers -c 48 --job-name $gspecies --wrap 'hostname; cd /scratch; \time -v ~/tools/wfmash/build/bin/wfmash-948f1683d14927745aef781cdabeb66ac6c7880b '$ASSEMBLIES' '$ASSEMBLIES' -X -s '$s' -l '$l' -p '$p' -n '$NUM_HAPLOTYPES' -t 48 > '$PAF
+      done
   done
 done
-
 ```
-

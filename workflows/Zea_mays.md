@@ -125,7 +125,7 @@ mkdir -p /lizardfs/guarracino/seqwish-paper/zmays/alignment/
 ASSEMBLIES=/lizardfs/guarracino/seqwish-paper/zmays/assemblies/zmays41.fasta.gz
 
 # -p 98
-for s in 20k 50k 100k; do
+for s in 20k 50k; do
   for p in 98; do
     s_no_k=${s::-1}
     l_no_k=$(echo $s_no_k '*' 3 | bc)
@@ -137,7 +137,7 @@ for s in 20k 50k 100k; do
 done
 
 # -p 95
-for s in 20k 50k 100k; do
+for s in 20k 50k; do
   for p in 95; do
     s_no_k=${s::-1}
     l_no_k=$(echo $s_no_k '*' 3 | bc)
@@ -148,7 +148,7 @@ for s in 20k 50k 100k; do
   done
 done
 
-for s in 20k 50k 100k; do
+for s in 20k 50k; do
   for p in 95; do
     s_no_k=${s::-1}
     l_no_k=$(echo $s_no_k '*' 3 | bc)
@@ -168,16 +168,35 @@ done
 ```shell
 mkdir -p /lizardfs/guarracino/seqwish-paper/zmays/graphs/
 
-for s in 20k 50k 100k; do
-  for p in 98 95; do
+ASSEMBLIES=/lizardfs/guarracino/seqwish-paper/zmays/assemblies/zmays41.fasta.gz
+
+# -p 98
+for s in 20k 50k; do
+  for p in 98; do
     s_no_k=${s::-1}
     l_no_k=$(echo $s_no_k '*' 3 | bc)
     l=${l_no_k}k
     
     PAF=/lizardfs/guarracino/seqwish-paper/zmays/alignment/zmays41.s$s.l$l.p$p.n41.paf
-    for k in 311 229 179 127 79 49 29 11 0; do
-      GFA=/lizardfs/guarracino/seqwish-paper/zmays/graphs/zmays41.s$s.l$l.p$p.n41.k$k.B50M.gfa
-      sbatch -p 386mem -c 48 --job-name zmays --wrap 'hostname; cd /scratch; \time -v ~/tools/seqwish/bin/seqwish-ccfefb016fcfc9937817ce61dc06bbcf382be75e -s '$ASSEMBLIES' -p '$PAF' -g '$GFA' -k '$k' -B50M -P'
+    for k in 0 11 29 49 79 127 179 229 311; do
+      GFA=/scratch/zmays41.s$s.l$l.p$p.n41.k$k.B20M.gfa
+      sbatch -p 386mem -c 48 --job-name seqwish_zmays --wrap 'hostname; cd /scratch; \time -v ~/tools/seqwish/bin/seqwish-ccfefb016fcfc9937817ce61dc06bbcf382be75e -t 48 -s '$ASSEMBLIES' -p '$PAF' -g '$GFA' -k '$k' -B20M -P; mv '$GFA' /lizardfs/guarracino/seqwish-paper/zmays/graphs/'
+    done
+  done
+done
+
+# -p 95
+for s in 20k 50k; do
+  for p in 95; do
+    s_no_k=${s::-1}
+    l_no_k=$(echo $s_no_k '*' 3 | bc)
+    l=${l_no_k}k
+    
+    PAFS=$(ls /lizardfs/guarracino/seqwish-paper/zmays/alignment/zmays41.s$s.l$l.p$p.n41.chunk_*.paf | tr '\n' ',')
+    PAFS=${PAFS::-1}
+    for k in 0 11 29 49 79 127 179 229 311; do
+      GFA=/scratch/zmays41.s$s.l$l.p$p.n41.k$k.B20M.gfa
+      sbatch -p 386mem -c 48 --job-name seqwish_zmays --wrap 'hostname; cd /scratch; \time -v ~/tools/seqwish/bin/seqwish-ccfefb016fcfc9937817ce61dc06bbcf382be75e -t 48 -s '$ASSEMBLIES' -p '$PAFS' -g '$GFA' -k '$k' -B20M -P; mv '$GFA' /lizardfs/guarracino/seqwish-paper/zmays/graphs/'
     done
   done
 done
