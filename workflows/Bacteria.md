@@ -220,9 +220,40 @@ Helicobacter pylori
 
 ## All-vs-all alignment
 
-```shell
-mkdir -p /lizardfs/guarracino/seqwish-paper/bacteria/alignment/
+Mapping:
 
+```shell
+for genus_species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumoniae" "Helicobacter pylori"; do
+  echo $genus_species
+  
+  genus_species_lower=$(echo $genus_species | tr '[:upper:]' '[:lower:]')
+  g=$(echo $genus_species_lower | cut -f 1 -d ' ')
+  g=${g:0:1} # fist letter
+  species=$(echo $genus_species_lower | cut -f 2 -d ' ')
+  gspecies=$(echo $g$species)
+  
+  mkdir -p /lizardfs/guarracino/seqwish-paper/bacteria/alignment/$gspecies
+  
+  ASSEMBLIES=/lizardfs/guarracino/seqwish-paper/bacteria/assemblies/$gspecies/*fasta.gz
+  NUM_HAPLOTYPES=$(cut -f 1 -d '#' $ASSEMBLIES.fai | sort | uniq | wc -l)
+  FILENAME=$(basename $ASSEMBLIES .fasta.gz)
+
+  for s in 5k 10k; do
+      for p in 95; do
+          s_no_k=${s::-1}
+          l_no_k=$(echo $s_no_k '*' 3 | bc)
+          l=${l_no_k}k
+            
+          APPROX_PAF=/lizardfs/guarracino/seqwish-paper/bacteria/alignment/$gspecies/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.approx.paf
+          sbatch -p workers -c 48 --job-name $gspecies --wrap 'hostname; cd /scratch; \time -v ~/tools/wfmash/build/bin/wfmash-948f1683d14927745aef781cdabeb66ac6c7880b '$ASSEMBLIES' '$ASSEMBLIES' -X -s '$s' -l '$l' -p '$p' -n '$NUM_HAPLOTYPES' -t 48 -m > '${APPROX_PAF}
+      done
+  done
+done
+```
+
+Split mappings:
+
+```shell
 for genus_species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumoniae" "Helicobacter pylori"; do
   echo $genus_species
   
@@ -236,14 +267,46 @@ for genus_species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumo
   NUM_HAPLOTYPES=$(cut -f 1 -d '#' $ASSEMBLIES.fai | sort | uniq | wc -l)
   FILENAME=$(basename $ASSEMBLIES .fasta.gz)
 
-  for s in 1k 5k 10k 20k; do
-      for p in 95 90; do
+  for s in 5k 10k; do
+      for p in 95; do
           s_no_k=${s::-1}
           l_no_k=$(echo $s_no_k '*' 3 | bc)
           l=${l_no_k}k
             
-          PAF=/lizardfs/guarracino/seqwish-paper/bacteria/alignment/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.paf
-          sbatch -p workers -c 48 --job-name $gspecies --wrap 'hostname; cd /scratch; \time -v ~/tools/wfmash/build/bin/wfmash-948f1683d14927745aef781cdabeb66ac6c7880b '$ASSEMBLIES' '$ASSEMBLIES' -X -s '$s' -l '$l' -p '$p' -n '$NUM_HAPLOTYPES' -t 48 > '$PAF
+          APPROX_PAF=/lizardfs/guarracino/seqwish-paper/bacteria/alignment/$gspecies/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.approx.paf
+          python3 ~/tools/wfmash/scripts/split_approx_mappings_in_chunks.py $APPROX_PAF 10
+      done
+  done
+done
+```
+
+Alignment:
+
+```shell
+for genus_species in "Helicobacter pylori" "Klebsiella pneumoniae" "Salmonella enterica" "Escherichia coli" ; do
+  echo $genus_species
+  
+  genus_species_lower=$(echo $genus_species | tr '[:upper:]' '[:lower:]')
+  g=$(echo $genus_species_lower | cut -f 1 -d ' ')
+  g=${g:0:1} # fist letter
+  species=$(echo $genus_species_lower | cut -f 2 -d ' ')
+  gspecies=$(echo $g$species)
+  
+  ASSEMBLIES=/lizardfs/guarracino/seqwish-paper/bacteria/assemblies/$gspecies/*fasta.gz
+  NUM_HAPLOTYPES=$(cut -f 1 -d '#' $ASSEMBLIES.fai | sort | uniq | wc -l)
+  FILENAME=$(basename $ASSEMBLIES .fasta.gz)
+
+  for s in 5k 10k; do
+      for p in 95; do
+          s_no_k=${s::-1}
+          l_no_k=$(echo $s_no_k '*' 3 | bc)
+          l=${l_no_k}k
+          
+          seq 0 9 | while read i; do
+            APPROX_PAF=/lizardfs/guarracino/seqwish-paper/bacteria/alignment/$gspecies/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.approx.paf.chunk_$i.paf
+            PAF=/lizardfs/guarracino/seqwish-paper/bacteria/alignment/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.chunk_$i.paf.gz
+            sbatch -p workers -c 48 --job-name $gspecies --wrap 'hostname; cd /scratch; \time -v ~/tools/wfmash/build/bin/wfmash-948f1683d14927745aef781cdabeb66ac6c7880b '$ASSEMBLIES' '$ASSEMBLIES' -X -s '$s' -l '$l' -p '$p' -n '$NUM_HAPLOTYPES' -t 48 -i '$APPROX_PAF' | pigz -c > '$PAF
+          done
       done
   done
 done
