@@ -57,14 +57,17 @@ $^\ast$To whom correspondence should be addressed. \\
 
 \abstract{
 \textbf{Motivation:}
-Pangenome graphs provide a complete representation of the mutual alignment of collections of genomes.
-They are commonly modeled as variation graphs.
-A set of pairwise alignments imply a variation graph, but, to our knowledge, there are no methods to generate such a graph or lossless string graph from these alignments. \\
+Pangenome graphs, often formally encoded as variation graphs, moodel the mutual alignment of collections of genomes.
+A set of pairwise alignments imply a variation graph, but there are no scalable methods to generate such a graph or lossless string graph from these alignments.
+Existing approaches depend on a single reference or a specific ordering of genomes, and do not provide base-level information about the mapping of genomes into the pangenome.
+A scalable method to build pangenome graphs without such biases would be a key functional step in pangenome construction and manipulation pipelines. \\
 \textbf{Results:}
 We design the \textit{seqwish} algorithm, which builds variation graph from a set of sequences and alignments between them.
-Our seqwish implementation operates in external memory, using disk-backed implicit interval trees and a lock-free parallel union find algorithm to transform the alignment set into an alignment graph, then a sequence graph, and finally a variation graph with paths representing the input sequences.
-%        use of this graph in the elaboration of the variation graph including paths representing the input sequences.
-The resulting graph is a lossless representation of the input and its alignments.\\
+We first transform the alignment set into an interval tree.
+To build up the variation graph, we query this tree-based representation of the alignments to reduce transitive matches into single DNA segments in a sequence graph.
+By recording the mapping from input sequence to output graph, we can trace the original paths through this graph, yielding a pangenome graph.
+We present an implementation that operates in external memory, using disk-backed implicit interval trees and a lock-free parallel algorithm to drive the core graph induction step.
+We demonstrate that our method scales to very large graph induction problems, and apply our work to build graphs from dozens of genomes from the same or different species in clades throughout the tree of life. \\
 \textbf{Availability:}
 seqwish is published as free software under the MIT open source license.
 Source code and documentation are available at \url{https://github.com/ekg/seqwish}.
@@ -86,7 +89,7 @@ In a pangenome graph, variation can be understood in the context of any part of 
 Surprisingly, existing methods to build pangenome graphs from large genome assemblies are reference-based.
 Minigraph progressively builds a pangenome graph using by layering an ordered series of input genomes onto a specific reference.
 Cactus depends on a single guide tree to structure pairwise alignments between genomes.
-Both kinds of methods limit computational costs by reducing the number of pairwise comparisons, but in turn their results exhibit order and reference-dependency.
+Both kinds of methods limit computational costs by reducing the number of pairwise comparisons, but in turn their results depend on input genome order, selected reference, and guide-tree topology.
 
 Although a reference-guided approach is pragmatic when we only have a single reference genome, in humans and other species recent advances in sequencing and assembly are driving the generation of many reference-quality assemblies.
 Motivated by the need to generate ``multi-reference'' pangenome graphs, we present \textit{seqwish}, an algorithm that allows us to build pangenome graphs directly from a collection of sequences and pairwise alignments between them.
@@ -240,7 +243,8 @@ Memory usage during construction and traversal is limited by the use of sorted d
 
     \section*{Acknowledgements}
 
-    We thank members of the HPRC production teams for their development of resources used in our exposition.
+    We thank Richard Durbin, Benedict Paten, and Simon Puglisi for support and helpful discussions in the development of this algorithm.
+    %We are greatful to members of the HPRC production teams for their development of resources used in our exposition.
 
     \section*{Funding}
 
