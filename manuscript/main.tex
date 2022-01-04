@@ -81,20 +81,25 @@ seqwish can be installed via Bioconda \url{https://bioconda.github.io/recipes/se
 
 \section{Introduction}
 \label{sec:introduction}
-A pangenome models the full genomic information of a species or clade~\FIXME{PMID:32034321}.
-These models encode the mutual relationships between all the genomes represented, in contrast to reference-based approaches which relate sequences only to a particular ``reference'' genome.
+A pangenome models the full genomic information of a species or clade \citep{Medini_2005,Sherman_2020}.
+In contrast to reference-based approaches that relate sequences to a particular reference genome, methods that use pangenome reference systems attempt to model the mutual relationship between all represented genomes \citep{cpang2018}.
+%These models encode the mutual relationships between all the genomes represented, in contrast to reference-based approaches which relate sequences only to a particular ``reference'' genome.
 %In principle, pangenome graphs can allow for a great reduction in reference bias, allowing any part of a pangenome to be considered in biological studies. %, and may provide a simpler representation of structurally-variable regions.
-In a pangenome graph, variation can be understood in the context of any part of any included genome, which lets us avoid the problem of reference bias, or a limitation of analyses to sequences that are very similar to a chosen reference genome.
+Popular approaches model the pangenome alignment as a \textit{pangenome graph}.
+Conceptually, the pangenome graph relates genomes as walks through and underlying DNA sequence language encoded as a sequence graph. 
+In a pangenome graph, variation can be understood in the context of any part of any included genome, which lets us avoid the problem of reference bias, or a limitation of analyses to sequences that are very similar to a chosen reference genome \cite{Eizenga_2020}.
 
 Surprisingly, existing methods to build pangenome graphs from large genome assemblies are reference-based.
-Minigraph progressively builds a pangenome graph using by layering an ordered series of input genomes onto a specific reference.
-Cactus depends on a single guide tree to structure pairwise alignments between genomes.
+Minigraph progressively builds a pangenome graph using by layering an ordered series of input genomes onto a specific reference \citep{Li:2020}.
+Cactus depends on a single guide tree to structure pairwise alignments between genomes \citep{Armstrong:2020}.
 Both kinds of methods limit computational costs by reducing the number of pairwise comparisons, but in turn their results depend on input genome order, selected reference, and guide-tree topology.
 
-Although a reference-guided approach is pragmatic when we only have a single reference genome, in humans and other species recent advances in sequencing and assembly are driving the generation of many reference-quality assemblies.
-Motivated by the need to generate ``multi-reference'' pangenome graphs, we present \textit{seqwish}, an algorithm that allows us to build pangenome graphs directly from a collection of sequences and pairwise alignments between them.
+Although a reference-guided approach is pragmatic when we only have a single reference genome, in humans and other species recent advances in sequencing and assembly are driving the generation of many reference-quality assemblies \cite{Nurk_2021}.
+Motivated by the need to generate ``multi-reference'' pangenome graphs, we develop \textit{seqwish}, an algorithm that allows us to build pangenome graphs directly from a collection of sequences and pairwise alignments between them.
 Here, we formally describe the algorithm, evaluate its basic combinatoric bounds and costs, and present applications of the method to pangenome building problems in a variety of species.
-Our approach is both highly generic---in that we can apply it to truly any collection of sequences and alignments---but it easily scales to some of the largest species pangenome construction problems possible using publicly-available, high-quality genome assemblies.
+%Our approach is both highly generic and scalable.
+We can apply our method to any collection of sequences and alignments.
+It easily scales to some of the largest species pangenome construction problems possible using publicly-available, high-quality genome assemblies.
 %Not only is our approach highly generic,but it also efficiently scales to both large and complex pangenomes.
 %with \textit{any} collection of alignments and sequences, 
 
@@ -107,41 +112,31 @@ Our approach is both highly generic---in that we can apply it to truly any colle
 \section{Model}
 \label{sec:model}
 
-A class of methods to represent pangenomes involves the \textit{sequence graphs} \FIXME{PMID:2488477}, where similar orthologous regions between genomes collapse into a single representative component in the graph.
+A class of methods to represent pangenomes involves the \textit{sequence graph} \citep{Hein_1989}, where identical segments of different genomes collapse into a single representative segment (often node) in the graph.
 In \textit{node-labeled} sequence graphs, nodes indicate DNA sequences, with edges connecting the nodes that are concatenated in the sequences represented in the graph.
 A \textit{bidirected} sequence graph represents both strands of DNA.
-On this model, variation graphs add the concept of \textit{path} to embed linear sequences (e.g., genomes or haplotypes) into the graph\citep{Garrison:2018}.
+On this model, variation graphs add the concept of \textit{path} to embed linear sequences (e.g., genomes or haplotypes) into the graph \citep{Garrison_2018}.
 Paths provide a stable coordinate system, allowing graph annotations and interoperability between different graphs.
 
 A pangenome graph is a sequence model that encodes the mutual alignment of many genomes \citep{Garrison_2019_thesis,Eizenga_2020}.
 In the variation graph, $V = (N, E, P)$, nodes $N = n_1\ldots n_{|N|}$ contain sequences of DNA.
-Each node $n_i$ has an identifier $i$ and an implicit reverse complement $\bar{n_i}$, and a node strand $s$ corresponds to one such orientations.
-Edges $E = e_1\ldots e_{|E|}$ represent ordered pairs of node strands: $e_i = ( s_a, s_b )$.
-Paths $P = p_1\ldots p_{|P|}$ describe walks over node strands: $p_i = s_1 \ldots s_{|p_i|}$.
+Each node $n_i$ has a unique numerical identifier $i$ and an implicit reverse complement $\bar{n_i}$.
+A node strand $s$ corresponds to one node orientation.
+Edges $E = e_1\ldots e_{|E|}$ connect ordered pairs of node strands: $e_i = ( s_a, s_b )$, encoding the base topology of the sequence graph.
+Paths $P = p_1\ldots p_{|P|}$ describe walks over node strands: $p_i = s_1 \ldots s_{|p_i|}$, storing a collection of genomes written terms of the sequence graph.
 
-A variation graph represents all pairwise alignments between its paths.
-It follows that we can construct a variation graph from a set of pairwise alignments.
-We do so in a process based on three distinct graph models.
-(\textit{1}) We transform the alignments and input sequences into an \textit{alignment graph} \cite{Kehr_2014}.
-(\textit{2}) We then contract match components in this graph into single nodes of a \textit{sequence graph}.
+A variation graph models a set of pairwise alignments between its embedded paths.
+The variation graph shows that two sequences match when they both ``step'' on the same node or series of nodes.
+This is trivial given our definition.
+If two sub-paths contain the same set of steps, they must have identical subsequences.
+%Thus, to represent alignments in the graph, we built it by rendering matches into the graph
+We can construct a variation graph from a set of pairwise alignments by guaranteeing that each matching pair of subsequences are represented in a single walk in the output graph.
+
+We do so in a process based on three complementary graph models.
+(\textit{1}) We transform the alignments and input sequences into an \textit{alignment graph} \citep{Kehr_2014}.
+(\textit{2}) We then contract match components in this graph into single nodes of a \textit{sequence graph} \citep{Hein_1989}.
 (\textit{3}) By recording the translation from alignment graph nodes to sequence graph nodes, we are able to walk the input sequences through the graph.
-In doing so, we are able to derive edges and label the paths of a \textit{variation graph} which captures the pairwise alignments and all implied transitive relationships between them.
-
-
-
-%Finally, we derive edges and label the paths of the output variation graph by  
-
-%A set of pairwise alignments imply a variation graph.
-
-%We can see that pairs of aligned sequences would be represented as single 
-
-%, however, to our knowledge, there is no existing method that can generate the variation graph or lossless string graph from large input alignments with arbitrary properties.
-
-%We first formalize the graph induction algorithm that we will implement
-
-%To explore this,  algorithm to do so that operates in external memory by conversion of the alignment set into an alignment graph and the subsequent use of this graph in the elaboration of the variation graph including paths representing the input sequences.
-%The resulting graph is a lossless representation of the input and the alignments between them.
-%To distinguish the approach from string graphs, which imply error correction, we call the result of this variation graph induction model the \emph{squish graph}.
+In doing so, we are able to derive edges and label the paths of a \textit{variation graph} \citep{Garrison_2018} which captures the pairwise alignments and all implied transitive relationships between them.
 
 \subsection{Sequence index}
 
@@ -163,9 +158,9 @@ We encode the set of input pairwise alignments between sequences in $Q$ as objec
 Although these alignments tend to be represented using oriented interval pairs in $Q$, for simplicity and robustness to graph complexity, we describe $A$ as a set of pairs of bidirectional positions (sequence offsets and strands) $[1 \ldots |Q_1 \ldots Q_{|Q|}|]$ , such that $A = \{ (b_{q}, b_{r}), \ldots \}$.
 We sort $A$ by the first member ($b_{q}$) of each pair, ensuring that the entries in $A$ are ordered according to their order in $Q$.
 
-    To query the induced graph we build a rank/select dictionary allowing efficient traversal of $A$, based on a bit vector $A_{bv}$ of the same length as $A$ such that we record a 1 at those positions which correspond to the first instance of a given $b_{q}$ and record a 0 in $A_{bv}$ otherwise.
-    We record which $b_{q}$ we have processed in the bitvector $Q_{seen}$ which is of the same length as $Q$.
-    This allows us to avoid a quadratic penalty in the order of the size of the transitive closures in $Q$ generated by pairs in $A$.
+To query the induced graph we build a rank/select dictionary allowing efficient traversal of $A$, based on a bit vector $A_{bv}$ of the same length as $A$ such that we record a 1 at those positions which correspond to the first instance of a given $b_{q}$ and record a 0 in $A_{bv}$ otherwise.
+We record which $b_{q}$ we have processed in the bitvector $Q_{seen}$ which is of the same length as $Q$.
+This allows us to avoid a quadratic penalty in the order of the size of the transitive closures in $Q$ generated by pairs in $A$.
 
 Now we inductively derive the graph implied by the alignments.
 For each base $b_{q}$ in $Q$ not already marked in $Q_{seen}$, we find its transitive closure $c_{q} := \{b_{q}, b_{r_{1}}, \ldots \}$ by traversing aligned base pairs recorded in $A$.

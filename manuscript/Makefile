@@ -1,12 +1,10 @@
 all: main.pdf
 
-main.pdf: main.tex main.bbl fig/* *.tex
-	pdflatex main.tex </dev/null
-	pdflatex main.tex </dev/null
-
-main.bbl: document.bib
+main.pdf: main.tex document.bib fig/* *.tex
 	pdflatex main </dev/null
 	bibtex main </dev/null
+	pdflatex main.tex </dev/null
+	pdflatex main.tex </dev/null
 
 clean:
 	rm -f main.aux main.toc main.pdf main.log main.bbl main.blg
