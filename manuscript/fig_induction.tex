@@ -10,6 +10,7 @@
     node distance= 10mm and 20mm,
     roundnode/.style={circle, draw=black!60, fill=gray!10, very thick, minimum size=7mm},
     squarednode/.style={rectangle, draw=black!60, fill=gray!10, very thick, minimum size=5mm},
+    keynode/.style={rectangle, draw=black!60, fill=gray!10, thick, minimum size=1mm}
 ]
 %Nodes
 \node[squarednode] (seqA1) {G};
@@ -112,15 +113,15 @@
 \draw[line width=0.5,color=gray,looseness=0.5] (seqB2.south) to (g3);
 
 \begin{scope}[node distance=0.5cm]
-  \node[squarednode,fill=red!100] (c1) [right = 1cm of seqA7] {1};
-  \node[squarednode,fill={rgb:red,1;orange,1}] (c2) [below of=c1] {2};
-  \node[squarednode,fill=orange!100] (c3) [below of=c2] {3};
-  \node[squarednode,fill=green!100] (c4) [below of=c3] {4};
-  \node[squarednode,fill={rgb:blue,1;green,1},text=white] (c5) [below of=c4] {5};
-  \node[squarednode,fill=blue!100,text=white] (c6) [below of=c5] {6};
-  \node[squarednode,fill={rgb:blue,1;purple,1},text=white] (c7) [below of=c6] {7};
-  \node[squarednode,fill=purple!100] (c8) [below of=c7] {8};
-  \node[squarednode,fill=gray] (c9) [below of=c8] {9};
+  \node[keynode,fill=red!100] (c1) [right = 1cm of seqA7] {1};
+  \node[keynode,fill={rgb:red,1;orange,1}] (c2) [below of=c1] {2};
+  \node[keynode,fill=orange!100] (c3) [below of=c2] {3};
+  \node[keynode,fill=green!100] (c4) [below of=c3] {4};
+  \node[keynode,fill={rgb:blue,1;green,1},text=white] (c5) [below of=c4] {5};
+  \node[keynode,fill=blue!100,text=white] (c6) [below of=c5] {6};
+  \node[keynode,fill={rgb:blue,1;purple,1},text=white] (c7) [below of=c6] {7};
+  \node[keynode,fill=purple!100] (c8) [below of=c7] {8};
+  \node[keynode,fill=gray] (c9) [below of=c8] {9};
 \end{scope}
 
 \end{pgfonlayer}
