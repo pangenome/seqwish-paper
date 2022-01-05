@@ -1,25 +1,37 @@
 \documentclass{article}
 \usepackage{tikz}
 \usetikzlibrary{positioning}
+
+\pgfdeclarelayer{bg}    % declare background layer
+\pgfsetlayers{bg,main}  % set the order of the layers (main is the standard layer)
+
 \begin{document}
-\begin{tikzpicture}[
-roundnode/.style={circle, draw=green!60, fill=green!5, very thick, minimum size=7mm},
-squarednode/.style={rectangle, draw=red!60, fill=red!5, very thick, minimum size=5mm},
+\begin{tikzpicture}[auto,
+    node distance= 10mm and 20mm,
+    roundnode/.style={circle, draw=black!60, fill=gray!10, very thick, minimum size=7mm},
+    squarednode/.style={rectangle, draw=black!60, fill=gray!10, very thick, minimum size=5mm},
 ]
 %Nodes
 \node[squarednode] (seqA1) {G};
-\node[squarednode] (seqA2) [right=of seqA1] {A};
-\node[squarednode] (seqA3) [right=of seqA2] {T};
-\node[squarednode] (seqA4) [right=of seqA3] {T};
-\node[squarednode] (seqA5) [right=of seqA4] {A};
-\node[squarednode] (seqA6) [right=of seqA5] {C};
-\node[squarednode] (seqA7) [right=of seqA6] {A};
-
-\node[squarednode] (seqB1) [below=of seqA1] {Q};
+\node[squarednode] (seqA2) [right of=seqA1] {A};
+\node[squarednode] (seqA3) [right of=seqA2] {T};
+\node[squarednode] (seqA4) [right of=seqA3] {T};
+\node[squarednode] (seqA5) [right of=seqA4] {A};
+\node[squarednode] (seqA6) [right of=seqA5] {C};
+\node[squarednode] (seqA7) [right of=seqA6] {A};
 
 %\node[roundnode]        (uppercircle)       [above=of seqA1] {1};
 %\node[squarednode]      (rightsquare)       [below=of seqA1] {3};
 %\node[roundnode]        (lowercircle)       [below=of seqA1] {4};
+
+
+\node[squarednode] (seqB1) [below of=seqA1] {G};
+\node[squarednode] (seqB2) [right of=seqB1] {C};
+\node[squarednode] (seqB3) [right of=seqB2] {T};
+\node[squarednode] (seqB4) [right of=seqB3] {T};
+\node[squarednode] (seqB5) [right of=seqB4] {A};
+\node[squarednode] (seqB6) [right of=seqB5] {C};
+\node[squarednode] (seqB7) [right of=seqB6] {G};
 
 %Lines
 \draw (seqA1) -- (seqA2);
@@ -28,6 +40,90 @@ squarednode/.style={rectangle, draw=red!60, fill=red!5, very thick, minimum size
 \draw (seqA4) -- (seqA5);
 \draw (seqA5) -- (seqA6);
 \draw (seqA6) -- (seqA7);
+
+\draw (seqB1) -- (seqB2);
+\draw (seqB2) -- (seqB3);
+\draw (seqB3) -- (seqB4);
+\draw (seqB4) -- (seqB5);
+\draw (seqB5) -- (seqB6);
+\draw (seqB6) -- (seqB7);
+
+\node[squarednode] (seqC1) [below of=seqB1] {G};
+\node[squarednode] (seqC2) [right of=seqC1] {A};
+\node[squarednode] (seqC3) [right of=seqC2] {T};
+\node[squarednode] (seqC4) [right of=seqC3] {C};
+\node[squarednode] (seqC5) [right of=seqC4] {A};
+
+\draw (seqC1) -- (seqC2);
+\draw (seqC2) -- (seqC3);
+\draw (seqC3) -- (seqC4);
+\draw (seqC4) -- (seqC5);
+
+%\begin{scope}[node distance=0.5cm]
+  \node[roundnode] (g2) [below = 3cm of seqA1] {A};
+\node[roundnode] (g1) [below left of=g2] {G};
+\node[roundnode] (g3) [below right of=g2] {C};
+\node[roundnode] (g4) [above right of=g3] {T};
+\node[roundnode] (g5) [right of=g4] {T};
+\node[roundnode] (g6) [right of=g5] {A};
+\node[roundnode] (g7) [right of=g6] {C};
+\node[roundnode] (g8) [above right of=g7] {A};
+\node[roundnode] (g9) [below right of=g7] {G};
+%\end{scope}
+
+\draw (g1) to (g2);
+\draw (g1) to (g3);
+\draw (g2) to (g4);
+\draw (g3) to (g4);
+\draw (g4) to (g5);
+\draw (g4) to [looseness=1] (g7);
+\draw (g5) to (g6);
+\draw (g6) to (g7);
+\draw (g7) to (g8);
+\draw (g7) to (g9);
+
+\begin{pgfonlayer}{bg}    % select the background layer
+\draw[line width=1,color=red!100,looseness=1] (seqA1.south) to (g1);
+\draw[line width=1,color=red!100,looseness=1] (seqB1.south) to (g1);
+\draw[line width=1,color=red!100,looseness=1] (seqC1.south) to (g1);
+
+\draw[line width=1,color={rgb:red,1;orange,1},looseness=0.5] (seqA2.south) to (g2);
+\draw[line width=1,color={rgb:red,1;orange,1},looseness=0.5] (seqC2.south) to (g2);
+
+\draw[line width=1,color=orange!100,looseness=0.5] (seqA3.south) to (g4);
+\draw[line width=1,color=orange!100,looseness=0.5] (seqB3.south) to (g4);
+\draw[line width=1,color=orange!100,looseness=0.5] (seqC3.south) to (g4);
+
+\draw[line width=1,color=green!100,looseness=0.5] (seqA4.south) to (g5);
+\draw[line width=1,color=green!100,looseness=0.5] (seqB4.south) to (g5);
+%\draw[line width=1,color=blue!100,looseness=0.5] (seqC3.south) to (g4);
+
+\draw[line width=1,color={rgb:blue,1;green,1},looseness=0.5] (seqA5.south) to (g6);
+\draw[line width=1,color={rgb:blue,1;green,1},looseness=0.5] (seqB5.south) to (g6);
+
+\draw[line width=1,color=blue!100,looseness=0.5] (seqA6.south) to (g7);
+\draw[line width=1,color=blue!100,looseness=0.5] (seqB6.south) to (g7);
+
+\draw[line width=1,color={rgb:blue,1;purple,1},looseness=0.5] (seqA7.south) to (g8);
+\draw[line width=1,color={rgb:blue,1;purple,1},looseness=0.5] (seqC5.south) to (g8);
+
+\draw[line width=1,color=purple!100,looseness=0.5] (seqB7.south) to (g9);
+
+\draw[line width=1,color=gray,looseness=0.5] (seqB2.south) to (g3);
+
+\begin{scope}[node distance=0.5cm]
+  \node[squarednode,fill=red!100] (c1) [right = 1cm of seqA7] {1};
+  \node[squarednode,fill={rgb:red,1;orange,1}] (c2) [below of=c1] {2};
+  \node[squarednode,fill=orange!100] (c3) [below of=c2] {3};
+  \node[squarednode,fill=green!100] (c4) [below of=c3] {4};
+  \node[squarednode,fill={rgb:blue,1;green,1},text=white] (c5) [below of=c4] {5};
+  \node[squarednode,fill=blue!100,text=white] (c6) [below of=c5] {6};
+  \node[squarednode,fill={rgb:blue,1;purple,1},text=white] (c7) [below of=c6] {7};
+  \node[squarednode,fill=purple!100] (c8) [below of=c7] {8};
+  \node[squarednode,fill=gray] (c9) [below of=c8] {9};
+\end{scope}
+
+\end{pgfonlayer}
 
 %\draw[->] (uppercircle.south) -- (seq1.north);
 %\draw[->] (seq1.east) -- (rightsquare.west);
