@@ -109,7 +109,7 @@ It easily scales to some of the largest species pangenome construction problems 
 %Motivated by the current availability of two reference-quality human genome assemblies 
 %The inability to build pangenome graphs from 
 
-\section{Model}
+\section{Variation graph induction}
 \label{sec:model}
 
 A class of methods to represent pangenomes involves the \textit{sequence graph} \citep{Hein_1989}, where identical segments of different genomes collapse into a single representative segment (often node) in the graph.
@@ -123,13 +123,14 @@ In the variation graph, $V = (N, E, P)$, nodes $N = n_1\ldots n_{|N|}$ contain s
 Each node $n_i$ has a unique numerical identifier $i$ and an implicit reverse complement $\bar{n_i}$.
 A node strand $s$ corresponds to one node orientation.
 Edges $E = e_1\ldots e_{|E|}$ connect ordered pairs of node strands: $e_i = ( s_a, s_b )$, encoding the base topology of the sequence graph.
-Paths $P = p_1\ldots p_{|P|}$ describe walks over node strands: $p_i = s_1 \ldots s_{|p_i|}$, storing a collection of genomes written terms of the sequence graph.
+Paths $P = p_1\ldots p_{|P|}$ describe walks over node strands: $p_i = s_1 \ldots s_{|p_i|}$, storing a collection of genomes written in terms of the sequence graph.
 
-A variation graph models a set of pairwise alignments between its embedded paths.
-The variation graph shows that two sequences match when they both ``step'' on the same node or series of nodes.
-This is trivial given our definition.
+A variation graph represents pairwise alignments between its embedded paths.
+We infer that two sequences match when they both ``step'' on the same node or series of nodes.
+This follows from our definition of the graph itself.
 If two sub-paths contain the same set of steps, they must have identical subsequences.
 %Thus, to represent alignments in the graph, we built it by rendering matches into the graph
+%The core of our graph constr TODO HERE
 We can construct a variation graph from a set of pairwise alignments by guaranteeing that each matching pair of subsequences are represented in a single walk in the output graph.
 
 We do so in a process based on three complementary graph models.
@@ -138,14 +139,23 @@ We do so in a process based on three complementary graph models.
 (\textit{3}) By recording the translation from alignment graph nodes to sequence graph nodes, we are able to walk the input sequences through the graph.
 In doing so, we are able to derive edges and label the paths of a \textit{variation graph} \citep{Garrison_2018} which captures the pairwise alignments and all implied transitive relationships between them.
 
-\subsection{Sequence index}
 
-As input, we have $Q$, which is a concatenation of the sequences from which we will build the graph.
-We build a compressed suffix array (CSA) mapping sequence names to offsets in $Q$, and also the inverse using a rank/select dictionary on a bitvector marking the starts of sequences in $Q$.
+\subsection{Sequence input}
+
+As input, we have $Q = g_1 \ldots g_N$, which is a concatenation of the $N$ genome sequences from which we will build the graph.
+Using a compressed suffix array (CSA) over sequence names, we build an index that maps between offsets in all genomes and offsets in $Q$ via lookup of the sequence name in the CSA.
 This allows us to map between positions in the sequences of $Q$, which is the format in which alignment algorithms typically express alignments, and positions in $Q$ itself, which is the coordinate space we will use as a basis for the generation of our graph.
 
-
 \subsection{Alignment graph}
+
+Alignments between genomes imply a set of exact matches between subsequences of $Q$, which we represent as interval pairs $m := ((q_b, q_e), (t_b, t_e))$.
+We encode the $X$ matches in a set of alignments made by an external method \cite{wfmash,Li_2018} in $A = m_1 \ldots m_X$.
+
+\citep{Li_bedtk_2020}.
+
+
+
+
 
 \FIXME{To integrate to the text} The alignment graph formalizes the collection of alignments between genomes.
 In this graph, each base pair in the input genomes is represented by a node.
