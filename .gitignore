@@ -274,4 +274,10 @@ TSWLatexianTemp*
 
 # Makeindex log files
 *.lpz
-/manuscript/main.pdf
+
+# emacs poop
+*~
+
+# outputs
+manuscript/main.pdf
+manuscript/fig_induction.pdf
