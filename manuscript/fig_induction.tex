@@ -50,24 +50,24 @@
 \node[squarednode] (seqC5) [right of=seqC4] {A};
 
 %Lines
-\draw[very thick,color=red] (seqA1) -- (seqA2);
-\draw[very thick,color=red] (seqA2) -- (seqA3);
-\draw[very thick,color=red] (seqA3) -- (seqA4);
-\draw[very thick,color=red] (seqA4) -- (seqA5);
-\draw[very thick,color=red] (seqA5) -- (seqA6);
-\draw[very thick,color=red] (seqA6) -- (seqA7);
+\draw[line width=2.0,color=red] (seqA1) -- (seqA2);
+\draw[line width=2.0,color=red] (seqA2) -- (seqA3);
+\draw[line width=2.0,color=red] (seqA3) -- (seqA4);
+\draw[line width=2.0,color=red] (seqA4) -- (seqA5);
+\draw[line width=2.0,color=red] (seqA5) -- (seqA6);
+\draw[line width=2.0,color=red] (seqA6) -- (seqA7);
 
-\draw[very thick,color=green] (seqB1) -- (seqB2);
-\draw[very thick,color=green] (seqB2) -- (seqB3);
-\draw[very thick,color=green] (seqB3) -- (seqB4);
-\draw[very thick,color=green] (seqB4) -- (seqB5);
-\draw[very thick,color=green] (seqB5) -- (seqB6);
-\draw[very thick,color=green] (seqB6) -- (seqB7);
+\draw[line width=2.0,color=green] (seqB1) -- (seqB2);
+\draw[line width=2.0,color=green] (seqB2) -- (seqB3);
+\draw[line width=2.0,color=green] (seqB3) -- (seqB4);
+\draw[line width=2.0,color=green] (seqB4) -- (seqB5);
+\draw[line width=2.0,color=green] (seqB5) -- (seqB6);
+\draw[line width=2.0,color=green] (seqB6) -- (seqB7);
 
-\draw[very thick,color=blue] (seqC1) -- (seqC2);
-\draw[very thick,color=blue] (seqC2) -- (seqC3);
-\draw[very thick,color=blue] (seqC3) -- (seqC4);
-\draw[very thick,color=blue] (seqC4) -- (seqC5);
+\draw[line width=2.0,color=blue] (seqC1) -- (seqC2);
+\draw[line width=2.0,color=blue] (seqC2) -- (seqC3);
+\draw[line width=2.0,color=blue] (seqC3) -- (seqC4);
+\draw[line width=2.0,color=blue] (seqC4) -- (seqC5);
 
 % alignments
 \draw[very thick,dashed] (seqA1) -- (seqB1);
@@ -107,6 +107,28 @@
 \node[graphnode,draw=gray!95] (g9) [below = 0.5cm of g8] {9};
 %\end{scope}
 
+\begin{pgfonlayer}{bg}    % select the background layer
+\draw[line width=2,transform canvas={yshift=0.05cm},color=red] (g1) to (g2);
+\draw[line width=2,transform canvas={yshift=-0.05cm},color=blue] (g1) to (g2);
+\draw[line width=2,transform canvas={yshift=0cm},color=green] (g1) to (g3);
+\draw[line width=2,transform canvas={yshift=0cm},color=green] (g3) to (g4);
+\draw[line width=2,transform canvas={yshift=0.05cm},color=red] (g2) to (g4);
+\draw[line width=2,transform canvas={yshift=-0.05cm},color=blue] (g2) to (g4);
+\draw[line width=2,transform canvas={yshift=0.05cm},color=red] (g4) to (g5);
+\draw[line width=2,transform canvas={yshift=-0.1cm},color=blue,looseness=1] (g4) to (g7);
+\draw[line width=2,transform canvas={yshift=-0.05cm},color=green] (g4) to (g5);
+\draw[line width=2,transform canvas={yshift=0.05cm},color=red] (g5) to (g6);
+\draw[line width=2,transform canvas={yshift=-0.05cm},color=green] (g5) to (g6);
+\draw[line width=2,transform canvas={yshift=0.05cm},color=red] (g6) to (g7);
+\draw[line width=2,transform canvas={yshift=-0.05cm},color=green] (g6) to (g7);
+\draw[line width=2,transform canvas={yshift=0.05cm},color=red] (g7) to (g8);
+\draw[line width=2,transform canvas={yshift=-0.05cm},color=blue] (g7) to (g8);
+\draw[line width=2,transform canvas={yshift=0cm},color=green] (g7) to (g9);
+
+
+\end{pgfonlayer}
+
+\begin{comment}
 \draw[very thick] (g1) to (g2);
 \draw[very thick] (g1) to (g3);
 \draw[very thick] (g2) to (g4);
@@ -117,6 +139,9 @@
 \draw[very thick] (g6) to (g7);
 \draw[very thick] (g7) to (g8);
 \draw[very thick] (g7) to (g9);
+\end{comment}
+
+%\coordinate[yshift=-0.6cm, right=0.1cm of A1.east] (aux2);
 
 %\begin{pgfonlayer}{bg}    % select the background layer
 \draw[very thick,color=gray!20] (seqA1) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g1);
@@ -164,6 +189,7 @@
 \end{scope}
 \end{comment}
 
+\begin{comment}
 \node[pathnode,label=left:path1] (pathA1) [below = 1cm of g1] {1};
 \node[pathnode] (pathA2) [right of=pathA1] {2};
 \node[pathnode] (pathA3) [right of=pathA2] {3};
@@ -204,7 +230,7 @@
 \draw[very thick] (pathC2) -- (pathC3);
 \draw[very thick] (pathC3) -- (pathC4);
 \draw[very thick] (pathC4) -- (pathC5);
-
+\end{comment}
 
 %\end{pgfonlayer}
 
