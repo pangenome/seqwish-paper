@@ -22,7 +22,8 @@
     roundnode/.style={circle, draw=black!60, fill=gray!10, very thick, minimum size=7mm},
     squarednode/.style={rectangle, draw=black!60, fill=gray!10, very thick, minimum size=5mm},
     graphnode/.style={rectangle, draw=black!60, fill=black!100, text=white, very thick, minimum size=5mm},
-    keynode/.style={rectangle, draw=black!60, fill=gray!10, thick, minimum size=1mm}
+    keynode/.style={rectangle, draw=black!60, fill=gray!10, thick, minimum size=1mm},
+    pathnode/.style={rectangle, minimum size=5mm},
     %draw matchclosure/.style={very thick,color=gray!100}
 ]
 %Nodes
@@ -49,24 +50,24 @@
 \node[squarednode] (seqC5) [right of=seqC4] {A};
 
 %Lines
-\draw[very thick] (seqA1) -- (seqA2);
-\draw[very thick] (seqA2) -- (seqA3);
-\draw[very thick] (seqA3) -- (seqA4);
-\draw[very thick] (seqA4) -- (seqA5);
-\draw[very thick] (seqA5) -- (seqA6);
-\draw[very thick] (seqA6) -- (seqA7);
+\draw[very thick,color=red] (seqA1) -- (seqA2);
+\draw[very thick,color=red] (seqA2) -- (seqA3);
+\draw[very thick,color=red] (seqA3) -- (seqA4);
+\draw[very thick,color=red] (seqA4) -- (seqA5);
+\draw[very thick,color=red] (seqA5) -- (seqA6);
+\draw[very thick,color=red] (seqA6) -- (seqA7);
 
-\draw[very thick] (seqB1) -- (seqB2);
-\draw[very thick] (seqB2) -- (seqB3);
-\draw[very thick] (seqB3) -- (seqB4);
-\draw[very thick] (seqB4) -- (seqB5);
-\draw[very thick] (seqB5) -- (seqB6);
-\draw[very thick] (seqB6) -- (seqB7);
+\draw[very thick,color=green] (seqB1) -- (seqB2);
+\draw[very thick,color=green] (seqB2) -- (seqB3);
+\draw[very thick,color=green] (seqB3) -- (seqB4);
+\draw[very thick,color=green] (seqB4) -- (seqB5);
+\draw[very thick,color=green] (seqB5) -- (seqB6);
+\draw[very thick,color=green] (seqB6) -- (seqB7);
 
-\draw[very thick] (seqC1) -- (seqC2);
-\draw[very thick] (seqC2) -- (seqC3);
-\draw[very thick] (seqC3) -- (seqC4);
-\draw[very thick] (seqC4) -- (seqC5);
+\draw[very thick,color=blue] (seqC1) -- (seqC2);
+\draw[very thick,color=blue] (seqC2) -- (seqC3);
+\draw[very thick,color=blue] (seqC3) -- (seqC4);
+\draw[very thick,color=blue] (seqC4) -- (seqC5);
 
 % alignments
 \draw[very thick,dashed] (seqA1) -- (seqB1);
@@ -162,6 +163,48 @@
   \node[keynode,fill=gray] (c9) [below of=c8] {9};
 \end{scope}
 \end{comment}
+
+\node[pathnode,label=left:path1] (pathA1) [below = 1cm of g1] {1};
+\node[pathnode] (pathA2) [right of=pathA1] {2};
+\node[pathnode] (pathA3) [right of=pathA2] {3};
+\node[pathnode] (pathA4) [right of=pathA3] {4};
+\node[pathnode] (pathA5) [right of=pathA4] {5};
+\node[pathnode] (pathA6) [right of=pathA5] {6};
+\node[pathnode] (pathA7) [right of=pathA6] {7};
+
+\node[pathnode,label=left:path2] (pathB1) [below of=pathA1] {1};
+\node[pathnode] (pathB2) [right of=pathB1] {8};
+\node[pathnode] (pathB3) [right of=pathB2] {3};
+\node[pathnode] (pathB4) [right of=pathB3] {4};
+\node[pathnode] (pathB5) [right of=pathB4] {5};
+\node[pathnode] (pathB6) [right of=pathB5] {6};
+\node[pathnode] (pathB7) [right of=pathB6] {9};
+
+\node[pathnode,label=left:path3] (pathC1) [below of=pathB1] {1};
+\node[pathnode] (pathC2) [right of=pathC1] {2};
+\node[pathnode] (pathC3) [right of=pathC2] {3};
+\node[pathnode] (pathC4) [below of=pathB6] {6};
+\node[pathnode] (pathC5) [right of=pathC4] {7};
+
+\draw[very thick] (pathA1) -- (pathA2);
+\draw[very thick] (pathA2) -- (pathA3);
+\draw[very thick] (pathA3) -- (pathA4);
+\draw[very thick] (pathA4) -- (pathA5);
+\draw[very thick] (pathA5) -- (pathA6);
+\draw[very thick] (pathA6) -- (pathA7);
+
+\draw[very thick] (pathB1) -- (pathB2);
+\draw[very thick] (pathB2) -- (pathB3);
+\draw[very thick] (pathB3) -- (pathB4);
+\draw[very thick] (pathB4) -- (pathB5);
+\draw[very thick] (pathB5) -- (pathB6);
+\draw[very thick] (pathB6) -- (pathB7);
+
+\draw[very thick] (pathC1) -- (pathC2);
+\draw[very thick] (pathC2) -- (pathC3);
+\draw[very thick] (pathC3) -- (pathC4);
+\draw[very thick] (pathC4) -- (pathC5);
+
 
 %\end{pgfonlayer}
 
