@@ -12,8 +12,9 @@
     font=\sffamily,
     roundnode/.style={circle, draw=black!60, fill=gray!10, very thick, minimum size=7mm},
     squarednode/.style={rectangle, draw=black!60, fill=gray!10, very thick, minimum size=5mm},
-    graphnode/.style={rectangle, draw=gray!60, fill=black!100, text=white, very thick, minimum size=5mm},
+    graphnode/.style={rectangle, draw=black!60, fill=black!100, text=white, very thick, minimum size=5mm},
     keynode/.style={rectangle, draw=black!60, fill=gray!10, thick, minimum size=1mm}
+    %draw matchclosure/.style={very thick,color=gray!100}
 ]
 %Nodes
 \node[squarednode,label=left:text1] (seqA1) {G};
@@ -59,25 +60,25 @@
 \draw[very thick] (seqC4) -- (seqC5);
 
 % alignments
-\draw[very thick,color=gray!50] (seqA1) -- (seqB1);
-%\draw[very thick,color=gray!50] (seqA1) to [in=135,out=225,looseness=0.5, edge node={node [sloped,above] {}}] (seqC1);
-\draw[very thick,color=gray!50] (seqB1) -- (seqC1);
+\draw[very thick,dashed] (seqA1) -- (seqB1);
+%\draw[very thick,dashed] (seqA1) to [in=135,out=225,looseness=0.5, edge node={node [sloped,above] {}}] (seqC1);
+\draw[very thick,dashed] (seqB1) -- (seqC1);
 
-\draw[very thick,color=gray!50] (seqA2) to [in=135,out=225,looseness=0.5, edge node={node [sloped,above] {}}] (seqC2);
+\draw[very thick,dashed] (seqA2) to [in=135,out=225,looseness=0.5, edge node={node [sloped,above] {}}] (seqC2);
 
-\draw[very thick,color=gray!50] (seqA3) -- (seqB3);
-\draw[very thick,color=gray!50] (seqA3) to [in=135,out=225,looseness=0.5, edge node={node [sloped,above] {}}] (seqC3);
-\draw[very thick,color=gray!50] (seqB3) -- (seqC3);
+\draw[very thick,dashed] (seqA3) -- (seqB3);
+\draw[very thick,dashed] (seqA3) to [in=135,out=225,looseness=0.5, edge node={node [sloped,above] {}}] (seqC3);
+\draw[very thick,dashed] (seqB3) -- (seqC3);
 
-\draw[very thick,color=gray!50] (seqA4) -- (seqB4);
-\draw[very thick,color=gray!50] (seqA5) -- (seqB5);
+\draw[very thick,dashed] (seqA4) -- (seqB4);
+\draw[very thick,dashed] (seqA5) -- (seqB5);
 
-%\draw[very thick,color=gray!50] (seqA6) -- (seqB6);
-\draw[very thick,color=gray!50] (seqA6) to [in=135,out=225,looseness=0.5, edge node={node [sloped,above] {}}] (seqC4);
-\draw[very thick,color=gray!50] (seqB6) -- (seqC4);
+%\draw[very thick,dashed] (seqA6) -- (seqB6);
+\draw[very thick,dashed] (seqA6) to [in=135,out=225,looseness=0.5, edge node={node [sloped,above] {}}] (seqC4);
+\draw[very thick,dashed] (seqB6) -- (seqC4);
 
-%\draw[very thick,color=gray!50] (seqA7) -- (seqB7);
-\draw[very thick,color=gray!50] (seqA7) to [in=135,out=225,looseness=0.5, edge node={node [sloped,above] {}}] (seqC5);
+%\draw[very thick,dashed] (seqA7) -- (seqB7);
+\draw[very thick,dashed] (seqA7) to [in=135,out=225,looseness=0.5, edge node={node [sloped,above] {}}] (seqC5);
 %\draw[very thick,dashed,color=gray!50] (seqB7) -- (seqC5);
 
 
@@ -85,15 +86,15 @@
 %    \draw (k) to[out=30, in=-30, looseness=4, edge node={node [sloped,above] {$\leftarrow$}}] (j);
 
 %\begin{scope}[node distance=1cm]
-\node[graphnode,draw={rgb:red,1;orange,1}] (g2) [below = 0.75cm of seqC2] {2};
-\node[graphnode,draw=red!100,label=left:graph] (g1) [below = 1.25cm of seqC1] {1};
-\node[graphnode,draw=brown] (g3) [below = 0.5cm of g2] {8};
-\node[graphnode,draw=orange!100] (g4) [below = 1.25cm of seqC3] {3};
-\node[graphnode,draw=green!100] (g5) [right of=g4] {4};
-\node[graphnode,draw={rgb:blue,1;green,1}] (g6) [right of=g5] {5};
-\node[graphnode,draw=blue!100] (g7) [below = 1.25cm of seqC4] {6};
-\node[graphnode,draw={rgb:blue,1;purple,1}] (g8) [below = 0.75cm of seqC5] {7};
-\node[graphnode,draw=purple!100] (g9) [below = 0.5cm of g8] {9};
+\node[graphnode,draw=gray!25] (g2) [below = 0.75cm of seqC2] {2};
+\node[graphnode,label=left:graph,draw=gray!20] (g1) [below = 1.25cm of seqC1] {1};
+\node[graphnode,draw=gray!80] (g3) [below = 0.5cm of g2] {8};
+\node[graphnode,draw=gray!30] (g4) [below = 1.25cm of seqC3] {3};
+\node[graphnode,draw=gray!35] (g5) [right of=g4] {4};
+\node[graphnode,draw=gray!40] (g6) [right of=g5] {5};
+\node[graphnode,draw=gray!50] (g7) [below = 1.25cm of seqC4] {6};
+\node[graphnode,draw=gray!60] (g8) [below = 0.75cm of seqC5] {7};
+\node[graphnode,draw=gray!95] (g9) [below = 0.5cm of g8] {9};
 %\end{scope}
 
 \draw[very thick] (g1) to (g2);
@@ -108,36 +109,36 @@
 \draw[very thick] (g7) to (g9);
 
 %\begin{pgfonlayer}{bg}    % select the background layer
-\draw[very thick,color=red!100] (seqA1) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g1);
-\draw[very thick,color=red!100] (seqB1) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g1);
-\draw[very thick,color=red!100] (seqC1) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g1);
-%\draw[very thick,color=red!100,looseness=0.5] (seqB1.south) to (g1.north);
-%\draw[very thick,color=red!100,looseness=0.5] (seqC1.south) to (g1.north);
+\draw[very thick,color=gray!20] (seqA1) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g1);
+\draw[very thick,color=gray!20] (seqB1) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g1);
+\draw[very thick,color=gray!20] (seqC1) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g1);
+%\draw[very thick,color=gray!50,color=red!50,looseness=0.5] (seqB1.south) to (g1.north);
+%\draw[very thick,color=gray!50,color=red!50,looseness=0.5] (seqC1.south) to (g1.north);
 
-\draw[very thick,color={rgb:red,1;orange,1}] (seqA2) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g2);
-\draw[very thick,color={rgb:red,1;orange,1}] (seqC2) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g2);
+\draw[very thick,color=gray!25] (seqA2) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g2);
+\draw[very thick,color=gray!25] (seqC2) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g2);
 
-\draw[very thick,color=orange!100] (seqA3) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g4);
-\draw[very thick,color=orange!100] (seqB3) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g4);
-\draw[very thick,color=orange!100] (seqC3) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g4);
+\draw[very thick,color=gray!30] (seqA3) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g4);
+\draw[very thick,color=gray!30] (seqB3) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g4);
+\draw[very thick,color=gray!30] (seqC3) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g4);
 
-\draw[very thick,color=green!100] (seqA4) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g5);
-\draw[very thick,color=green!100] (seqB4) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g5);
-%\draw[very thick,color=blue!100] (seqC3) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g4);
+\draw[very thick,color=gray!35] (seqA4) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g5);
+\draw[very thick,color=gray!35] (seqB4) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g5);
+%\draw[very thick,color=gray!50,color=blue!50] (seqC3) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g4);
 
-\draw[very thick,color={rgb:blue,1;green,1}] (seqA5) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g6);
-\draw[very thick,color={rgb:blue,1;green,1}] (seqB5) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g6);
+\draw[very thick,color=gray!40] (seqA5) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g6);
+\draw[very thick,color=gray!40] (seqB5) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g6);
 
-\draw[very thick,color=blue!100] (seqA6) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g7);
-\draw[very thick,color=blue!100] (seqB6) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g7);
-\draw[very thick,color=blue!100] (seqC4) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g7);
+\draw[very thick,color=gray!50] (seqA6) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g7);
+\draw[very thick,color=gray!50] (seqB6) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g7);
+\draw[very thick,color=gray!50] (seqC4) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g7);
 
-\draw[very thick,color={rgb:blue,1;purple,1}] (seqA7) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g8);
-\draw[very thick,color={rgb:blue,1;purple,1}] (seqC5) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g8);
+\draw[very thick,color=gray!60] (seqA7) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g8);
+\draw[very thick,color=gray!60] (seqC5) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g8);
 
-\draw[very thick,color=purple!100] (seqB7) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g9);
+\draw[very thick,color=gray!95] (seqB7) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g9);
 
-\draw[very thick,color=brown] (seqB2) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g3);
+\draw[very thick,color=gray!80] (seqB2) to [looseness=0.4,in=45,out=-45, edge node={node [sloped,above] {}}] (g3);
 
 \begin{comment}
 \begin{scope}[node distance=0.5cm]
