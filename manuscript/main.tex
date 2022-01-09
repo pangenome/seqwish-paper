@@ -167,23 +167,35 @@ By definition of $m$, each $m^+$ implies a single, identical character $c(m^+)$.
 We build a graph $V$ inductively.
 We take the first match in $A$, $m_1$, and execute a union-find operation to obtain $m_1^+$.
 We add the character of the match $c(m_1^+)$ as a node $n_1$ in $V$, record the mapping from $m_1^+ \to n_1$.
-To induce the graph, we take the next un-used match in $A : m_i \notin \forall_{j < i} m_j^+$, obtain $m_i^+$, and add $c(m_i^+)$ to $V$ while recording the match transitive closure to graph mapping.
+To induce the graph, we take the next un-used match in $A : m_i \notin \forall_{j < i} m_j^+$, obtain $m_i^+$, and add $c(m_i^+)$ to $V$.
+To allow the annotation of paths, we record the set of characters in $Q$ that match to a given node in $V$ in mapping $Z = Q \to V$
 We continue until all matches have been used.
-Finally, we establish paths ($P$) by projecting $Q$ through the match-to-node mapping, and record edges ($E$) where nodes occur successively in paths.
+Finally, we establish paths ($P$) by walking them in $V$ using $Z$, and record edges ($E$) where nodes occur successively in paths.
 
 \begin{proof}
 After the first step of induction, the graph represents all pairwise matches in $m_1^+$.
 Each subsequent step includes progressively more of $A$, until at completion, all pairwise relationships are accounted for in $V$.
-The variation graph is constructed from pairwise alignments, and because its paths are equivalent to input sequences, it represents them losslessly.
+The paths of the variation graph are equivalent to input sequences, and the path relationship within the graph is defined by their alignments.
 \end{proof}
+
+The set of alignments represented by a variation graph is strictly larger than the set of alignments used to induce it.
+The graph must contain at least the set of alignments given on input.
+It may also contain new implied pairwise relationships that arise due to transitive match relationships, as shown in closures 1 and 6 in Figure \ref{fig:induction}.
+However, it cannot contain less match information than represented in $A$, by definition of $V$.
+
+
+\input{fig_from_alignment_to_variation_graph.tex}
+
+
+\section{Algorithm}
+
+
+
+\section{Implementation}
+
 
 \begin{comment}
 
-Our algorithm flows through three complementary graph models.
-(\textit{1}) We transform the alignments and input sequences into an \textit{alignment graph} \citep{Kehr_2014}.
-(\textit{2}) We then transitively close match relations in this graph to produce single nodes of a \textit{sequence graph} \citep{Hein_1989}.
-(\textit{3}) By recording the translation from alignment graph nodes to sequence graph nodes, we are able to walk the input sequences through the graph.
-In doing so, we are able to derive edges and label the paths of a \textit{variation graph} \citep{Garrison_2018} which captures the pairwise alignments and all implied transitive relationships between them.
 
 
 \subsection{Sequence input}
@@ -196,18 +208,13 @@ This allows us to map between positions in the sequences of $Q$, which is the fo
 
 Alignments between genomes imply a set of exact matches between subsequences of $Q$, which we represent as interval pairs $m := ((q_b, q_e), (t_b, t_e))$.
 We encode the $X$ matches in a set of alignments made by an external method \cite{wfmash,Li_2018} in $A = m_1 \ldots m_X$.
-
 \citep{Li_bedtk_2020}.
 
-
-
-
-
-\FIXME{To integrate to the text} The alignment graph formalizes the collection of alignments between genomes.
+%\FIXME{To integrate to the text
+The alignment graph formalizes the collection of alignments between genomes.
 In this graph, each base pair in the input genomes is represented by a node.
 Two kinds of edges connect these nodes.
-The first `precedence' edge type indicates successive pairs of base pairs in the input,
-linking together the input genomes within the alignment graph.
+The first ``precedence'' edge type indicates successive pairs of base pairs in the input, linking together the input genomes within the alignment graph.
 The second “match” type of edge links nodes that alignment has asserted to be matches.
 
 We encode the set of input pairwise alignments between sequences in $Q$ as object $A$.
@@ -223,8 +230,6 @@ For each base $b_{q}$ in $Q$ not already marked in $Q_{seen}$, we find its trans
 We write the character of the base $b_{q}$ to an entry $s_i$ in a vector $S$, then for each $b_{c}$ in $c_{q}$ we record a pair $(s_{i}, b_{c})$ into $N$ and its reverse, $(b_{c}, s_{i})$ into $P$.
 We mark $Q_{seen}$ for each base in each emitted cluster, so that we will not consider these bases in subsequent transitive closures.
 By sorting $N$ and $P$ by their first entries, we can build rank/select dictionaries on them akin to that we built on $A$ that allow random access by graph base (as given in $S$) or input base (as given in $Q$).
-
-
 
 \subsection{Sequence graph}
 
@@ -242,37 +247,31 @@ As input, we typically take all-versus-all alignments, but the exact structure o
 Seqwish uses a series of disk-backed sorts and passes over the alignment and sequence inputs to allow the graph to be constructed in low memory relative to the size of the input sequence set.
 Memory usage during construction and traversal is limited by the use of sorted disk-backed arrays and succinct rank/select dictionaries to record a queryable version of the graph.
 
-\end{comment}
-
-\input{fig_from_alignment_to_variation_graph.tex}
-
 \section{Seqwish implementation}
 \label{sec:implementation}
 
-    \FIXME{The algorithm validates some aspects of itself, we should point that out}
+We need to establish the links between bases in $S$ that would be required for us to find any sequence in the input as a walk through the graph.
+We do so by rewriting $Q$ (in both the forward and reverse orientation) in terms of pairs of bases in $S$, then sorting the resulting pairs by their first element, which yields $L = [(b_{a}, b_{b}), \ldots ]$.
+In typical use we take the edges of the graph to be given by the unique elements of $L$.
 
+Our data model encodes the graph using single-base nodes, but often downstream use requires identifying nodes and thus we benefit from compressing the unitigs of the graph into single nodes, which reduces memory used by identifiers in analysis.
+We can compress the node space of the graph by traversing $S$, and for each base querying the inbound links.
+Maintaining a bitvector $S_{id}$ of length equal to $S$ we mark each base at which we see any link other than one from or to the previous base on the forward or reverse strand, or at bases where we have no incoming links.
+By building a rank/select dictionary on $S_{id}$ we can assign a smaller set of node ids to the sequence space of the graph.
 
-    To fully induce the variation graph we need to establish the links between bases in $S$ that would be required for us to find any sequence in the input as a walk through the graph.
-    We do so by rewriting $Q$ (in both the forward and reverse orientation) in terms of pairs of bases in $S$, then sorting the resulting pairs by their first element, which yields $L = [(b_{a}, b_{b}), \ldots ]$.
-    These pairs record the links and their frequencies, which we can emit or filter (such as by frequency) as needed in particular applications.
-    In typical use we take the graph to be given by the unique elements of $L$.
+Given the id space encoded by $S_{id}$ we can materialize the graph in a variety of interchange formats, or provide id-based interfaces to the indexed squish graph.
+To generate graphs in \texttt {vg} or GFA format, we want to decompose the graph into its nodes ($S$), edges ($L$) and paths ($P$).
+The nodes are given by $S$ and $S_{id}$, and similarly we project $L$ and $P$ through $S_{id}$ to obtain a compressed variation graph.
 
-    Our data model encodes the graph using single-base nodes, but often downstream use requires identifying nodes and thus we benefit from compressing the unitigs of the graph into single nodes, which reduces memory used by identifiers in analysis.
-    We can compress the node space of the graph by traversing $S$, and for each base querying the inbound links.
-    Maintaining a bitvector $S_{id}$ of length equal to $S$ we mark each base at which we see any link other than one from or to the previous base on the forward or reverse strand, or at bases where we have no incoming links.
-    By building a rank/select dictionary on $S_{id}$ we can assign a smaller set of node ids to the sequence space of the graph.
+\end{comment}
 
-    Given the id space encoded by $S_{id}$ we can materialize the graph in a variety of interchange formats, or provide id-based interfaces to the indexed squish graph.
-    To generate graphs in \texttt {vg} or GFA format, we want to decompose the graph into its nodes ($S$), edges ($L$) and paths ($P$).
-    The nodes are given by $S$ and $S_{id}$, and similarly we project $L$ and $P$ through $S_{id}$ to obtain a compressed variation graph.
-
-    \FIXME{To integrate to the text}
-    To support this kind of data scale, we implement \texttt{seqwish}'s algorithm using disk-backed memory.
-    We write the alignment graph into a disk-backed implicit interval tree, wherein each match in the input alignments is a queryable range.
-    A lock-free, parallel union-find algorithm \FIXME{Wait-free parallel algorithms for the union-find problem} allows us to, for each base pair of input sequence, collect all other base pairs in the pangenome that are aligned to it.
-    By processing this transitive closure operation in chunks (\textit{e.g.} 10Mbp at a time), we limit the maximum working memory (RAM) requirements of the process without affecting the output.
-    After the transitive closure, we write our final graph on disk in a set of arrays, then augment it with the paths of our input sequences,
-    finally emitting the resulting graph in the standard Graphical Fragment Assembly (GFA) format~\citep{GFA}.
+%    \FIXME{To integrate to the text}
+%    To support this kind of data scale, we implement \texttt{seqwish}'s algorithm using disk-backed memory.
+%    We write the alignment graph into a disk-backed implicit interval tree, wherein each match in the input alignments is a queryable range.
+%    A lock-free, parallel union-find algorithm \FIXME{Wait-free parallel algorithms for the union-find problem} allows us to, for each base pair of input sequence, collect all other base pairs in the pangenome that are aligned to it.
+%    By processing this transitive closure operation in chunks (\textit{e.g.} 10Mbp at a time), we limit the maximum working memory (RAM) requirements of the process without affecting the output.
+%    After the transitive closure, we write our final graph on disk in a set of arrays, then augment it with the paths of our input sequences,
+%    finally emitting the resulting graph in the standard Graphical Fragment Assembly (GFA) format~\citep{GFA}.
 
 
     \section{Results}
@@ -284,9 +283,9 @@ Memory usage during construction and traversal is limited by the use of sorted d
     %Or
     %We go schematic with the figure to show a complex but very detailed example with the algorithm worked out
 
-    \subsection{subsection 1}
-    \label{subsec:subsec1}
-    \FIXME{to do}
+    %    \subsection{subsection 1}
+    %\label{subsec:subsec1}
+    %\FIXME{to do}
 
 
     \section{Discussion}
