@@ -4,7 +4,16 @@
    \includegraphics[width=\linewidth]{fig_induction.pdf}
    \caption{
    A visual description of variation graph induction.
-   At top, the alignment graph model.
+   \textit{Top}: an alignment graph model for three sequences and their alignments.
+   Nodes are single characters (DNA base pairs, of which the forward strand is shown) in individual sequences.
+   Solid ``precedence'' edges link successive characters in each sequence, and are colored (red, green, blue) to identify each.
+   Dashed edges indicate aligned pairs of characters.
+    \textit{Bottom}: a variation graph model induced from the alignment graph.
+   %   We transform the alignment graph into a variation graph  first condensing sets of nodes in the alignment graph that are transitively linked by alignment edges.
+   Each transitive match closure (gray shaded edges, of increasing darkness) in the alignment graph results in a single node in the output graph, which is labeled by the rank of the transitive closure operation that produced it.
+   By recording the full set of match closures, we can project the sequences in the input through to paths in the variation graph (colored edges).
+   The unique set of node pairings in the paths provide the edges of the output graph.
+   %   Black nodes are numbered by the rank of the transitive closure operation
    %   At bottom, a sequence graph obtained by contracting 
    %   At top, three sequences (text1, text2, text3) 
     }
