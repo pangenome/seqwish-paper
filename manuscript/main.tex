@@ -145,7 +145,7 @@ A variation graph represents pairwise alignments between its embedded paths.
 \begin{proof}
 By definition \ref{def:vg}, two paths have identical subsequences where they walk (or ``step'') through the same series of oriented nodes (e.g. $s_1 s_2 s_3$).
 An identical set of path steps is thus equivalent to a sequence match.
-Pairwise alignments are by definition collections of matches between sequences.
+Pairwise alignments are by definition collections of character-level matches between sequences.
 The variation graph thus models a set of pairwise alignments between paths in $P$.
 \end{proof}
 
@@ -175,7 +175,8 @@ Finally, we establish paths ($P$) by walking them in $V$ using $Z$, and record e
 \begin{proof}
 After the first step of induction, the graph represents all pairwise matches in $m_1^+$.
 Each subsequent step includes progressively more of $A$, until at completion, all pairwise relationships are accounted for in $V$.
-The paths of the variation graph are equivalent to input sequences, and the path relationship within the graph is defined by their alignments.
+%All characters in $S$ have been accounted for in $V$, and we can make this mapping explicit by tracing $S$ through the
+%The paths of the variation graph are equivalent to input sequences, and the path relationship within the graph is defined by their alignments.
 \end{proof}
 
 The set of alignments represented by a variation graph is strictly larger than the set of alignments used to induce it.
