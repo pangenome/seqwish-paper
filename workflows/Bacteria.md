@@ -304,7 +304,7 @@ for genus_species in "Helicobacter pylori" "Klebsiella pneumoniae" "Salmonella e
           
           seq 0 9 | while read i; do
             APPROX_PAF=/lizardfs/guarracino/seqwish-paper/bacteria/alignment/$gspecies/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.approx.paf.chunk_$i.paf
-            PAF=/lizardfs/guarracino/seqwish-paper/bacteria/alignment/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.chunk_$i.paf.gz
+            PAF=/lizardfs/guarracino/seqwish-paper/bacteria/alignment/$gspecies/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.chunk_$i.paf.gz
             sbatch -p workers -c 48 --job-name $gspecies --wrap 'hostname; cd /scratch; \time -v ~/tools/wfmash/build/bin/wfmash-948f1683d14927745aef781cdabeb66ac6c7880b '$ASSEMBLIES' '$ASSEMBLIES' -X -s '$s' -l '$l' -p '$p' -n '$NUM_HAPLOTYPES' -t 48 -i '$APPROX_PAF' | pigz -c > '$PAF
           done
       done

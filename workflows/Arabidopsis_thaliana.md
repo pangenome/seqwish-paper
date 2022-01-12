@@ -105,8 +105,8 @@ for s in 20k 50k 100k; do
     l_no_k=$(echo $s_no_k '*' 3 | bc)
     l=${l_no_k}k
     
-    PAF=/lizardfs/guarracino/seqwish-paper/athaliana/alignment/athaliana16.s$s.l$l.p$p.n16.paf
-    sbatch -p 386mem -c 48 --job-name athaliana --wrap 'hostname; cd /scratch; \time -v ~/tools/wfmash/build/bin/wfmash-948f1683d14927745aef781cdabeb66ac6c7880b '$ASSEMBLIES' '$ASSEMBLIES' -X -s '$s' -l '$l' -p '$p' -n 16 -t 48 > '$PAF
+    PAF=/lizardfs/guarracino/seqwish-paper/athaliana/alignment/athaliana16.s$s.l$l.p$p.n16.paf.gz
+    sbatch -p 386mem -c 48 --job-name athaliana --wrap 'hostname; cd /scratch; \time -v ~/tools/wfmash/build/bin/wfmash-948f1683d14927745aef781cdabeb66ac6c7880b '$ASSEMBLIES' '$ASSEMBLIES' -X -s '$s' -l '$l' -p '$p' -n 16 -t 48 | pigz -c > '$PAF
   done
 done
 ```
@@ -116,6 +116,7 @@ done
 ```shell
 mkdir -p /lizardfs/guarracino/seqwish-paper/athaliana/graphs/
 
+#!/bin/bash
 ASSEMBLIES=/lizardfs/guarracino/seqwish-paper/athaliana/assemblies/athaliana16.fasta.gz
 
 for s in 20k 50k 100k; do
@@ -124,10 +125,13 @@ for s in 20k 50k 100k; do
     l_no_k=$(echo $s_no_k '*' 3 | bc)
     l=${l_no_k}k
     
-    PAF=/lizardfs/guarracino/seqwish-paper/athaliana/alignment/athaliana16.s$s.l$l.p$p.n16.paf
+    PAF=/lizardfs/guarracino/seqwish-paper/athaliana/alignment/athaliana16.s$s.l$l.p$p.n16.paf.gz
     for k in 311 229 179 127 79 49 29 11 0; do
       GFA=/scratch/athaliana16.s$s.l$l.p$p.n16.k$k.B50M.gfa
-      sbatch -p 386mem -c 48 --job-name athaliana --wrap 'hostname; cd /scratch; \time -v ~/tools/seqwish/bin/seqwish-ccfefb016fcfc9937817ce61dc06bbcf382be75e -t 48 -s '$ASSEMBLIES' -p '$PAF' -g '$GFA' -k '$k' -B50M -P; mv '$GFA' /lizardfs/guarracino/seqwish-paper/athaliana/graphs/'
+      LOG=/scratch/athaliana16.s$s.l$l.p$p.n16.k$k.B50M.size.log
+      #sbatch -p 386mem -c 48 --job-name athaliana --wrap 'hostname; cd /scratch; \time -v ~/tools/seqwish/bin/seqwish-ccfefb016fcfc9937817ce61dc06bbcf382be75e -t 48 -s '$ASSEMBLIES' -p '$PAF' -g '$GFA' -k '$k' -B50M -P; mv '$GFA' /lizardfs/guarracino/seqwish-paper/athaliana/graphs/'
+    
+      sbatch -p 386mem -c 48 --job-name athaliana --wrap 'bash /lizardfs/guarracino/seqwish-paper/scripts/seqwish_with_logging.sh '$ASSEMBLIES' '$PAF' '$GFA' '$k' 50M '$LOG' 10; mv '$GFA' /lizardfs/guarracino/seqwish-paper/athaliana/graphs/; mv '$LOG' /lizardfs/guarracino/seqwish-paper/logs/'
     done
   done
 done
