@@ -9,6 +9,8 @@
 
 \usepackage{comment}
 
+\usepackage{siunitx}
+
 % singlelinecheck=false puts subcaptions on the left
 \usepackage[singlelinecheck=false]{subcaption}
 
@@ -118,7 +120,7 @@ It easily scales to some of the largest species pangenome construction problems 
 %Motivated by the current availability of two reference-quality human genome assemblies 
 %The inability to build pangenome graphs from 
 
-\section{Variation graph induction}
+\section{Algorithm}
 \label{sec:algorithm}
 
 A class of methods to represent pangenomes involves the \textit{sequence graph} \citep{Hein_1989}, where identical segments of different genomes collapse into a single representative segment (often node) in the graph.
@@ -128,14 +130,21 @@ On this model, variation graphs add the concept of \textit{path} to embed linear
 Paths provide a stable coordinate system, allowing graph annotations and interoperability between different graphs.
 A pangenome graph is a sequence model that encodes the mutual alignment of many genomes \citep{Eizenga_2020}.
 
+In this section, we provide a formal definition of variation graph induction.
+We then examine the bounds of a na\"{i}ve implementation of this algorithm.
+Finally, we propose compression and partitioning techniques to reduce the space and working memory complexity of the induction process by a large constant factor modulated by the degree of sequence divengence in the input pangenome.
+This yields a practical algorithm for variation graph induction that can scale to the largest available pangenomes.
+
+\subsection{Variation graph induction}
+
 \begin{definition}
 \label{def:vg}
 Variation graphs are a common formalism to encode pangenome graphs \citep{Garrison_2019_thesis}.
-In the variation graph, $V = (N, E, P)$, nodes $N = n_1\ldots n_{|N|}$ contain sequences of DNA.
+In the variation graph, $\mathcal{V} = (\mathcal{N}, \mathcal{E}, \mathcal{P})$, nodes $\mathcal{N} = n_1\ldots n_{|\mathcal{N}|}$ contain sequences of DNA.
 Each node $n_i$ has a unique numerical identifier $i$ and an implicit reverse complement $\bar{n_i}$.
 A node strand $s$ corresponds to one node orientation.
-Edges $E = e_1\ldots e_{|E|}$ connect ordered pairs of node strands: $e_i = ( s_a, s_b )$, encoding the base topology of the sequence graph.
-Paths $P = p_1\ldots p_{|P|}$ describe walks over node strands: $p_i = s_1 \ldots s_{|p_i|}$, storing a collection of genomes written in terms of the sequence graph.
+Edges $\mathcal{E} = e_1\ldots e_{|\mathcal{E}|}$ connect ordered pairs of node strands: $e_i = ( s_a, s_b )$, encoding the base topology of the sequence graph.
+Paths $\mathcal{P} = p_1\ldots p_{|\mathcal{P}|}$ describe walks over node strands: $p_i = s_1 \ldots s_{|p_i|}$, storing a collection of genomes written in terms of the sequence graph.
 \end{definition}
 
 \begin{theorem}
@@ -146,11 +155,14 @@ A variation graph represents pairwise alignments between its embedded paths.
 By definition \ref{def:vg}, two paths have identical subsequences where they walk (or ``step'') through the same series of oriented nodes (e.g. $s_1 s_2 s_3$).
 An identical set of path steps is thus equivalent to a sequence match.
 Pairwise alignments are by definition collections of character-level matches between sequences.
-The variation graph thus models a set of pairwise alignments between paths in $P$.
+The variation graph thus models a set of pairwise alignments between paths in $\mathcal{P}$.
 \end{proof}
 
 \begin{theorem}
-We can construct a variation graph from pairwise alignments.
+\label{thm:seqwish}
+%\textit{seqwish}:
+We can build a variation graph from sequences and pairwise alignments.
+The variation graph will fully embed both the sequences and all pairwise relationships in the input.
 \end{theorem}
 
 This follows from \ref{def:vg}.
@@ -164,13 +176,13 @@ By standard definition, each sequence matches its own reverse complement: $g[i] 
 The transitive closure of a match, $m^+ = \{ i \ldots j \}$, is a set of characters in $Q$ that are transitively linked together by other matches.
 By definition of $m$, each $m^+$ implies a single, identical character $c(m^+)$.
 
-We build a graph $V$ inductively.
+We build a graph $\mathcal{V}$ inductively.
 We take the first match in $A$, $m_1$, and execute a union-find operation to obtain $m_1^+$.
-We add the character of the match $c(m_1^+)$ as a node $n_1$ in $V$, record the mapping from $m_1^+ \to n_1$.
-To induce the graph, we take the next un-used match in $A : m_i \notin \forall_{j < i} m_j^+$, obtain $m_i^+$, and add $c(m_i^+)$ to $V$.
-To allow the annotation of paths, we record the set of characters in $Q$ that match to a given node in $V$ in mapping $Z = Q \to V$
+We add the character of the match $c(m_1^+)$ as a node $n_1$ in $\mathcal{V}$, record the mapping from $m_1^+ \to n_1$.
+To induce the graph, we take the next un-used match in $A : m_i \notin \forall_{j < i} m_j^+$, obtain $m_i^+$, and add $c(m_i^+)$ to $\mathcal{V}$.
+To allow the annotation of paths, we record the set of characters in $Q$ that match to a given node in $\mathcal{V}$ in mapping $Z = Q \to \mathcal{N} = m_1 \ldots m_{|\mathcal{N}|}$.
 We continue until all matches have been used.
-Finally, we establish paths ($P$) by walking them in $V$ using $Z$, and record edges ($E$) where nodes occur successively in paths.
+Finally, we establish paths ($P$) by walking them in $\mathcal{V}$ using $Z$, and record edges ($E$) where nodes occur successively in paths.
 
 \begin{proof}
 After the first step of induction, the graph represents all pairwise matches in $m_1^+$.
@@ -182,17 +194,100 @@ Each subsequent step includes progressively more of $A$, until at completion, al
 The set of alignments represented by a variation graph is strictly larger than the set of alignments used to induce it.
 The graph must contain at least the set of alignments given on input.
 It may also contain new implied pairwise relationships that arise due to transitive match relationships, as shown in closures 1 and 6 in Figure \ref{fig:induction}.
-However, it cannot contain less match information than represented in $A$, by definition of $V$.
-
+However, by definition of $V$, it cannot contain \textit{less} match information than represented in $A$.
 
 \input{fig_from_alignment_to_variation_graph.tex}
 
+\subsection{Induction algorithm sketch}
 
-\section{Algorithm}
+%Although the space bounds alone indicate that this approach is infeasible, we can also consider its time complexity.
+%First, we must enable random access to match elements in $A$.
+%Assuming that $A$ contains pairs of characters in $Q$, then we can sort it
+For the sake of time and space complexity analysis, we consider a simple algorithm to implement the induction process.
+The induction depends on our ability to compute transitive closures of matches $m^+$.
+If $A$ is sorted, we can find the matches of a given character in $Q$ using binary search, which allows us to compute $m^+$ for each character.
+We do so non-redundantly by marking each used charcater in $Q$ in an auxiliary data structure (e.g. a bitvector of $|Q|$).
+As we compute the transitive closures, we emit both the nodes (single characters) of the graph $\mathcal{N}$ and the the sequence-to-graph mapping $Z$, which like $A$ consists of match pairs, but rather than mapping $Q \to Q$, maps $Q \to \mathcal{N}$.
+As with $A$, we can sort $Z$ to obtain random access via binary search.
+Finally, we derive elements in $\mathcal{P}$ by iterating through the characters of $Q$ and looking up their mapping in $Z$ using binary search.
+The edge set $\mathcal{E}$ are the unique pairs of steps found in $\mathcal{P}$, and can be computed by sorting pairs of steps in $\mathcal{P}$.
+
+%We construct an index $A_{idx}$ which allows us to query the matches of each character in $Q$.
+
+\subsection{Na\"{i}ve algorithm bounds}
+\label{sec:bounds}
+
+The inductive proof of theorem \ref{thm:seqwish} demonstrates how to build a variation graph from sequences and their pairwise alignments.
+However, a na\"{i}ve algorithm based on this model will require a very large amount of space.
+Take $\mathcal{Q} = |S|$.
+Although our identifier space $\mathcal{Q}$ must include all of $Q$, in practice, we only store $S$, as $\bar{S}$ can be trivially computed.
+Assume an all-to-all alignment of $N$ sequences in $A$ as input, and that all sequences are approximately identical, so that the induced variation graph has $\mathcal{Q}/N$ nodes.
+The induction must maintain reference to all characters in all input sequences $O(\mathcal{Q})$, all character-to-character matches $O(|A|) \approx O(\mathcal{Q}N^2)$, the mapping of $Q$ into the graph $O(|Z|) \approx O(\mathcal{Q})$, the nodes of the graph $O(|\mathcal{N}|) \approx O(\mathcal{Q}/N)$, the size of the edge set $O(|\mathcal{E}|) \approx O(\mathcal{Q})$, and the set of paths $O(|\mathcal{P}|) \approx O(\mathcal{Q})$.
+In total, na\"{i}ve theorem \ref{thm:seqwish}-based induction would require approximately $O(\mathcal{Q}N^2 + 4\mathcal{Q} + \mathcal{Q}/N)$ space.
+
+Assuming that we want to build a graph for e.g. 100 haploid human genomes of $\num{3e9}$ bp, where $N=100$ and $\mathcal{Q} \approx \num{e11}$ we might expect to use $\approx O(\num{e15})$ identifiers to store the full model.
+Such a design is almost certainly infeasible for inputs larger than a handful of genomes.
+For instance, we would need $O(\num{3e12})$ identifiers for just 5 human genomes.
+Although it is feasible to compute such a graph using external memory, the approximately 200-fold increase in space relative to the input renders this clearly impractical.
+
+Considering the time complexity of induction, we anticipate $O(|A|\log|A|)$ time to sort the match set and $O(\mathcal{N} \log |A|)$ to query it and compute our $\mathcal{N}$ transitive closures.
+Computing the variation graph paths $\mathcal{P}$ involves converting sequences in $S$ to walks through $\mathcal{N}$.
+We first sort the sequence-to-graph mapping array $Z$ in $O(\mathcal{Q} \log \mathcal{Q})$ operations, and then compute $\mathcal{P}$ in $O(\mathcal{Q})$ queries which each cost $O(\log \mathcal{Q})$.
+To obtain unique edges and generate $\mathcal{E}$, we must build and sort an array of $O(2\mathcal{P})$, and then iterate through it for $O(2\mathcal{P} \log 2\mathcal{P} + 2\mathcal{P})$ operations.
+In sum, we would expect to require $O(|A|\log|A| + \mathcal{N} \log |A| + 2(\mathcal{Q} \log \mathcal{Q}) + 2(\mathcal{P} \log 2\mathcal{P} + \mathcal{P}))$.
+Using our approximate relationships to $\mathcal{Q}$ given previously, and simplifying we arrive at $O[\mathcal{Q}(2N^2 \log N / \log \mathcal{Q} + (1/N + 4)\log \mathcal{Q} + 2 + log(4))]$.
+
+Due to our dependence on sorting, and the logarithmic-time cost of queries, crowth in $\mathcal{Q}$ drives $\Omega(\mathcal{Q} \log \mathcal{Q})$ growth in overall complexity.
+As $N$ grows, the time complexity is dominated by the number of alignments, which in the case of our example is $O(N^2)$.
+Clearly, for large numbers of highly-similar genomes, we may not require all pairs.
+Various approaches could be used to reduce the size of $A$, but these lie outside the scope of this work.
+
+%In practice, it is likely that this can be considerably reduced with minimal effect , particularly for
+%In practice, for large numbers of highly similar genomes, it a true all-pairs alignment may be unnecessary, but the construction of a graph that represents all-pairwise alignments 
+%In practical applications, it is unlikely that we will need a true all-pairs alignments for highly similar genomes, and this could be considerably reduced with heuristics that
+
+%we likely  a true all pairs alignment, but limiting this requires heuristic schemes to generate a set of alignments that does not cause any match transitive closures to be partitioned. This topic lies outside the scope of this work.
+
+%$O[(\mathcal{Q}/N + 5\mathcal{Q}) \log \mathcal{Q} + \mathcal{Q}(2 + log(4))]$.
+%$O(\mathcal{Q} \log \mathcal{Q} + \mathcal{Q}/N \log \mathcal{Q} + 2(\mathcal{Q} \log \mathcal{Q}) + 2(\mathcal{Q} \log 2\mathcal{Q} + \mathcal{Q}))$.
+
+%(note that this would 
+%To enable random access to match elements between $A$
+%Continuing our assumed graph context, with quasi-identical genomes and an all-to-all alignment between them, we can compute each match closure operation 
+%The cost of each transitive closure operation should be 
+
+\subsection{Match compression}
+
+As the analysis in section \ref{sec:bounds} shows, space requirements make it impractical to apply a trivial version of theorem \ref{thm:seqwish} to generate a large pangenome graph.
+We seek a compression approach that will exploit redundancy in the input genomes to reduce the costs of the algorithm.
+With large numbers of genomes, alignments dominate our costs.
+A simple technique is to generalize matches $m = (i, j)$ to pairs of ranges in $Q$.
+For highly-similar sequences, we expect exact matches to occur in long runs.
+If the average pairwise diversity of sequences in our input is $1/k$, we expect exact matches to be around $k$ characters long.
+By encoding matches as pairs of ranges of characters, $r = (a, b) : a, b = (i, j) : i, j \in Q$, we can obtain a $\approx$ $k$-fold compression of $A$.
+The same encoding can be used to replace the sequence-to-graph mapping $Z$.
+Rather than pairs of characters in $Q$ and $\mathcal{N}$, we can record runs of matchhes between them as range matches.
+
+%We can save $\approx k$ match pairs per recorded range 
+%a pair of ranges $r = [(a_0, a_1), (b_0, b_1)]$ in $Q$ requires twice the space, but we expect it to 
+
+%The dominance of alignments in our space costs make
+%In practice, the cost of
+
+%We render this 
+
+\subsection{Induction partitioning}
+
+\subsection{Node compaction}
 
 
+%Taking $\mathcal{Q} = |Q|$, and assuming an all-to-all alignment of $N$ sequences in $A$ would give an approximate space bound of $O(2\mathcal{Q} + \mathcal{Q}N^2)$
+%in the order of the length of sequences, the number of character matches in the alignments, and 
 
 \section{Implementation}
+
+
+
 
 
 \begin{comment}
@@ -202,7 +297,7 @@ However, it cannot contain less match information than represented in $A$, by de
 \subsection{Sequence input}
 
 
-Using a compressed suffix array (CSA) over sequence names, we build an index that maps between offsets in all genomes and offsets in $Q$ via lookup of the sequence name in the CSA.
+Using a compressed suffix array (CSA) \citep{Sadakane_2000} over sequence names, we build an index that maps between offsets in all genomes and offsets in $Q$ via lookup of the sequence name in the CSA.
 This allows us to map between positions in the sequences of $Q$, which is the format in which alignment algorithms typically express alignments, and positions in $Q$ itself, which is the coordinate space we will use as a basis for the generation of our graph.
 
 \subsection{Alignment graph}
@@ -295,8 +390,8 @@ The nodes are given by $S$ and $S_{id}$, and similarly we project $L$ and $P$ th
 
     \section*{Acknowledgements}
 
-    We thank Richard Durbin, Benedict Paten, and Simon Puglisi for support and helpful discussions in the development of this algorithm.
-    %We are greatful to members of the HPRC production teams for their development of resources used in our exposition.
+    %We thank Richard Durbin, Benedict Paten, and Simon Puglisi for support and helpful discussions in the development of this algorithm.
+    We are greatful to members of the HPRC production teams for their development of resources used in our exposition.
 
     \section*{Funding}
 
