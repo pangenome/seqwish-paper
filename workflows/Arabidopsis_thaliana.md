@@ -106,7 +106,7 @@ for s in 20k 50k 100k; do
     l=${l_no_k}k
     
     PAF=/lizardfs/guarracino/seqwish-paper/athaliana/alignment/athaliana16.s$s.l$l.p$p.n16.paf.gz
-    sbatch -p 386mem -c 48 --job-name athaliana --wrap 'hostname; cd /scratch; \time -v ~/tools/wfmash/build/bin/wfmash-948f1683d14927745aef781cdabeb66ac6c7880b '$ASSEMBLIES' '$ASSEMBLIES' -X -s '$s' -l '$l' -p '$p' -n 16 -t 48 | pigz -c > '$PAF
+    sbatch -p workers -c 48 --job-name athaliana --wrap 'hostname; cd /scratch; \time -v ~/tools/wfmash/build/bin/wfmash-948f1683d14927745aef781cdabeb66ac6c7880b '$ASSEMBLIES' '$ASSEMBLIES' -X -s '$s' -l '$l' -p '$p' -n 16 -t 48 | pigz -c > '$PAF
   done
 done
 ```
@@ -116,7 +116,6 @@ done
 ```shell
 mkdir -p /lizardfs/guarracino/seqwish-paper/athaliana/graphs/
 
-#!/bin/bash
 ASSEMBLIES=/lizardfs/guarracino/seqwish-paper/athaliana/assemblies/athaliana16.fasta.gz
 
 for s in 20k 50k 100k; do

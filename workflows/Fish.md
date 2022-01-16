@@ -84,39 +84,21 @@ sed 1,1d fish.mash_triangle.txt | tr '\t' '\n' | grep GCA -v | grep e -v | sort 
 0.263022
 ```
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-## All-vs-all alignment and graph induction
+## All-vs-all alignment
 
 ```shell
-mkdir -p /lizardfs/guarracino/seqwish-paper/arabidopsis/alignment/
-mkdir -p /lizardfs/guarracino/seqwish-paper/arabidopsis/graphs/
+mkdir -p /lizardfs/guarracino/seqwish-paper/fish/alignment
 
-ASSEMBLIES=/lizardfs/guarracino/seqwish-paper/arabidopsis/assemblies/arabidopsis.fasta.gz
+ASSEMBLIES=/lizardfs/guarracino/seqwish-paper/fish/assemblies/fish12.fasta.gz
 
-for s in 100000 50000 20000; do
-  for p in 95 90; do
-    l=$(echo $s '*' 3 | bc)
-    PAF=/lizardfs/guarracino/seqwish-paper/arabidopsis/alignment/arabidopsis.s$s.l$l.p$p.n9.paf
-    for k in 79 29 7 0; do
-      GFA=/lizardfs/guarracino/seqwish-paper/arabidopsis/graphs/arabidopsis.s$s.l$l.p$p.n9.k$k.B50M.gfa
-      sbatch -p workers -c 48 --wrap 'cd /scratch; \time -v ~/tools/wfmash/build/bin/wfmash-948f1683d14927745aef781cdabeb66ac6c7880b '$ASSEMBLIES' '$ASSEMBLIES' -X -s '$s' -l '$l' -p '$p' -n 9 -t 48 > '$PAF'; \time -v ~/tools/seqwish/bin/seqwish-ccfefb016fcfc9937817ce61dc06bbcf382be75e -f '$ASSEMBLIES' -p '$PAF' -g '$GFA' -k '$k' -B50M -P'
-    done
+for s in 50k; do
+  for p in 85 80; do
+    s_no_k=${s::-1}
+    l_no_k=$(echo $s_no_k '*' 3 | bc)
+    l=${l_no_k}k
+    
+    PAF=/lizardfs/guarracino/seqwish-paper/fish/alignment/fish12.s$s.l$l.p$p.n12.paf.gz
+    sbatch -p workers -c 48 --job-name fish --wrap 'hostname; cd /scratch; \time -v ~/tools/wfmash/build/bin/wfmash-948f1683d14927745aef781cdabeb66ac6c7880b '$ASSEMBLIES' '$ASSEMBLIES' -X -s '$s' -l '$l' -p '$p' -n 12 -t 48 | pigz -c > '$PAF
   done
 done
-
 ```
-
