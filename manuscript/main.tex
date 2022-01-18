@@ -74,10 +74,10 @@ Existing approaches depend on a single reference or a specific ordering of genom
 A scalable method to build pangenome graphs without such biases would be a key functional step in pangenome construction and manipulation pipelines. \\
 \textbf{Results:}
 We design the \textit{seqwish} algorithm, which builds variation graph from a set of sequences and alignments between them.
-We first transform the alignment set into an interval tree.
+We first transform the alignment set into an implicit interval tree.
 To build up the variation graph, we query this tree-based representation of the alignments to reduce transitive matches into single DNA segments in a sequence graph.
 By recording the mapping from input sequence to output graph, we can trace the original paths through this graph, yielding a pangenome graph.
-We present an implementation that operates in external memory, using disk-backed implicit interval trees and a lock-free parallel algorithm to drive the core graph induction step.
+We present an implementation that operates in external memory, using disk-backed data structures and a lock-free parallel algorithm to drive the core graph induction step.
 We demonstrate that our method scales to very large graph induction problems, and apply our work to build graphs from dozens of genomes from the same or different species in clades throughout the tree of life. \\
 \textbf{Availability:}
 seqwish is published as free software under the MIT open source license.
@@ -98,14 +98,14 @@ In contrast to reference-based approaches that relate sequences to a particular 
 %In principle, pangenome graphs can allow for a great reduction in reference bias, allowing any part of a pangenome to be considered in biological studies. %, and may provide a simpler representation of structurally-variable regions.
 Popular approaches model the pangenome alignment as a \textit{pangenome graph}.
 Conceptually, the pangenome graph relates genomes as walks through and underlying DNA sequence language encoded as a sequence graph. 
-In a pangenome graph, variation can be understood in the context of any part of any included genome, which lets us avoid the problem of reference bias, or a limitation of analyses to sequences that are very similar to a chosen reference genome \cite{Eizenga_2020}.
+In a pangenome graph, variation can be understood in the context of any part of any included genome, which lets us avoid the problem of reference bias, or a limitation of analyses to sequences that are very similar to a chosen reference genome \citep{Eizenga_2020}.
 
 Surprisingly, existing methods to build pangenome graphs from large genome assemblies are reference-based.
 Minigraph progressively builds a pangenome graph using by layering an ordered series of input genomes onto a specific reference \citep{Li:2020}.
 Cactus depends on a single guide tree to structure pairwise alignments between genomes \citep{Armstrong:2020}.
 Both kinds of methods limit computational costs by reducing the number of pairwise comparisons, but in turn their results depend on input genome order, selected reference, and guide-tree topology.
 
-Although a reference-guided approach is pragmatic when we only have a single reference genome, in humans and other species recent advances in sequencing and assembly are driving the generation of many reference-quality assemblies \cite{Nurk_2021}.
+Although a reference-guided approach is pragmatic when we only have a single reference genome, in humans and other species recent advances in sequencing and assembly are driving the generation of many reference-quality assemblies \citep{Nurk_2021}.
 Motivated by the need to generate ``multi-reference'' pangenome graphs, we develop \textit{seqwish}, an algorithm that allows us to build pangenome graphs directly from a collection of sequences and pairwise alignments between them.
 Here, we formally describe the algorithm, evaluate its basic combinatoric bounds and costs, and present applications of the method to pangenome building problems in a variety of species.
 %Our approach is both highly generic and scalable.
@@ -194,7 +194,7 @@ Each subsequent step includes progressively more of $A$, until at completion, al
 The set of alignments represented by a variation graph is strictly larger than the set of alignments used to induce it.
 The graph must contain at least the set of alignments given on input.
 It may also contain new implied pairwise relationships that arise due to transitive match relationships, as shown in closures 1 and 6 in Figure \ref{fig:induction}.
-However, by definition of $V$, it cannot contain \textit{less} match information than represented in $A$.
+However, by definition of $\mathcal{V}$, it cannot contain \textit{less} match information than represented in $A$.
 
 \input{fig_from_alignment_to_variation_graph.tex}
 
@@ -237,10 +237,11 @@ To obtain unique edges and generate $\mathcal{E}$, we must build and sort an arr
 In sum, we would expect to require $O(|A|\log|A| + \mathcal{N} \log |A| + 2(\mathcal{Q} \log \mathcal{Q}) + 2(\mathcal{P} \log 2\mathcal{P} + \mathcal{P}))$.
 Using our approximate relationships to $\mathcal{Q}$ given previously, and simplifying we arrive at $O[\mathcal{Q}(2N^2 \log N / \log \mathcal{Q} + (1/N + 4)\log \mathcal{Q} + 2 + log(4))]$.
 
-Due to our dependence on sorting, and the logarithmic-time cost of queries, crowth in $\mathcal{Q}$ drives $\Omega(\mathcal{Q} \log \mathcal{Q})$ growth in overall complexity.
-As $N$ grows, the time complexity is dominated by the number of alignments, which in the case of our example is $O(N^2)$.
-Clearly, for large numbers of highly-similar genomes, we may not require all pairs.
-Various approaches could be used to reduce the size of $A$, but these lie outside the scope of this work.
+Due to our dependence on sorting, and the logarithmic-time cost of queries, growth in $\mathcal{Q}$ drives $\Omega(\mathcal{Q} \log \mathcal{Q})$ growth in overall complexity.
+As $N$ grows, both time and space complexity are dominated by the number of alignments, which in the case of our example is $O(N^2)$.
+For large numbers of highly-similar genomes, we may not require all pairs of alignments to build a graph that contains all pairwise alignments.
+Various approaches could be used to reduce the size of $A$ without disrupting the induced graph.
+We leave these to later work.
 
 %In practice, it is likely that this can be considerably reduced with minimal effect , particularly for
 %In practice, for large numbers of highly similar genomes, it a true all-pairs alignment may be unnecessary, but the construction of a graph that represents all-pairwise alignments 
@@ -257,16 +258,25 @@ Various approaches could be used to reduce the size of $A$, but these lie outsid
 %The cost of each transitive closure operation should be 
 
 \subsection{Match compression}
+\label{sec:matchcompression}
 
-As the analysis in section \ref{sec:bounds} shows, space requirements make it impractical to apply a trivial version of theorem \ref{thm:seqwish} to generate a large pangenome graph.
-We seek a compression approach that will exploit redundancy in the input genomes to reduce the costs of the algorithm.
+As the bounds analysis shows, space requirements make it impractical to apply a trivial version of theorem \ref{thm:seqwish} to generate a large pangenome graph.
+We need a compression approach that will exploit redundancy in the input genomes to reduce the costs of the algorithm.
 With large numbers of genomes, alignments dominate our costs.
 A simple technique is to generalize matches $m = (i, j)$ to pairs of ranges in $Q$.
 For highly-similar sequences, we expect exact matches to occur in long runs.
 If the average pairwise diversity of sequences in our input is $1/k$, we expect exact matches to be around $k$ characters long.
-By encoding matches as pairs of ranges of characters, $r = (a, b) : a, b = (i, j) : i, j \in Q$, we can obtain a $\approx$ $k$-fold compression of $A$.
-The same encoding can be used to replace the sequence-to-graph mapping $Z$.
-Rather than pairs of characters in $Q$ and $\mathcal{N}$, we can record runs of matchhes between them as range matches.
+By encoding matches as pairs of ranges of characters, $r = (a, b) : a, b = (i, j) : i, j \in Q$, we can obtain a $\approx$ $k$-fold compression of $A$, which for clarity we label as $\mathcal{A}$.
+If sorted, $\mathcal{A}$ can be treated as an \textit{implicit interval tree} \citep{Li_bedtk_2020}, which allows queries of containment and overlap in $O(|\mathcal{A}| \log |\mathcal{A}|)$ time.
+This compression requires trivial changes to our graph induction model.
+To obtain our match transitive closures ($m^+$), we query $\mathcal{A}$ for the range of a single character in $Q$, computing the character-level transitive relationships from the relative offsets of the ranges in $\mathcal{A}$.
+Match compression thus reduces our alignment storage memory bounds by a factor of $k$ without affecting our time complexity bounds.
+
+The same encoding can be used to replace the sequence-to-graph mapping $Z$, yielding $\mathcal{Z}$.
+Rather than pairs of characters in $Q$ and $\mathcal{N}$, we record runs of matches between them as range matches.
+Although in expectation the length of these matches should be strictly less than $k$, due to the interruption of the graph by variation between genomes, this still allows us to reduce the size of $Z$ using runs of matches between $Q$ and $\mathcal{N}$.
+Additionally, we store the inverse of $\mathcal{Z}$, which maps ranges from $\mathcal{N} \to Q$, as $\bar{\mathcal{Z}}$.
+We use $\mathcal{Z}$ to compact unbranching regions of $\mathcal{V}$ into single nodes, and $\bar{\mathcal{Z}}$ to accelerate our calculation of links in the graph.
 
 %We can save $\approx k$ match pairs per recorded range 
 %a pair of ranges $r = [(a_0, a_1), (b_0, b_1)]$ in $Q$ requires twice the space, but we expect it to 
@@ -276,19 +286,70 @@ Rather than pairs of characters in $Q$ and $\mathcal{N}$, we can record runs of 
 
 %We render this 
 
-\subsection{Induction partitioning}
-
 \subsection{Node compaction}
 
+For simplicity, we have thus-far presented a character-level model of variation graph induction.
+However, range, or ``run'' compression can also reduce the representation size of the graph.
+Rather than recording an identifier for each character in a sequence graph, it is useful to ``compact'' characters that form trivial linear components in the graph into single nodes.
+Broadly, the size of nodes will be bounded by the average distance between variants, which for pangenomes built from ~100 individuals of the same species, often provides a great reduction in the total number of nodes (and thus identifiers) required for $\mathcal{V}$ and its components.
 
-%Taking $\mathcal{Q} = |Q|$, and assuming an all-to-all alignment of $N$ sequences in $A$ would give an approximate space bound of $O(2\mathcal{Q} + \mathcal{Q}N^2)$
-%in the order of the length of sequences, the number of character matches in the alignments, and 
+To compact $\mathcal{V}$, we traverse $Q$, finding each entry in $\mathcal{Z}$ in turn, recording its start and end in $\mathcal{N}$, which can be understood as a character vector or string containing all the sequence in the nodes of $\mathcal{V}$.
+%in a ``graph vector'' $\mathcal{G} = n_1,n_2 \ldots n_{|\mathcal{N}|}$ containing the ordered characters of the graph.
+%Any position in $\mathcal{G}$ so marked must be the start or end of a node.
+We subsequently use these markings to subdivide $\mathcal{N}$ into a compacted version $\mathcal{N}'$ such that $|n_i| \ge 1 \forall_{i \in 1 \ldots |\mathcal{N}'|}$.
+
+
+\subsection{Induction partitioning}
+
+Although match compression provides an approximate factor $k$ improvement in memory bounds for key data structures used in the induction, the approach we present in section \ref{sec:matchcompression} requires working memory in the order of the set of transitive match closures in our graph.
+A simple approach to reduce this bound is to divide the induction problem into smaller pieces.
+We do so by computing the graph induction for a collection of initial characters in $Q$.
+We induce the related graph for each partition, appending the induction results to the appropriate data structures.
+This partitioning can introduce boundary effects which change the contents of $\mathcal{Z}$ and $\bar{\mathcal{Z}}$) by splitting ranges at the boundaries of our partitions.
+However, while this will affect the compressed node definition $\mathcal{N}'$, it does not affect $\mathcal{N}$, and it can be corrected via a post-processing step to sort and compact the id space.
+Partitioning reduces the working memory limits to be in the order of the size of the largest transitive match closure found in the input.
 
 \section{Implementation}
 
+We have presented a complete model for variation graph induction from sequences and their pairwise alignments.
+Here, we describe our specific implementation of this algorithm: \textit{seqwish}.
+In general, our approach uses external memory to elaborate the graph, and we assume the availability of low-latency storage media (like SSDs) to maximize the performance of this approach.
 
+\subsection{Key disk-backed data structures}
 
+In our implementation, we rely on several basic external memory kernels.
+To reduce working memory requirements to an absolute minimum, we use a disk-backed version of the implicit interval tree that memory-maps the sorted array of intervals (mmiitree).
+Indexing the implicit interval tree requires a sorting step which dominates the runtime of our algorithm.
+We adapt the current best-performing in-place parallel sorting algorithm, In-place Parallel Super Scalar Samplesort (IPS$^4$o), to work on a disk-backed, memory-mapped array \citep{axtmann2017}.
+This allows us work with $\mathcal{A}$, $\mathcal{Z}$, and $\bar{\mathcal{Z}}$ in external memory.
+By storing numerical identifiers in the backing array, we are able to generate a disk-backed multiset model which we use to compute the unique set of edges $\mathcal{E}$.
+The graph sequence vector $\mathcal{N}$ is simply written by appending characters to a file.
+We ``mark'' nodes to generate $\mathcal{N}'$ using a bitvector kept in main memory, over which we subsequently generate a rank/select dictionary \cite{Gog_2014} for support of the final emission of the graph $\mathcal{V}$.
 
+\subsection{Input and output processing}
+
+A practical implementation introduces a new set of problems related to input and output. % that we have not yet introduced.
+Our implementation reads standard data formats, FASTA or FASTQ for the input sequences, and PAF \citep{Li_2018} for pairwise alignments.
+It writes the graph in standard Graphical Fragment Assembly (GFA) format \citep{GFA}.
+
+In PAF, the input set of alignments is not directly expressed in terms of matches between specific characters in $Q$.
+Rather, each record lists the name of the aligned pair of query and target sequences and offsets in each.
+To efficiently process the input PAF, we thus need to build a sequence index that allows us to generate $\mathcal{A}$.
+We often wish to build graphs from very large collections of sequences, such as raw sequencing reads or contigs from many thousands of samples.
+We build a compressed suffix array (CSA) \citep{Sadakane_2000} over sequence names, and provide auxiliary supporting data structures that allow us to map between our input and the abstract concatenation of all input sequences and their reverse complements: $Q$.
+This \textit{seqidx} avoids the overheads associated with a hash table on string names of input sequences.
+To enable highly-efficient random access, we cache the input sequences in a disk-backed version of $Q$, into which our queries of sequence name and offset point.
+This trades time that might be spent accessing a compressed representation of the input for space in external memory.
+
+For output in GFA, the process is relatively simple.
+We iterate over nodes in $\mathcal{N}'$, writing each as a node record.
+Edges can be similarly produced from the disk-backed multiset representing $\mathcal{E}$.
+The most involved part of graph emission is the rendering of our input sequences $S$ as paths $\mathcal{P}$ through the graph.
+For each input sequence in our \textit{seqidx}, we walk through the offsets in $S$ contained in the sequence and look up their mapping into $\mathcal{N}'$ using $\mathcal{Z}$.
+Range compression allows us to complete one lookup per range.
+By definition, each character is $S$ is covered by only one range in $\mathcal{Z}$.
+We can thus iterate through the ranges in $\mathcal{Z}$ without considering each character.
+Following the GFA format, we are able to independently generate $\mathcal{P}$, as each path is represented on a separate record in the GFA.
 
 \begin{comment}
 
@@ -303,7 +364,7 @@ This allows us to map between positions in the sequences of $Q$, which is the fo
 \subsection{Alignment graph}
 
 Alignments between genomes imply a set of exact matches between subsequences of $Q$, which we represent as interval pairs $m := ((q_b, q_e), (t_b, t_e))$.
-We encode the $X$ matches in a set of alignments made by an external method \cite{wfmash,Li_2018} in $A = m_1 \ldots m_X$.
+We encode the $X$ matches in a set of alignments made by an external method \citep{wfmash,Li_2018} in $A = m_1 \ldots m_X$.
 \citep{Li_bedtk_2020}.
 
 %\FIXME{To integrate to the text
