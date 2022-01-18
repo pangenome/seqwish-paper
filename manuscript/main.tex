@@ -322,7 +322,7 @@ To reduce working memory requirements to an absolute minimum, we use a disk-back
 Indexing the implicit interval tree requires a sorting step which dominates the runtime of our algorithm.
 We adapt the current best-performing in-place parallel sorting algorithm, In-place Parallel Super Scalar Samplesort (IPS$^4$o), to work on a disk-backed, memory-mapped array \citep{axtmann2017}.
 This allows us work with $\mathcal{A}$, $\mathcal{Z}$, and $\bar{\mathcal{Z}}$ in external memory.
-By storing numerical identifiers in the backing array, we are able to generate a disk-backed multiset model which we use to compute the unique set of edges $\mathcal{E}$.
+By storing pairs of numerical identifiers in the backing array, we are able to generate a disk-backed multiset model which we use to compute the unique set of edges $\mathcal{E}$ in terms of offsets in $\mathcal{N}$.
 The graph sequence vector $\mathcal{N}$ is simply written by appending characters to a file.
 We ``mark'' nodes to generate $\mathcal{N}'$ using a bitvector kept in main memory, over which we subsequently generate a rank/select dictionary \cite{Gog_2014} for support of the final emission of the graph $\mathcal{V}$.
 
