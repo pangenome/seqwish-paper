@@ -1,5 +1,5 @@
 # Usage:
-#    grep 'Command\|wall\|Maximum' logs/*/*.log | python3 scripts/log2info.py | sort -k 1,3 -k4,4n -k 5,6n -k 7,7 | column -t
+#    cat *.log | python3 scripts/log2info.py | sort -k 1,3 -k4,4n -k 5,5n -k 6,6n -k 7,7 | column -t
 
 import sys
 
