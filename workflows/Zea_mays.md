@@ -180,7 +180,10 @@ for s in 20k 50k; do
     PAF=/lizardfs/guarracino/seqwish-paper/zmays/alignment/zmays41.s$s.l$l.p$p.n41.paf
     for k in 0 11 29 49 79 127 179 229 311; do
       GFA=/scratch/zmays41.s$s.l$l.p$p.n41.k$k.B20M.gfa
-      sbatch -p 386mem -c 48 --job-name seqwish_zmays --wrap 'hostname; cd /scratch; \time -v ~/tools/seqwish/bin/seqwish-ccfefb016fcfc9937817ce61dc06bbcf382be75e -t 48 -s '$ASSEMBLIES' -p '$PAF' -g '$GFA' -k '$k' -B20M -P; mv '$GFA' /lizardfs/guarracino/seqwish-paper/zmays/graphs/'
+      LOG=/scratch/zmays41.s$s.l$l.p$p.n12.k$k.B20M.size.log
+      #sbatch -p 386mem -c 48 --job-name zmays --wrap 'hostname; cd /scratch; \time -v ~/tools/seqwish/bin/seqwish-ccfefb016fcfc9937817ce61dc06bbcf382be75e -t 48 -s '$ASSEMBLIES' -p '$PAF' -g '$GFA' -k '$k' -B20M -P; mv '$GFA' /lizardfs/guarracino/seqwish-paper/zmays/graphs/'
+    
+      sbatch -p 386mem -c 48 --job-name zmays --wrap 'bash /lizardfs/guarracino/seqwish-paper/scripts/seqwish_with_logging.sh '$ASSEMBLIES' '$PAF' '$GFA' '$k' 20M '$LOG' 10; mv '$GFA' /lizardfs/guarracino/seqwish-paper/zmays/graphs/; mv '$LOG' /lizardfs/guarracino/seqwish-paper/logs/'
     done
   done
 done
@@ -196,8 +199,12 @@ for s in 20k 50k; do
     PAFS=${PAFS::-1}
     for k in 0 11 29 49 79 127 179 229 311; do
       GFA=/scratch/zmays41.s$s.l$l.p$p.n41.k$k.B20M.gfa
-      sbatch -p 386mem -c 48 --job-name seqwish_zmays --wrap 'hostname; cd /scratch; \time -v ~/tools/seqwish/bin/seqwish-ccfefb016fcfc9937817ce61dc06bbcf382be75e -t 48 -s '$ASSEMBLIES' -p '$PAFS' -g '$GFA' -k '$k' -B20M -P; mv '$GFA' /lizardfs/guarracino/seqwish-paper/zmays/graphs/'
+      LOG=/scratch/zmays41.s$s.l$l.p$p.n12.k$k.B20M.size.log
+      #sbatch -p 386mem -c 48 --job-name seqwish_zmays --wrap 'hostname; cd /scratch; \time -v ~/tools/seqwish/bin/seqwish-ccfefb016fcfc9937817ce61dc06bbcf382be75e -t 48 -s '$ASSEMBLIES' -p '$PAFS' -g '$GFA' -k '$k' -B20M -P; mv '$GFA' /lizardfs/guarracino/seqwish-paper/zmays/graphs/'
+ 
+      sbatch -p 386mem -c 48 --job-name zmays --wrap 'bash /lizardfs/guarracino/seqwish-paper/scripts/seqwish_with_logging.sh '$ASSEMBLIES' '$PAFS' '$GFA' '$k' 20M '$LOG' 10; mv '$GFA' /lizardfs/guarracino/seqwish-paper/zmays/graphs/; mv '$LOG' /lizardfs/guarracino/seqwish-paper/logs/'
     done
   done
 done
+
 ```

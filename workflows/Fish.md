@@ -102,3 +102,29 @@ for s in 50k; do
   done
 done
 ```
+
+## Graph induction
+
+```shell
+mkdir -p /lizardfs/guarracino/seqwish-paper/fish/graphs/
+
+ASSEMBLIES=/lizardfs/guarracino/seqwish-paper/fish/assemblies/fish12.fasta.gz
+
+for s in 50k; do
+  for p in 85 80; do
+    s_no_k=${s::-1}
+    l_no_k=$(echo $s_no_k '*' 3 | bc)
+    l=${l_no_k}k
+    
+    PAF=/lizardfs/guarracino/seqwish-paper/fish/alignment/fish12.s$s.l$l.p$p.n12.paf.gz
+    for k in 311 229 179 127 79 49 29 11 0; do
+      GFA=/scratch/fish12.s$s.l$l.p$p.n12.k$k.B50M.gfa
+      LOG=/scratch/fish12.s$s.l$l.p$p.n12.k$k.B50M.size.log
+      #sbatch -p 386mem -c 48 --job-name fish --wrap 'hostname; cd /scratch; \time -v ~/tools/seqwish/bin/seqwish-ccfefb016fcfc9937817ce61dc06bbcf382be75e -t 48 -s '$ASSEMBLIES' -p '$PAF' -g '$GFA' -k '$k' -B50M -P; mv '$GFA' /lizardfs/guarracino/seqwish-paper/fish/graphs/'
+    
+      sbatch -p 386mem -c 48 --job-name fish --wrap 'bash /lizardfs/guarracino/seqwish-paper/scripts/seqwish_with_logging.sh '$ASSEMBLIES' '$PAF' '$GFA' '$k' 50M '$LOG' 10; mv '$GFA' /lizardfs/guarracino/seqwish-paper/fish/graphs/; mv '$LOG' /lizardfs/guarracino/seqwish-paper/logs/'
+    done
+  done
+done
+
+```
