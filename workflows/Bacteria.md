@@ -311,3 +311,46 @@ for genus_species in "Helicobacter pylori" "Klebsiella pneumoniae" "Salmonella e
   done
 done
 ```
+
+## Graph induction
+
+```shell
+for genus_species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumoniae" "Helicobacter pylori"; do
+  echo $genus_species
+  
+  genus_species_lower=$(echo $genus_species | tr '[:upper:]' '[:lower:]')
+  g=$(echo $genus_species_lower | cut -f 1 -d ' ')
+  g=${g:0:1} # fist letter
+  species=$(echo $genus_species_lower | cut -f 2 -d ' ')
+  gspecies=$(echo $g$species)
+  
+  if [ $gspecies == "hpylori" ]; then
+    LOGSECS=1 # Graph induction is fast because the dataset is small
+  else
+    LOGSECS=10
+  fi
+  
+  mkdir -p /lizardfs/guarracino/seqwish-paper/bacteria/graphs/$gspecies
+  
+  ASSEMBLIES=/lizardfs/guarracino/seqwish-paper/bacteria/assemblies/$gspecies/*fasta.gz
+  NUM_HAPLOTYPES=$(cut -f 1 -d '#' $ASSEMBLIES.fai | sort | uniq | wc -l)
+  FILENAME=$(basename $ASSEMBLIES .fasta.gz)
+
+  for s in 5k 10k; do
+      for p in 95; do
+          s_no_k=${s::-1}
+          l_no_k=$(echo $s_no_k '*' 3 | bc)
+          l=${l_no_k}k
+
+          PAFS=$(ls /lizardfs/guarracino/seqwish-paper/bacteria/alignment/$gspecies/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.chunk_*.paf.gz | tr '\n' ',')
+          PAFS=${PAFS::-1}
+          for k in 311 229 179 127 79 49 29 11 0; do
+              GFA=/scratch/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.k$k.B20M.gfa
+              LOG=/scratch/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.k$k.B20M.size.log
+              
+              sbatch -p 386mem -c 48 --job-name $gspecies --wrap 'bash /lizardfs/guarracino/seqwish-paper/scripts/seqwish_with_logging.sh '$ASSEMBLIES' '$PAFS' '$GFA' '$k' 20M '$LOG' '$LOGSECS'; mv '$GFA' /lizardfs/guarracino/seqwish-paper/graphs/'$gspecies'; mv '$LOG' /lizardfs/guarracino/seqwish-paper/logs/'
+          done
+      done
+  done
+done
+```

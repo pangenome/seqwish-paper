@@ -137,6 +137,7 @@ for s in 20k 50k; do
 done
 
 # -p 95
+### Approximate mapping and splitting
 for s in 20k 50k; do
   for p in 95; do
     s_no_k=${s::-1}
@@ -147,7 +148,7 @@ for s in 20k 50k; do
     sbatch -p workers -c 48 --job-name zmays --wrap 'hostname; cd /scratch; \time -v ~/tools/wfmash/build/bin/wfmash-948f1683d14927745aef781cdabeb66ac6c7880b '$ASSEMBLIES' '$ASSEMBLIES' -X -s '$s' -l '$l' -p '$p' -n 41 -t 48 -m > '$APPROX_PAF'; python3 ~/tools/wfmash/scripts/split_approx_mappings_in_chunks.py '$APPROX_PAF' 5'
   done
 done
-
+### Alignment
 for s in 20k 50k; do
   for p in 95; do
     s_no_k=${s::-1}
@@ -170,33 +171,19 @@ mkdir -p /lizardfs/guarracino/seqwish-paper/zmays/graphs/
 
 ASSEMBLIES=/lizardfs/guarracino/seqwish-paper/zmays/assemblies/zmays41.fasta.gz
 
-# -p 98
 for s in 20k 50k; do
-  for p in 98; do
+  for p in 98 95; do
     s_no_k=${s::-1}
     l_no_k=$(echo $s_no_k '*' 3 | bc)
     l=${l_no_k}k
     
-    PAF=/lizardfs/guarracino/seqwish-paper/zmays/alignment/zmays41.s$s.l$l.p$p.n41.paf
-    for k in 0 11 29 49 79 127 179 229 311; do
-      GFA=/scratch/zmays41.s$s.l$l.p$p.n41.k$k.B20M.gfa
-      LOG=/scratch/zmays41.s$s.l$l.p$p.n41.k$k.B20M.size.log
-      #sbatch -p 386mem -c 48 --job-name zmays --wrap 'hostname; cd /scratch; \time -v ~/tools/seqwish/bin/seqwish-ccfefb016fcfc9937817ce61dc06bbcf382be75e -t 48 -s '$ASSEMBLIES' -p '$PAF' -g '$GFA' -k '$k' -B20M -P; mv '$GFA' /lizardfs/guarracino/seqwish-paper/zmays/graphs/'
+    if [ $p == 98 ]; then
+        PAFS=/lizardfs/guarracino/seqwish-paper/zmays/alignment/zmays41.s$s.l$l.p$p.n41.paf
+    else
+        PAFS=$(ls /lizardfs/guarracino/seqwish-paper/zmays/alignment/zmays41.s$s.l$l.p$p.n41.chunk_*.paf | tr '\n' ',')
+        PAFS=${PAFS::-1}
+    fi
     
-      sbatch -p 386mem -c 48 --job-name zmays --wrap 'bash /lizardfs/guarracino/seqwish-paper/scripts/seqwish_with_logging.sh '$ASSEMBLIES' '$PAF' '$GFA' '$k' 20M '$LOG' 10; mv '$GFA' /lizardfs/guarracino/seqwish-paper/zmays/graphs/; mv '$LOG' /lizardfs/guarracino/seqwish-paper/logs/'
-    done
-  done
-done
-
-# -p 95
-for s in 20k 50k; do
-  for p in 95; do
-    s_no_k=${s::-1}
-    l_no_k=$(echo $s_no_k '*' 3 | bc)
-    l=${l_no_k}k
-    
-    PAFS=$(ls /lizardfs/guarracino/seqwish-paper/zmays/alignment/zmays41.s$s.l$l.p$p.n41.chunk_*.paf | tr '\n' ',')
-    PAFS=${PAFS::-1}
     for k in 0 11 29 49 79 127 179 229 311; do
       GFA=/scratch/zmays41.s$s.l$l.p$p.n41.k$k.B20M.gfa
       LOG=/scratch/zmays41.s$s.l$l.p$p.n12.k$k.B20M.size.log
