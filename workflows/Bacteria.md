@@ -345,10 +345,10 @@ for genus_species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumo
           PAFS=$(ls /lizardfs/guarracino/seqwish-paper/bacteria/alignment/$gspecies/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.chunk_*.paf.gz | tr '\n' ',')
           PAFS=${PAFS::-1}
           for k in 311 229 179 127 79 49 29 11 0; do
-              GFA=/scratch/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.k$k.B20M.gfa
-              LOG=/scratch/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.k$k.B20M.size.log
+              GFA=/scratch/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.k$k.B10M.gfa
+              LOG=/scratch/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.k$k.B10M.size.log
               
-              sbatch -p 386mem -c 48 --job-name $gspecies --wrap 'bash /lizardfs/guarracino/seqwish-paper/scripts/seqwish_with_logging.sh '$ASSEMBLIES' '$PAFS' '$GFA' '$k' 20M '$LOG' '$LOGSECS'; mv '$GFA' /lizardfs/guarracino/seqwish-paper/graphs/'$gspecies'; mv '$LOG' /lizardfs/guarracino/seqwish-paper/logs/'
+              sbatch -p 386mem -c 48 --job-name $gspecies --wrap 'bash /lizardfs/guarracino/seqwish-paper/scripts/seqwish_with_logging.sh '$ASSEMBLIES' '$PAFS' '$GFA' '$k' 10M '$LOG' '$LOGSECS'; mv '$GFA' /lizardfs/guarracino/seqwish-paper/graphs/'$gspecies'; mv '$LOG' /lizardfs/guarracino/seqwish-paper/logs/'
           done
       done
   done
