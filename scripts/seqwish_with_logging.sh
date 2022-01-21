@@ -23,4 +23,4 @@ SIZE_DEMON_PID=$!
 kill $SIZE_DEMON_PID
 
 # Clean the directory (in case seqwish ends incorrectly)
-rm "$GFA".{sqa,sqi,sql,sqn,sqp,sqq,sqs}
+rm -f "$GFA".{sqa,sqi,sql,sqn,sqp,sqq,sqs}
