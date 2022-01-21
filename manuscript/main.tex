@@ -99,7 +99,7 @@ In contrast to reference-based approaches that relate sequences to a particular 
 Many approaches model the pangenome alignment as a \textit{pangenome graph} \cite{Garrison_2018,Yokoyama2019,Hickey:2020}.
 A pangenome graph encodes DNA sequences as walks through an underlying language encoded in a sequence graph \citep{Hein_1989}.
 In a pangenome graph, variation can be understood in the context of any part of any included genome  \citep{Eizenga_2020}.
-This lets us avoid the problem of reference bias, which can be understood as the a limitation of analyses to genome sequences that are similar to a chosen reference genome.
+This lets us avoid the problem of reference bias, which can be understood as the limitation of analyses to genome sequences that are similar to a chosen reference genome.
 %Reference bias distorts an inferred genome to appear more similar to the reference genome than it actually is.
 
 An unbiased pangenome graph would represent the alignment of all included genomes to all others.
@@ -109,7 +109,7 @@ These methods limit computational costs by reducing the number of pairwise compa
 We consider the problem of building a pangenome graph without these potential sources of bias.
 Such a graph would be an ideal system to represent variation between two or more high-quality genomes.
 Given the rapid development of complete genome assemblies for humans and other vertebrates \citep{Rhie_2021,Nurk_2021}, we need a practical approach that can achieve this for tens to thousands of genomes on commodity hardware.
-Here, we present \textit{seqwish}, an algorithm for the generation of a pangenome graph from of pairwise alignments.
+Here, we present \textit{seqwish}, an algorithm for the generation of a pangenome graph from pairwise alignments.
 %It transforms a collection of sequences and their alignments into a series of intermediate representations that support the computation of an equivalent pangenome graph.
 Our solution is simple, but experiments on diverse sequence collections demonstrate that it easily scales to large pangenome building problems.
 %It is also, by focus on the key graph induction step, a simple component.
