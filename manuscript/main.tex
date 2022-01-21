@@ -198,7 +198,7 @@ We add the character of the match $c(m_1^+)$ as a node $n_1$ in $\mathcal{V}$, a
 To induce the graph, we take the next unused match in $A : m_i \notin \forall_{j < i} m_j^+$, obtain $m_i^+$, and add $c(m_i^+)$ to $\mathcal{V}$.
 To allow the annotation of paths, we record the set of characters in $Q$ that match to a given node in $\mathcal{V}$ in mapping $Z = Q \to \mathcal{N} = m_1 \ldots m_{|\mathcal{N}|}$.
 We continue until all matches have been used.
-Finally, we establish paths ($P$) by walking them in $\mathcal{V}$ using $Z$, and record edges ($E$) where nodes occur successively in paths.
+Finally, we establish paths ($\mathcal{P}$) by walking them in $\mathcal{V}$ using $Z$, and record edges ($\mathcal{E}$) where nodes occur successively in paths.
 
 \begin{proof}
 After the first step of induction, the graph represents all pairwise matches in $m_1^+$.
@@ -278,12 +278,13 @@ We leave these to later work.
 
 As the bounds analysis shows, space requirements make it impractical to apply a trivial version of theorem \ref{thm:seqwish} to generate a large pangenome graph.
 Therefore, we need a compression approach that exploits redundancy in the input genomes to reduce the costs of the algorithm.
-In pratical, with large numbers of genomes, alignments dominate the computational costs.
-A simple technique is to generalize matches $m = (i, j)$ to pairs of ranges in $Q$.
-For highly-similar sequences, we expect exact matches to occur in long runs.
+When working with large numbers of genomes, alignments dominate the computational costs.
+A simple technique is to generalize matches $m = (i, j)$, which are between individual characters, to \textit{range}-matches over pairs of ranges of characters in $Q$.
+For highly-similar sequences, our expectation is that exact matches will occur in long runs.
 If the average pairwise diversity of sequences in our input is $1/k$, we expect exact matches to be around $k$ characters long.
-By encoding matches as pairs of ranges of characters, $r = (a, b) : a, b = (i, j) : i, j \in Q$, we can obtain a $\approx$ $k$-fold compression of $A$, which for clarity we label as $\mathcal{A}$.
-If sorted, $\mathcal{A}$ can be treated as an \textit{implicit interval tree} \citep{Li_bedtk_2020}, which allows queries of containment and overlap in $O(|\mathcal{A}| \log |\mathcal{A}|)$ time.
+By encoding matches as pairs of ranges of characters, $r = (a, b) : a, b = (i, j) : i, j \in Q$, we can obtain a $\approx$ $k$-fold compression of $A$, yielding the range-match array $\mathcal{A}$.
+
+If sorted, $\mathcal{A}$ can be treated as an \textit{implicit interval tree} \citep{Li_bedtk_2020}, which allows queries of containment and overlap in $O(\log |\mathcal{A}|)$ time.
 This compression requires trivial changes to our graph induction model.
 To obtain our match transitive closures ($m^+$), we query $\mathcal{A}$ for the range of a single character in $Q$, computing the character-level transitive relationships from the relative offsets of the ranges in $\mathcal{A}$.
 Match compression thus reduces our alignment storage memory bounds by a factor of $k$ without affecting our time complexity bounds.
@@ -393,10 +394,16 @@ We mark nodes to generate $\mathcal{N}'$ using a bitvector kept in main memory, 
 \section{Discussion}
 \label{sec:discussion}
 \FIXME{to do}
-We can apply our method to any collection of sequences and alignments.
+
+We can apply our method to various collections of sequences and alignments.
 It easily scales to some of the largest species pangenome construction problems possible using publicly-available, high-quality genome assemblies.
+
+However, this exposition comes with significant limitations.
 In our experiments, we have not explored the full problem, including alignment.
-We regard this as outside of the scope of the presented work, which focuses on a key kernel which is a bottleneck in the pangenome graph construction process.
+These lie outside of the scope of the presented work, wherein whe have focused on a key kernel which is a bottleneck in the pangenome graph construction process.
+Instead, \textit{seqwish} is a generic ``graph inducer'' of potentially many uses.
+But, it is important to note that the graphs which it produces are simply raw representations of an underlying alignment set.
+Due to differences in alignments that arise in regions of lower entropy, in practice, it is necessary to normalize generated graphs to simplify the local alignment structures represented in the graph.
 
 \section*{Acknowledgements}
 
