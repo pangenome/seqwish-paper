@@ -13,8 +13,12 @@ B = ''
 elapsed_wall_clock_time = ''
 max_resident_set_size = ''
 
+reject_result = False
+
 for line in sys.stdin:
-    if 'Command being timed' in line:
+    if 'Command terminated by signal' in line:
+        reject_result = True
+    elif 'Command being timed' in line:
         gfa_name = line.split('.gfa')[0].split('/')[-1]
         if len(gfa_name.split('.')) == 7:
             # Input dataset
@@ -33,7 +37,7 @@ for line in sys.stdin:
         max_resident_set_size = line.strip().split('): ')[-1]
 
         # Check if all information are available
-        if input and s and l and p and n and k and B and elapsed_wall_clock_time and max_resident_set_size:
+        if not reject_result and input and s and l and p and n and k and B and elapsed_wall_clock_time and max_resident_set_size:
             print(input, s, l, p, n, k, B, elapsed_wall_clock_time, max_resident_set_size)
 
         input = ''
@@ -45,3 +49,5 @@ for line in sys.stdin:
         B = ''
         elapsed_wall_clock_time = ''
         max_resident_set_size = ''
+
+        reject_result = False
