@@ -1,8 +1,9 @@
 # Usage:
-#    cat *.log | python3 scripts/log2info.py | sort -k 1,3 -k4,4n -k 5,5n -k 6,6n -k 7,7 | column -t
+#    cat *.log | python3 scripts/log2info.py
 
 import sys
 
+gfa_name = ''
 input = ''
 s = ''
 l = ''
@@ -36,10 +37,14 @@ for line in sys.stdin:
     elif 'Maximum resident set size' in line:
         max_resident_set_size = line.strip().split('): ')[-1]
 
-        # Check if all information are available
-        if not reject_result and input and s and l and p and n and k and B and elapsed_wall_clock_time and max_resident_set_size:
-            print(input, s, l, p, n, k, B, elapsed_wall_clock_time, max_resident_set_size)
+        # Convert in Gbytes
+        max_resident_set_size = '{:.4f}'.format(float(max_resident_set_size)/1024/1024)
 
+        # Check if all information are available
+        if not reject_result and gfa_name and input and s and l and p and n and k and B and elapsed_wall_clock_time and max_resident_set_size:
+            print('\t'.join([gfa_name, input, s, l, p, n, k, B, elapsed_wall_clock_time, max_resident_set_size]))
+
+        gfa_name = ''
         input = ''
         s = ''
         l = ''

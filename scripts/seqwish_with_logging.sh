@@ -13,6 +13,11 @@ hostname
 cd /scratch
 
 # Start the process to fill the log file
+### ls -s;  -s/--sizeprint the allocated size of each file, in blocks
+### To check the block_size:
+###echo 1 > sizeTest
+###ls -s --block-size 1 sizeTest
+###rm sizeTest
 (while true; do (date +%s; du -s .; ls -s; echo) >>"$LOG"; sleep "$SECS"; done) &
 SIZE_DEMON_PID=$!
 
