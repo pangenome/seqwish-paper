@@ -304,8 +304,44 @@ for genus_species in "Helicobacter pylori" "Klebsiella pneumoniae" "Salmonella e
           
           seq 0 9 | while read i; do
             APPROX_PAF=/lizardfs/guarracino/seqwish-paper/bacteria/alignment/$gspecies/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.approx.paf.chunk_$i.paf
-            PAF=/lizardfs/guarracino/seqwish-paper/bacteria/alignment/$gspecies/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.chunk_$i.paf.gz
-            sbatch -p workers -c 48 --job-name $gspecies --wrap 'hostname; cd /scratch; \time -v ~/tools/wfmash/build/bin/wfmash-948f1683d14927745aef781cdabeb66ac6c7880b '$ASSEMBLIES' '$ASSEMBLIES' -X -s '$s' -l '$l' -p '$p' -n '$NUM_HAPLOTYPES' -t 48 -i '$APPROX_PAF' | pigz -c > '$PAF
+            UNFILTERED_PAF=/lizardfs/guarracino/seqwish-paper/bacteria/alignment/$gspecies/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.chunk_$i.paf.gz
+            sbatch -p workers -c 48 --job-name $gspecies --wrap 'hostname; cd /scratch; \time -v ~/tools/wfmash/build/bin/wfmash-948f1683d14927745aef781cdabeb66ac6c7880b '$ASSEMBLIES' '$ASSEMBLIES' -X -s '$s' -l '$l' -p '$p' -n '$NUM_HAPLOTYPES' -t 48 -i '$APPROX_PAF' | pigz -c > '$UNFILTERED_PAF
+          done
+      done
+  done
+done
+```
+
+Filtering:
+
+```shell
+for genus_species in "Helicobacter pylori" "Klebsiella pneumoniae" "Salmonella enterica" "Escherichia coli" ; do
+  echo $genus_species
+  
+  genus_species_lower=$(echo $genus_species | tr '[:upper:]' '[:lower:]')
+  g=$(echo $genus_species_lower | cut -f 1 -d ' ')
+  g=${g:0:1} # fist letter
+  species=$(echo $genus_species_lower | cut -f 2 -d ' ')
+  gspecies=$(echo $g$species)
+  
+  ASSEMBLIES=/lizardfs/guarracino/seqwish-paper/bacteria/assemblies/$gspecies/*fasta.gz
+  NUM_HAPLOTYPES=$(cut -f 1 -d '#' $ASSEMBLIES.fai | sort | uniq | wc -l)
+  FILENAME=$(basename $ASSEMBLIES .fasta.gz)
+
+  for s in 5k 10k; do
+      for p in 95; do
+          s_no_k=${s::-1}
+          l_no_k=$(echo $s_no_k '*' 3 | bc)
+          l=${l_no_k}k
+          
+          p_threshold=$(echo "scale=2; $p/100.0" | bc)
+          
+          seq 0 9 | while read i; do
+              echo $s $p $i
+              UNFILTERED_PAF=/lizardfs/guarracino/seqwish-paper/bacteria/alignment/$gspecies/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.chunk_$i.paf.gz
+              PAF=/lizardfs/guarracino/seqwish-paper/bacteria/alignment/$gspecies/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.chunk_$i.filtered.paf.gz
+              
+              zcat $UNFILTERED_PAF | awk -v p=$p_threshold '{split($13, gi, /:/); if(gi[3] >= p) {print $0}}' | pigz -c > $PAF
           done
       done
   done
@@ -336,7 +372,7 @@ for genus_species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumo
   NUM_HAPLOTYPES=$(cut -f 1 -d '#' $ASSEMBLIES.fai | sort | uniq | wc -l)
   FILENAME=$(basename $ASSEMBLIES .fasta.gz)
 
-  for s in 5k 10k; do
+  for s in 10k 5k; do
       for p in 95; do
           s_no_k=${s::-1}
           l_no_k=$(echo $s_no_k '*' 3 | bc)
@@ -344,7 +380,7 @@ for genus_species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumo
 
           PAFS=$(ls /lizardfs/guarracino/seqwish-paper/bacteria/alignment/$gspecies/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.chunk_*.paf.gz | tr '\n' ',')
           PAFS=${PAFS::-1}
-          for k in 311 229 179 127 79 49 29 11 0; do
+          for k in 0 11 29 49 79 127 179 229 311; do
               GFA=/scratch/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.k$k.B10M.gfa
               LOG=/scratch/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.k$k.B10M.size.log
               

@@ -118,14 +118,14 @@ mkdir -p /lizardfs/guarracino/seqwish-paper/athaliana/graphs/
 
 ASSEMBLIES=/lizardfs/guarracino/seqwish-paper/athaliana/assemblies/athaliana16.fasta.gz
 
-for s in 20k 50k 100k; do
-  for p in 98 95 90; do
+for s in 100k 50k 20k; do
+  for p in 90 95 98; do
     s_no_k=${s::-1}
     l_no_k=$(echo $s_no_k '*' 3 | bc)
     l=${l_no_k}k
     
     PAF=/lizardfs/guarracino/seqwish-paper/athaliana/alignment/athaliana16.s$s.l$l.p$p.n16.paf.gz
-    for k in 311 229 179 127 79 49 29 11 0; do
+    for k in 0 11 29 49 79 127 179 229 311; do
       GFA=/scratch/athaliana16.s$s.l$l.p$p.n16.k$k.B50M.gfa
       LOG=/scratch/athaliana16.s$s.l$l.p$p.n16.k$k.B50M.size.log
       #sbatch -p 386mem -c 48 --job-name athaliana --wrap 'hostname; cd /scratch; \time -v ~/tools/seqwish/bin/seqwish-ccfefb016fcfc9937817ce61dc06bbcf382be75e -t 48 -s '$ASSEMBLIES' -p '$PAF' -g '$GFA' -k '$k' -B50M -P; mv '$GFA' /lizardfs/guarracino/seqwish-paper/athaliana/graphs/'
