@@ -147,7 +147,7 @@ for s in 20k 50k 100k; do
     
     for k in 311 229 179 127 79 49 29 11 0; do
       GFA=/lizardfs/guarracino/seqwish-paper/athaliana/graphs/athaliana16.s$s.l$l.p$p.n16.k$k.B50M.gfa
-      sbatch -p workers -c 12 --job-name athaliana_stats --wrap 'hostname; cd /scratch && ~/tools/odgi/bin/odgi-9e9c4811169760f64690e86619dbd1b088ec5955 build -g '$GFA' -o '$GFA'.og -t 12 -P; ~/tools/odgi/bin/odgi-9e9c4811169760f64690e86619dbd1b088ec5955 stats -i '$GFA'.og -S -b -L -W -t 12 -P > '$GFA'.og.stats.txt'
+      sbatch -p workers -c 12 --job-name athaliana_stats --wrap 'hostname; cd /scratch && ~/tools/odgi/bin/odgi-9e9c4811169760f64690e86619dbd1b088ec5955 stats -i '$GFA' -S -b -L -W -t 12 -P > '$GFA'.og.stats.txt'
     done
   done
 done

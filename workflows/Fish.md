@@ -126,5 +126,24 @@ for s in 50k; do
     done
   done
 done
+```
 
+## Statistics
+
+```shell
+for s in 50k; do
+  for p in 85 80; do
+    s_no_k=${s::-1}
+    l_no_k=$(echo $s_no_k '*' 3 | bc)
+    l=${l_no_k}k
+
+    for k in 311 229 179 127 79 49 29 11 0; do
+      GFA=/lizardfs/guarracino/seqwish-paper/fish/graphs/fish12.s$s.l$l.p$p.n12.k$k.B50M.gfa
+      sbatch -p workers -c 24 --job-name fish_stats --wrap 'hostname; cd /scratch && ~/tools/odgi/bin/odgi-67a7e5bb2f328888e194845a362cef9c8ccc488f stats -i '$GFA' -S -b -L -W -t 24 -P > '$GFA'.og.stats.txt';
+    done
+  done
+done
+
+# Compress GFA files
+ls /lizardfs/guarracino/seqwish-paper/fish/graphs/*.gfa | while read f; do echo $f; pigz $f; done
 ```

@@ -201,9 +201,17 @@ for s in 50k 20k; do
         PAFS=$(ls /lizardfs/guarracino/seqwish-paper/zmays/alignment/zmays41.s$s.l$l.p$p.n41.chunk_*.filtered.paf.gz | tr '\n' ',')
         PAFS=${PAFS::-1}
     fi
-    
-    B=1M
+        
     for k in 0 11 29 49 79 127 179 229 311; do
+      if [ $p == 98 ]; then
+          B=50M
+      else
+        if (( $k > 29)); then
+          B=50M
+        else
+          B=10k
+        fi
+      fi
       if [[ ! -s /lizardfs/guarracino/seqwish-paper/zmays/graphs/zmays41.s$s.l$l.p$p.n41.k$k.B$B.gfa ]]; then
           GFA=/scratch/zmays41.s$s.l$l.p$p.n41.k$k.B$B.gfa
           LOG=/scratch/zmays41.s$s.l$l.p$p.n12.k$k.B$B.size.log
@@ -211,6 +219,33 @@ for s in 50k 20k; do
      
           sbatch -p 386mem -c 48 --job-name zmays --wrap 'bash /lizardfs/guarracino/seqwish-paper/scripts/seqwish_with_logging.sh '$ASSEMBLIES' '$PAFS' '$GFA' '$k' '$B' '$LOG' 10; mv '$GFA' /lizardfs/guarracino/seqwish-paper/zmays/graphs/; mv '$LOG' /lizardfs/guarracino/seqwish-paper/logs/'        
       fi
+    done
+  done
+done
+```
+
+## Statistics
+
+```shell
+for s in 50k 20k; do
+  for p in 95 98; do
+    s_no_k=${s::-1}
+    l_no_k=$(echo $s_no_k '*' 3 | bc)
+    l=${l_no_k}k
+    
+    for k in 0 11 29 49 79 127 179 229 311; do
+      if [ $p == 98 ]; then
+          B=50M
+      else
+        if (( $k > 29)); then
+          B=50M
+        else
+          B=10k
+        fi
+      fi
+
+      GFA=/lizardfs/guarracino/seqwish-paper/zmays/graphs/zmays41.s$s.l$l.p$p.n41.k$k.B$B.gfa
+      sbatch -p workers -c 24 --job-name zmays_stats --wrap 'hostname; cd /scratch && ~/tools/odgi/bin/odgi-9e9c4811169760f64690e86619dbd1b088ec5955 stats -i '$GFA' -S -b -L -W -t 24 -P > '$GFA'.og.stats.txt'    
     done
   done
 done

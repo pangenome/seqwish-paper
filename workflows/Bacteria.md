@@ -12,14 +12,14 @@ cd /lizardfs/guarracino/seqwish-paper/bacteria/assemblies
 Download assembly information:
 
 ```shell
-wget ftp://ftp.ncbi.nih.gov/genomes/genbank/bacteria/assembly_summary.txt && pigz 
+wget ftp://ftp.ncbi.nih.gov/genomes/genbank/bacteria/assembly_summary.txt && pigz assembly_summary.txt
 # See ftp://ftp.ncbi.nlm.nih.gov/genomes/README_assembly_summary.txt for column descriptions
 ```
 
 Get IDs, species, and links for `Reference/representative genome`, `latest` and `Complete Genome` assemblies coming from `Full` data:
 
 ```shell
-zcat assembly_summary.txt | awk -F '\t' '{if($11=="latest" && $12=="Complete Genome" && $14=="Full" && $20 != "na") print $1"\t"$8"\t"$20 }' | pigz -c > assembly.bacteria.txt.gz
+zcat assembly_summary.txt.gz | awk -F '\t' '{if($11=="latest" && $12=="Complete Genome" && $14=="Full" && $20 != "na") print $1"\t"$8"\t"$20 }' | pigz -c > assembly.bacteria.txt.gz
 ```
 
 Top species with more assemblies:
@@ -351,7 +351,7 @@ done
 ## Graph induction
 
 ```shell
-for genus_species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumoniae" "Helicobacter pylori"; do
+for genus_species in "Helicobacter pylori" "Klebsiella pneumoniae" "Salmonella enterica" "Escherichia coli" ; do
   echo $genus_species
   
   genus_species_lower=$(echo $genus_species | tr '[:upper:]' '[:lower:]')
@@ -372,19 +372,60 @@ for genus_species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumo
   NUM_HAPLOTYPES=$(cut -f 1 -d '#' $ASSEMBLIES.fai | sort | uniq | wc -l)
   FILENAME=$(basename $ASSEMBLIES .fasta.gz)
 
-  for s in 10k 5k; do
+  for s in 10k; do
+  # for s in 10k 5k; do
       for p in 95; do
           s_no_k=${s::-1}
           l_no_k=$(echo $s_no_k '*' 3 | bc)
           l=${l_no_k}k
 
-          PAFS=$(ls /lizardfs/guarracino/seqwish-paper/bacteria/alignment/$gspecies/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.chunk_*.paf.gz | tr '\n' ',')
+          PAFS=$(ls /lizardfs/guarracino/seqwish-paper/bacteria/alignment/$gspecies/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.chunk_*.filtered.paf.gz | tr '\n' ',')
           PAFS=${PAFS::-1}
           for k in 0 11 29 49 79 127 179 229 311; do
               GFA=/scratch/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.k$k.B10M.gfa
               LOG=/scratch/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.k$k.B10M.size.log
               
-              sbatch -p 386mem -c 48 --job-name $gspecies --wrap 'bash /lizardfs/guarracino/seqwish-paper/scripts/seqwish_with_logging.sh '$ASSEMBLIES' '$PAFS' '$GFA' '$k' 10M '$LOG' '$LOGSECS'; mv '$GFA' /lizardfs/guarracino/seqwish-paper/graphs/'$gspecies'; mv '$LOG' /lizardfs/guarracino/seqwish-paper/logs/'
+              sbatch -p 386mem -c 48 --job-name $gspecies --wrap 'bash /lizardfs/guarracino/seqwish-paper/scripts/seqwish_with_logging.sh '$ASSEMBLIES' '$PAFS' '$GFA' '$k' 10M '$LOG' '$LOGSECS'; mv '$GFA' /lizardfs/guarracino/seqwish-paper/bacteria/graphs/'$gspecies'; mv '$LOG' /lizardfs/guarracino/seqwish-paper/logs/'
+          done
+      done
+  done
+done
+```
+
+## Statistics
+
+```shell
+for genus_species in "Helicobacter pylori" ; do
+  echo $genus_species
+  
+  genus_species_lower=$(echo $genus_species | tr '[:upper:]' '[:lower:]')
+  g=$(echo $genus_species_lower | cut -f 1 -d ' ')
+  g=${g:0:1} # fist letter
+  species=$(echo $genus_species_lower | cut -f 2 -d ' ')
+  gspecies=$(echo $g$species)
+  
+  if [ $gspecies == "hpylori" ]; then
+    LOGSECS=1 # Graph induction is fast because the dataset is small
+  else
+    LOGSECS=10
+  fi
+  
+  mkdir -p /lizardfs/guarracino/seqwish-paper/bacteria/graphs/$gspecies
+  
+  ASSEMBLIES=/lizardfs/guarracino/seqwish-paper/bacteria/assemblies/$gspecies/*fasta.gz
+  NUM_HAPLOTYPES=$(cut -f 1 -d '#' $ASSEMBLIES.fai | sort | uniq | wc -l)
+  FILENAME=$(basename $ASSEMBLIES .fasta.gz)
+
+  for s in 10k; do
+  # for s in 10k 5k; do
+      for p in 95; do
+          s_no_k=${s::-1}
+          l_no_k=$(echo $s_no_k '*' 3 | bc)
+          l=${l_no_k}k
+
+          for k in 0 11 29 49 79 127 179 229 311; do
+              GFA=/lizardfs/guarracino/seqwish-paper/bacteria/graphs/$gspecies/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.k$k.B10M.gfa
+              sbatch -p workers -c 24 --job-name ${gspecies}_stats --wrap 'hostname; cd /scratch && ~/tools/odgi/bin/odgi-67a7e5bb2f328888e194845a362cef9c8ccc488f stats -i '$GFA' -S -b -L -W -t 24 -P > '$GFA'.og.stats.txt';
           done
       done
   done
