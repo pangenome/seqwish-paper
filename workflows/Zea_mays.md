@@ -249,4 +249,7 @@ for s in 50k 20k; do
     done
   done
 done
+
+# Compress GFA files
+ls /lizardfs/guarracino/seqwish-paper/zmays/graphs/*.gfa | while read f; do echo $f; pigz $f; done
 ```

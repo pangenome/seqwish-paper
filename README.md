@@ -130,7 +130,7 @@ done
 Graph induction statistics:
 
 ```shell
-(echo output.gfa input.fasta input.paf s l p n k B "time.(h:mm:ss_or_m:ss)" memory_Gbytes disk_Gbytes | tr ' ' '\t' ;
+(echo output.gfa input.fasta input.paf s l p n k B time.seconds memory.Gbytes disk.Gbytes | tr ' ' '\t' ;
   join\
     <(cat /lizardfs/guarracino/seqwish-paper/logs/* | python3 /lizardfs/guarracino/seqwish-paper/scripts/log2info.py | sort -k 1)\
     <(cat /lizardfs/guarracino/seqwish-paper/logs/* | python3 /lizardfs/guarracino/seqwish-paper/scripts/sizeLog2diskUsage.py | sort -k 1) | sort -k2,4 -k5,5 -k7,7n) \
@@ -140,17 +140,18 @@ Graph induction statistics:
 Graph statistics:
 
 ```shell
-(echo input.gfa gzipped.disk.size.Mbytes | tr ' ' '\t'; find /lizardfs/guarracino/seqwish-paper/ -name *.gfa.gz | while read GFA; do
+(echo input.gfa gzipped.gfa.disk.size.Gbytes | tr ' ' '\t'; find /lizardfs/guarracino/seqwish-paper/ -name *.gfa.gz | while read GFA; do
   GFA_NAME=$(basename $GFA .gfa.gz);
   FILESIZE_MB=$(du -m "$GFA" | cut -f1);
-  echo $GFA_NAME $FILESIZE_MB  | tr ' ' '\t';
-done) > output_gfa.tsv
+  FILESIZE_GB=$(echo "scale=4; $FILESIZE_MB" / 1024 | bc);
+  echo $GFA_NAME $FILESIZE_GB  | tr ' ' '\t';
+done) > /lizardfs/guarracino/seqwish-paper/statistics/output_gfa.tsv
 
-(echo input.gfa graph.lengh num.nodes num.edges num.paths num.components | tr ' ' '\t'; find /lizardfs/guarracino/seqwish-paper/ -name *.og.stats.txt | while read TXT; do
+(echo input.gfa graph.length num.nodes num.edges num.paths num.components | tr ' ' '\t'; find /lizardfs/guarracino/seqwish-paper/ -name *.og.stats.txt | while read TXT; do
   GFA_NAME=$(basename $TXT .gfa.og.stats.txt);
   NUM_COMPONENTS=$(grep '##num_weakly_connected_components' $TXT | cut -f 2 -d ' ')
   (echo -n $GFA_NAME " "; (sed -n '2 p' $TXT | tr '\n' ' '); echo $NUM_COMPONENTS) | tr ' ' '\t';
-done) > graph_statistics.tsv
+done) > /lizardfs/guarracino/seqwish-paper/statistics/graph_statistics.tsv
 
 ```
 
@@ -160,20 +161,20 @@ Put all together:
 ```shell
 join\
   <(sed 1,1d /lizardfs/guarracino/seqwish-paper/statistics/input_fasta.tsv | sort -k 1)\
-  <(sed 1,1d /lizardfs/guarracino/seqwish-paper/statistics/graph_induction.tsv | sort -k 2)\
+  <(sed 1,1d /lizardfs/guarracino/seqwish-paper/statistics/graph_induction.tsv | sed 's/.chunk_0.filtered//g' | sort -k 2)\
   -1 1 -2 2 > /lizardfs/guarracino/seqwish-paper/statistics/input_fasta+graph_induction.tmp.tsv
 
 join\
   <(sed 1,1d /lizardfs/guarracino/seqwish-paper/statistics/input_paf.tsv | sort -k 1)\
   <(sed 1,1d /lizardfs/guarracino/seqwish-paper/statistics/input_fasta+graph_induction.tmp.tsv | sort -k 11)\
-  -1 1 -2 11 | awk '{print $4,$5,$6,$7,$8,$9,$10,$11,$12,$1,$2,$3,$14,$15,$16,$17,$13,$18,$19,$20,$21,$22}' | sort -k 1,1 -k 13,13 -k 15,15nr -k 18,18nr | tr ' ' '\t' > input_fasta+input+paf+graph_induction.tmp.tsv
+  -1 1 -2 11 | awk '{print $4,$5,$6,$7,$8,$9,$10,$11,$12,$1,$2,$3,$14,$15,$16,$17,$13,$18,$19,$20,$21,$22}' | tr ' ' '\t' > input_fasta+input+paf+graph_induction.tmp.tsv
 
 join <(sed 1,1d output_gfa.tsv | sort -k 1) <(sed 1,1d graph_statistics.tsv | sort -k 1) > output_gfa+graph_statistics.tmp.tsv
 
-(echo input.fasta num.sequences num.haplotypes Gbps A.fraction C.fraction G.fraction T.fraction N.fraction input.paf num.alignments num.matches s l p n output.gfa k B "time.(h:mm:ss_or_m:ss)" memory_Gbytes disk_Gbytes gzipped.disk.size.Mbytes graph.lengh num.nodes num.edges num.paths num.components| tr ' ' '\t';  join\
+(echo run input.fasta num.sequences num.haplotypes Gbps A.fraction C.fraction G.fraction T.fraction N.fraction input.paf num.alignments num.matches s l p n k B time.seconds memory.Gbytes disk.Gbytes gzipped.gfa.disk.size.Gbytes graph.length num.nodes num.edges num.paths num.components| tr ' ' '\t';  join\
   <(sed 1,1d input_fasta+input+paf+graph_induction.tmp.tsv | sort -k 17)\
   <(sort output_gfa+graph_statistics.tmp.tsv -k 1) \
-  -1 17 -2 1 ) | tr ' ' '\t' > all_statistics.tsv
+  -1 17 -2 1 | sort -k 2,2 -k 14,14 -k 16,16nr -k 18,18nr) | tr ' ' '\t' > all_statistics.tsv
 
 rm input_fasta+graph_induction.tmp.tsv output_gfa+graph_statistics.tmp.tsv
 ```

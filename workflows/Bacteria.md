@@ -430,4 +430,7 @@ for genus_species in "Helicobacter pylori" ; do
       done
   done
 done
+
+# Compress GFA files
+ls /lizardfs/guarracino/seqwish-paper/bacteria/graphs/hpylori/*.gfa | while read f; do echo $f; pigz $f; done
 ```

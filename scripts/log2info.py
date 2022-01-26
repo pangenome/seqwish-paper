@@ -35,6 +35,21 @@ for line in sys.stdin:
     elif 'Elapsed (wall clock) time' in line:
         elapsed_wall_clock_time = line.strip().split('): ')[-1]
 
+        if len(elapsed_wall_clock_time.split(':')) == 3:
+            # hh:mm:ss
+            hh, mm, ss = elapsed_wall_clock_time.split(':')
+
+            elapsed_wall_clock_time = str(int(hh) * 3600 + int(mm) * 60 + int(ss))
+        elif len(elapsed_wall_clock_time.split(':')) == 2:
+            # mm:ss.xx
+            mm, ss = elapsed_wall_clock_time.split(':')
+            ss = ss.split('.')[0]
+
+            elapsed_wall_clock_time = str(int(mm) * 60 + int(ss))
+        else:
+            # Not expected
+            elapsed_wall_clock_time = ''
+
         max_resident_set_size = ''
     elif 'Maximum resident set size' in line:
         max_resident_set_size = line.strip().split('): ')[-1]
