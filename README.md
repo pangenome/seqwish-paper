@@ -179,6 +179,12 @@ join <(sed 1,1d output_gfa.tsv | sort -k 1) <(sed 1,1d graph_statistics.tsv | so
 rm input_fasta+graph_induction.tmp.tsv output_gfa+graph_statistics.tmp.tsv
 ```
 
+processing all_statistics.tsv to break apart some of its fields
+
+```shell
+paste all_statistics.tsv <(echo group seg.len min.mapping.len map.ident map.n seqwish.k seqwish.B | tr ' ' '\t'; cat /lizardfs/guarracino/seqwish-paper/statistics/all_statistics.tsv | cut -f 1 | tr '.' '\t' | tail -n+2 ) >stats.tsv
+```
+
 ## Bioinformatics - Instructions to Authors
 
 https://academic.oup.com/bioinformatics/pages/instructions_for_authors
