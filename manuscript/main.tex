@@ -382,6 +382,20 @@ We mark nodes to generate $\mathcal{N}'$ using a bitvector kept in main memory, 
 \label{sec:results}
 \FIXME{to do}
 
+
+\begin{table*}[!ht]
+    \centering
+    \caption{Performance of the graph induction algorithm}
+    \begin{tabular}{|l|l|l|l|l|l|l|l|l|l|}
+        \hline
+        species & sequences & haplotypes & fasta.Gbps & min.match.bp & time.seconds & memory.Gbytes & disk.Gbytes & graph.Gbps & components \\ \hline
+        A. thaliana & 922 & 16 & 1.90251 & 49 & 468 & 43.1287 & 7.1218 & 0.234284 & 100 \\ \hline
+        H. sapiens & 17478 & 38 & 114.627 & 49 & 39723 & 347.9261 & 464.3392 & 6.2322 & 724 \\ \hline
+        H. pylori & 292 & 250 & 0.407782 & 49 & 475 & 33.7270 & 11.9739 & 0.0302351 & 33 \\ \hline
+        Z. mays & 46289 & 41 & 90.2491 & 49 & 31043 & 351.1235 & 402.8716 & 13.8838 & 925 \\ \hline
+    \end{tabular}
+\end{table*}
+
 %The alignment is taken as truth, so some of the cross validation things we do for pggb are irrelevant.
 %The one experiment could be graph induction on many graphs, with a 2D/3D plot with input size (alignments) vs induction time and color/shape to show graph output size or something
 %Or
