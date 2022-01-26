@@ -147,10 +147,10 @@ Graph statistics:
   echo $GFA_NAME $FILESIZE_GB  | tr ' ' '\t';
 done) > /lizardfs/guarracino/seqwish-paper/statistics/output_gfa.tsv
 
-(echo input.gfa graph.length num.nodes num.edges num.paths num.components | tr ' ' '\t'; find /lizardfs/guarracino/seqwish-paper/ -name *.og.stats.txt | while read TXT; do
+(echo input.gfa graph.length.Gbps num.nodes num.edges num.paths num.components | tr ' ' '\t'; find /lizardfs/guarracino/seqwish-paper/ -name *.og.stats.txt | while read TXT; do
   GFA_NAME=$(basename $TXT .gfa.og.stats.txt);
   NUM_COMPONENTS=$(grep '##num_weakly_connected_components' $TXT | cut -f 2 -d ' ')
-  (echo -n $GFA_NAME " "; (sed -n '2 p' $TXT | tr '\n' ' '); echo $NUM_COMPONENTS) | tr ' ' '\t';
+  (echo -n $GFA_NAME " "; (sed -n '2 p' $TXT | tr '\n' ' '); echo $NUM_COMPONENTS) | awk -v OFS='\t' '{print $1,$2/1000/1000/1000,$3,$4,$5,$6}' | tr ' ' '\t';
 done) > /lizardfs/guarracino/seqwish-paper/statistics/graph_statistics.tsv
 
 ```
@@ -171,7 +171,7 @@ join\
 
 join <(sed 1,1d output_gfa.tsv | sort -k 1) <(sed 1,1d graph_statistics.tsv | sort -k 1) > output_gfa+graph_statistics.tmp.tsv
 
-(echo run input.fasta num.sequences num.haplotypes Gbps A.fraction C.fraction G.fraction T.fraction N.fraction input.paf num.alignments num.matches s l p n k B time.seconds memory.Gbytes disk.Gbytes gzipped.gfa.disk.size.Gbytes graph.length num.nodes num.edges num.paths num.components| tr ' ' '\t';  join\
+(echo run input.fasta num.sequences num.haplotypes Gbps A.fraction C.fraction G.fraction T.fraction N.fraction input.paf num.alignments num.matches s l p n k B time.seconds memory.Gbytes disk.Gbytes gzipped.gfa.disk.size.Gbytes graph.length.Gbps num.nodes num.edges num.paths num.components| tr ' ' '\t';  join\
   <(sed 1,1d input_fasta+input+paf+graph_induction.tmp.tsv | sort -k 17)\
   <(sort output_gfa+graph_statistics.tmp.tsv -k 1) \
   -1 17 -2 1 | sort -k 2,2 -k 14,14 -k 16,16nr -k 18,18nr) | tr ' ' '\t' > all_statistics.tsv
