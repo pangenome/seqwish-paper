@@ -366,7 +366,25 @@ We adapt the current best-performing in-place parallel sorting algorithm, In-pla
 This allows us work with $\mathcal{A}$, $\mathcal{Z}$, and $\bar{\mathcal{Z}}$ in external memory.
 By storing pairs of numerical identifiers in the backing array, we are able to generate a disk-backed multiset model which we use to compute the unique set of edges $\mathcal{E}$ in terms of offsets in $\mathcal{N}$.
 The graph sequence vector $\mathcal{N}$ is simply written by appending characters to a file.
-We mark nodes to generate $\mathcal{N}'$ using a bitvector kept in main memory, over which we subsequently generate a rank/select dictionary \cite{Gog_2014} for support of the final emission of the graph $\mathcal{V}$.
+We mark nodes to generate $\mathcal{N}'$ using a bitvector kept in main memory, over which we subsequently generate a rank/select dictionary \citep{Gog_2014} for support of the final emission of the graph $\mathcal{V}$.
+
+\subsection{Short match filter}
+
+Building a graph from an all-to-all alignment does not guarantee that the local structure of the graph is easy to understand.
+The all-to-all alignment is not coordinated, with each mapping aligned in isolation, and in consequence it fails to resolve the indel alignment normalization problem \citep{Mose_2019}.
+This ambiguity can introduce deeply looping structures in the graph which collapse e.g. microsatellites and other short VNTRs into very small numbers of nodes with very complex local topologies.
+Such motifs can cause problems with downstream analysis.
+We find that ambiguity about the arrangement of very short matches tends to drive complex local structures in the graph.
+
+We mitigate this issue with a simple filter, \textit{seqwish -k}, which simply ignores exact matches that are shorter than $k$ characters.
+This filter necessarily increases the size of the induced graph.
+But, it also replaces complex motifs shorter than $k$ with single bubbles.
+In doing so, it also removes short, expensive matches, reducing the overall space requirements for \textit{seqwish}.
+When set very high, this filter can be used to generate a coarse, high-confidence graph built only from very long exact matches which will tend to be unique in the genome.
+Although the application of the $k>$ filter can result in a graph that is relatively ``under-aligned'', we can further refine it through the application of local multiple sequence alignment \citep{Gao_2020}, or graph normalization \citep{Doerr_2021}.
+In a pangenomic context, underalignment caused by $k>$ match filtering can be mitigated by transitive relationships present in the pangenome.
+
+%Also, short matches are expensive to store, and may not add much to our understanding of variation or our particular use of the graph.
 
 
 %    \FIXME{To integrate to the text}
@@ -385,7 +403,9 @@ We mark nodes to generate $\mathcal{N}'$ using a bitvector kept in main memory, 
 
 \begin{table*}[!ht]
     \centering
-    \caption{Performance of the graph induction algorithm}
+    \caption{Performance of the graph induction algorithm.
+        For each pangenome we have chosen a single experiment with the given \textit{seqwish -k} filter setting of 49bp.
+        }
     \begin{tabular}{|l|l|l|l|l|l|l|l|l|l|}
         \hline
         species & sequences & haplotypes & fasta.Gbps & min.match.bp & time.seconds & memory.Gbytes & disk.Gbytes & graph.Gbps & components \\ \hline
