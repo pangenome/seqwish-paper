@@ -125,7 +125,7 @@ Our solution is simple, but experiments on diverse sequence collections demonstr
 %A class of methods to represent pangenomes involves the \textit{sequence graph} \citep{Hein_1989}, where identical segments of different genomes collapse into a single representative segment (often node) in the graph.
 %In \textit{node-labeled} sequence graphs, nodes indicate DNA sequences, with edges connecting the nodes that are concatenated in the sequences represented in the graph.
 %A \textit{bidirected} sequence graph represents both strands of DNA.
-%On this model, variation graphs add the concept of \textit{path} to embed linear sequences (\textit{e.g.}, genomes or haplotypes) into the graph \citep{Garrison_2018}.
+%On this model, variation graphs add the concept of \textit{path} to embed linear sequences (e.g., genomes or haplotypes) into the graph \citep{Garrison_2018}.
 %Paths provide a stable coordinate system, allowing graph annotations and interoperability between different graphs.
 
 %A pangenome graph is a sequence model that encodes the mutual alignment of many genomes \citep{Eizenga_2020}.
@@ -168,7 +168,7 @@ A variation graph represents pairwise alignments between its embedded paths.
 \end{theorem}
 
 \begin{proof}
-By definition \ref{def:vg}, two paths have identical subsequences where they walk (or step) through the same series of oriented nodes (\textit{e.g.} $s_1 s_2 s_3$).
+By definition \ref{def:vg}, two paths have identical subsequences where they walk (or step) through the same series of oriented nodes (e.g. $s_1 s_2 s_3$).
 An identical set of path steps is thus equivalent to a sequence match.
 Pairwise alignments are by definition collections of character-level matches between sequences.
 The variation graph thus models a set of pairwise alignments between paths in $\mathcal{P}$.
@@ -222,7 +222,7 @@ However, by definition of $\mathcal{V}$, it cannot contain \textit{less} match i
 For the sake of time and space complexity analysis, we consider a simple algorithm to implement the induction process.
 The induction depends on our ability to compute transitive closures of matches $m^+$.
 If $A$ is sorted, we can find the matches of a given character in $Q$ using binary search, which allows us to compute $m^+$ for each character.
-We do so non-redundantly by marking each used character in $Q$ in an auxiliary data structure (\textit{e.g.} a bitvector of $|Q|$).
+We do so non-redundantly by marking each used character in $Q$ in an auxiliary data structure (e.g. a bitvector of $|Q|$).
 As we compute the transitive closures, we emit both the nodes (single characters) of the graph $\mathcal{N}$ and the sequence-to-graph mapping $Z$, which, like $A$, consists of match pairs, but rather than mapping $Q \to Q$, maps $Q \to \mathcal{N}$.
 As with $A$, we can sort $Z$ to obtain random access via binary search.
 Finally, we derive elements in $\mathcal{P}$ by iterating through the characters of $Q$ and looking up their mapping in $Z$ using binary search.
@@ -241,7 +241,7 @@ Assume an all-to-all alignment of $N$ sequences in $A$ as input, and that all se
 The induction must maintain reference to all characters in all input sequences $O(\mathcal{Q})$, all character-to-character matches $O(|A|) \approx O(\mathcal{Q}N^2)$, the mapping of $Q$ into the graph $O(|Z|) \approx O(\mathcal{Q})$, the nodes of the graph $O(|\mathcal{N}|) \approx O(\mathcal{Q}/N)$, the size of the edge set $O(|\mathcal{E}|) \approx O(\mathcal{Q})$, and the set of paths $O(|\mathcal{P}|) \approx O(\mathcal{Q})$.
 In total, na\"{i}ve theorem \ref{thm:seqwish}-based induction would require approximately $O(\mathcal{Q}N^2 + 4\mathcal{Q} + \mathcal{Q}/N)$ space.
 
-Assuming that we want to build a graph, \textit{e.g.}, 100 haploid human genomes of $\num{3e9}$ bp, where $N=100$ and $\mathcal{Q} \approx \num{e11}$, we might expect to use $\approx O(\num{e15})$ identifiers to store the full model.
+Assuming that we want to build a graph, e.g., 100 haploid human genomes of $\num{3e9}$ bp, where $N=100$ and $\mathcal{Q} \approx \num{e11}$, we might expect to use $\approx O(\num{e15})$ identifiers to store the full model.
 Such a design is almost infeasible for inputs larger than a handful of genomes.
 For instance, we would need $O(\num{3e12})$ identifiers for just 5 human genomes.
 Although it is feasible to compute such a graph using external memory, the approximately 200-fold increase in space relative to the input renders this clearly impractical.
@@ -366,14 +366,32 @@ We adapt the current best-performing in-place parallel sorting algorithm, In-pla
 This allows us work with $\mathcal{A}$, $\mathcal{Z}$, and $\bar{\mathcal{Z}}$ in external memory.
 By storing pairs of numerical identifiers in the backing array, we are able to generate a disk-backed multiset model which we use to compute the unique set of edges $\mathcal{E}$ in terms of offsets in $\mathcal{N}$.
 The graph sequence vector $\mathcal{N}$ is simply written by appending characters to a file.
-We mark nodes to generate $\mathcal{N}'$ using a bitvector kept in main memory, over which we subsequently generate a rank/select dictionary \cite{Gog_2014} for support of the final emission of the graph $\mathcal{V}$.
+We mark nodes to generate $\mathcal{N}'$ using a bitvector kept in main memory, over which we subsequently generate a rank/select dictionary \citep{Gog_2014} for support of the final emission of the graph $\mathcal{V}$.
+
+\subsection{Short match filter}
+
+Building a graph from an all-to-all alignment does not guarantee that the local structure of the graph is easy to understand.
+The all-to-all alignment is not coordinated, with each mapping aligned in isolation, and in consequence it fails to resolve the indel alignment normalization problem \citep{Mose_2019}.
+This ambiguity can introduce deeply looping structures in the graph which collapse e.g. microsatellites and other short VNTRs into very small numbers of nodes with very complex local topologies.
+Such motifs can cause problems with downstream analysis.
+We find that ambiguity about the arrangement of very short matches tends to drive complex local structures in the graph.
+
+We mitigate this issue with a simple filter, \textit{seqwish -k}, which simply ignores exact matches that are shorter than $k$ characters.
+This filter necessarily increases the size of the induced graph.
+But, it also replaces complex motifs shorter than $k$ with single bubbles.
+In doing so, it also removes short, expensive matches, reducing the overall space requirements for \textit{seqwish}.
+When set very high, this filter can be used to generate a coarse, high-confidence graph built only from very long exact matches which will tend to be unique in the genome.
+Although the application of the $k>$ filter can result in a graph that is relatively ``under-aligned'', we can further refine it through the application of local multiple sequence alignment \citep{Gao_2020}, or graph normalization \citep{Doerr_2021}.
+In a pangenomic context, underalignment caused by $k>$ match filtering can be mitigated by transitive relationships present in the pangenome.
+
+%Also, short matches are expensive to store, and may not add much to our understanding of variation or our particular use of the graph.
 
 
 %    \FIXME{To integrate to the text}
 %    To support this kind of data scale, we implement \texttt{seqwish}'s algorithm using disk-backed memory.
 %    We write the alignment graph into a disk-backed implicit interval tree, wherein each match in the input alignments is a queryable range.
 %    A lock-free, parallel union-find algorithm \FIXME{Wait-free parallel algorithms for the union-find problem} allows us to, for each base pair of input sequence, collect all other base pairs in the pangenome that are aligned to it.
-%    By processing this transitive closure operation in chunks (\textit{e.g.} 10Mbp at a time), we limit the maximum working memory (RAM) requirements of the process without affecting the output.
+%    By processing this transitive closure operation in chunks (e.g. 10Mbp at a time), we limit the maximum working memory (RAM) requirements of the process without affecting the output.
 %    After the transitive closure, we write our final graph on disk in a set of arrays, then augment it with the paths of our input sequences,
 %    finally emitting the resulting graph in the standard Graphical Fragment Assembly (GFA) format~\citep{GFA}.
 
@@ -385,7 +403,9 @@ We mark nodes to generate $\mathcal{N}'$ using a bitvector kept in main memory, 
 
 \begin{table*}[!ht]
     \centering
-    \caption{Performance of the graph induction algorithm}
+    \caption{Performance of the graph induction algorithm.
+        For each pangenome we have chosen a single experiment with the given \textit{seqwish -k} filter setting of 49bp.
+        }
     \begin{tabular}{|l|l|l|l|l|l|l|l|l|l|}
         \hline
         species & sequences & haplotypes & fasta.Gbps & min.match.bp & time.seconds & memory.Gbytes & disk.Gbytes & graph.Gbps & components \\ \hline
@@ -404,6 +424,8 @@ We mark nodes to generate $\mathcal{N}'$ using a bitvector kept in main memory, 
 %    \subsection{subsection 1}
 %\label{subsec:subsec1}
 %\FIXME{to do}
+
+\input{fig_experiments.tex}
 
 \section{Discussion}
 \label{sec:discussion}
