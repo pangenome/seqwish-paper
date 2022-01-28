@@ -15,4 +15,4 @@ scale_color_discrete("seqwish -k") +
 scale_shape_discrete("wfmash -p")
 #+ geom_text_repel(size=2)
 
-ggsave("manuscript/fig_experiment_stats.pdf", height=5, width=7)
+ggsave("manuscript/fig_experiment_stats.pdf", height=4, width=5.5)
