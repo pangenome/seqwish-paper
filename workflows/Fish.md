@@ -91,14 +91,41 @@ mkdir -p /lizardfs/guarracino/seqwish-paper/fish/alignment
 
 ASSEMBLIES=/lizardfs/guarracino/seqwish-paper/fish/assemblies/fish12.fasta.gz
 
-for s in 50k; do
-  for p in 85 80; do
+### Approximate mapping
+for s in 50k 20k; do
+  for p in 85 80 75; do
     s_no_k=${s::-1}
     l_no_k=$(echo $s_no_k '*' 3 | bc)
     l=${l_no_k}k
     
-    PAF=/lizardfs/guarracino/seqwish-paper/fish/alignment/fish12.s$s.l$l.p$p.n12.paf.gz
-    sbatch -p workers -c 48 --job-name fish --wrap 'hostname; cd /scratch; \time -v ~/tools/wfmash/build/bin/wfmash-948f1683d14927745aef781cdabeb66ac6c7880b '$ASSEMBLIES' '$ASSEMBLIES' -X -s '$s' -l '$l' -p '$p' -n 12 -t 48 | pigz -c > '$PAF
+    APPROX_PAF=/lizardfs/guarracino/seqwish-paper/fish/alignment/fish12.s$s.l$l.p$p.n12.approx.paf.gz
+    sbatch -p workers -c 48 --job-name fish --wrap 'hostname; cd /scratch; \time -v ~/tools/wfmash/build/bin/wfmash-948f1683d14927745aef781cdabeb66ac6c7880b '$ASSEMBLIES' '$ASSEMBLIES' -X -s '$s' -l '$l' -p '$p' -n 12 -t 48 -m | pigz -c > '$APPROX_PAF
+  done
+done
+
+### Alignment
+for s in 50k 20k; do
+  for p in 85 80 75; do
+    s_no_k=${s::-1}
+    l_no_k=$(echo $s_no_k '*' 3 | bc)
+    l=${l_no_k}k
+    
+    APPROX_PAF=/lizardfs/guarracino/seqwish-paper/fish/alignment/fish12.s$s.l$l.p$p.n12.approx.paf.gz
+    UNFILTERED_PAF=/lizardfs/guarracino/seqwish-paper/fish/alignment/fish12.s$s.l$l.p$p.n12.paf.gz
+    sbatch -p workers -c 48 --job-name fish --wrap 'hostname; cd /scratch; \time -v ~/tools/wfmash/build/bin/wfmash-948f1683d14927745aef781cdabeb66ac6c7880b '$ASSEMBLIES' '$ASSEMBLIES' -X -s '$s' -l '$l' -p '$p' -n 12 -t 48 -i '$APPROX_PAF' -b 1 | pigz -c > '$UNFILTERED_PAF
+  done
+done
+
+### Filtering
+#todo
+  for p in 85 80 75; do
+    s_no_k=${s::-1}
+    l_no_k=$(echo $s_no_k '*' 3 | bc)
+    l=${l_no_k}k
+    
+    UNFILTERED_PAF=/lizardfs/guarracino/seqwish-paper/fish/alignment/fish12.s$s.l$l.p$p.n12.paf.gz
+    PAF=/lizardfs/guarracino/seqwish-paper/fish/alignment/fish12.s$s.l$l.p$p.n12.filtered.paf.gz
+
   done
 done
 ```
