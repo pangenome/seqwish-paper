@@ -12,7 +12,7 @@ Install `sudo apt install ncbi-entrez-direct` and then get all the links for the
 bash genbank2url.sh assembly_results.zea_mays.txt zea_mays.ftp_links.txt
 ```
 
-Download the assemblies on `Octopus`:
+Download the assemblies:
 
 ```shell
 mkdir -p /lizardfs/guarracino/seqwish-paper/zmays/assemblies

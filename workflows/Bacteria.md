@@ -373,7 +373,7 @@ for genus_species in "Helicobacter pylori" ; do
   FILENAME=$(basename $ASSEMBLIES .fasta.gz)
 
   for s in 10k 5k; do
-      for p in 95; do
+      for p in 98 95 90; do
           s_no_k=${s::-1}
           l_no_k=$(echo $s_no_k '*' 3 | bc)
           l=${l_no_k}k

@@ -110,7 +110,7 @@ for s in 50k 20k; do
     (echo -n "$PAFS_NAME "; zcat $PAFS | awk '{ alignments += 1; matches += $10 } END { print alignments"\t"matches }') | tr ' ' '\t' >> /lizardfs/guarracino/seqwish-paper/statistics/input_paf.tsv
   done
 done
-for genus_species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumoniae" "Helicobacter pylori"; do
+for genus_species in "Helicobacter pylori"; do
   echo $genus_species
   
   genus_species_lower=$(echo $genus_species | tr '[:upper:]' '[:lower:]')
@@ -124,7 +124,7 @@ for genus_species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumo
   FILENAME=$(basename $ASSEMBLIES .fasta.gz)
 
   for s in 10k 5k; do
-      for p in 95; do
+      for p in 98 95 90; do
           s_no_k=${s::-1}
           l_no_k=$(echo $s_no_k '*' 3 | bc)
           l=${l_no_k}k
