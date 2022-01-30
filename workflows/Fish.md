@@ -123,15 +123,18 @@ for s in 20k; do
 done
 
 ### Filtering
-#todo
-  for p in 85 80 75; do
+for s in 20k; do
+  for p in 85; do
     s_no_k=${s::-1}
     l_no_k=$(echo $s_no_k '*' 3 | bc)
     l=${l_no_k}k
     
+    p_threshold=$(echo "scale=2; $p/100.0" | bc)
+    
     UNFILTERED_PAF=/lizardfs/guarracino/seqwish-paper/fish/alignment/fish12.s$s.l$l.p$p.n12.paf.gz
     PAF=/lizardfs/guarracino/seqwish-paper/fish/alignment/fish12.s$s.l$l.p$p.n12.filtered.paf.gz
-
+    
+    zcat $UNFILTERED_PAF | awk -v p=$p_threshold '{split($13, gi, /:/); if(gi[3] >= p) {print $0}}' | pigz -c > $PAF
   done
 done
 ```
