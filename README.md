@@ -164,7 +164,6 @@ done) > /lizardfs/guarracino/seqwish-paper/statistics/output_gfa.tsv
   NUM_COMPONENTS=$(grep '##num_weakly_connected_components' $TXT | cut -f 2 -d ' ')
   (echo -n $GFA_NAME " "; (sed -n '2 p' $TXT | tr '\n' ' '); echo $NUM_COMPONENTS) | awk -v OFS='\t' '{print $1,$2/1000/1000/1000,$3,$4,$5,$6}' | tr ' ' '\t';
 done) > /lizardfs/guarracino/seqwish-paper/statistics/graph_statistics.tsv
-
 ```
 
 
