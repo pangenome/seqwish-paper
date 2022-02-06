@@ -78,7 +78,9 @@ sed 1,1d hprcplus38.mash_triangle.txt | tr '\t' '\n' | grep GCA -v | grep e -v |
 ```shell
 mkdir -p /lizardfs/guarracino/seqwish-paper/hprc_plus/alignment
 
-sbatch -p lowmem -c 48 --wrap 'cd /scratch && ~/tools/wfmash/build/bin/wfmash-948f1683d14927745aef781cdabeb66ac6c7880b /lizardfs/guarracino/seqwish-paper/hprc_plus/assemblies/hprcplus38.fasta.gz /lizardfs/guarracino/seqwish-paper/hprc_plus/assemblies/hprcplus38.fasta.gz -X -s 100k -l 300k -p 98 -n 38 -k 16 -t 48 | pigz -c > /lizardfs/guarracino/seqwish-paper/hprc_plus/alignment/hprcplus38.s100k.l300k.p98.n38.k16.paf.gz'
+for p in 98 95; do
+  sbatch -p lowmem -c 48 --job-name hprcplus --wrap 'cd /scratch && ~/tools/wfmash/build/bin/wfmash-948f1683d14927745aef781cdabeb66ac6c7880b /lizardfs/guarracino/seqwish-paper/hprc_plus/assemblies/hprcplus38.fasta.gz /lizardfs/guarracino/seqwish-paper/hprc_plus/assemblies/hprcplus38.fasta.gz -X -s 100k -l 300k -p '$p' -n 38 -k 16 -t 48 | pigz -c > /lizardfs/guarracino/seqwish-paper/hprc_plus/alignment/hprcplus38.s100k.l300k.p'$p'.n38.k16.paf.gz'
+done
 ```
 
 ## Graph induction
@@ -87,23 +89,28 @@ sbatch -p lowmem -c 48 --wrap 'cd /scratch && ~/tools/wfmash/build/bin/wfmash-94
 mkdir -p /lizardfs/guarracino/seqwish-paper/hprc_plus/graphs
 
 ASSEMBLIES=/lizardfs/guarracino/seqwish-paper/hprc_plus/assemblies/hprcplus38.fasta.gz
-PAF=/lizardfs/guarracino/seqwish-paper/hprc_plus/alignment/hprcplus38.s100k.l300k.p98.n38.k16.paf.gz
 
-(echo 311; echo 229; echo 179; echo 127; echo 79; echo 49; echo 29; echo 11; echo 0;) | while read k; do
-  GFA=/scratch/hprcplus38.s100k.l300k.p98.n38.k$k.B50M.gfa
-  LOG=/scratch/hprcplus38.s100k.l300k.p98.n38.k$k.B50M.size.log
-  #sbatch -p 386mem -c 48 --job-name seqwk$k --wrap 'hostname; cd /scratch && \time -v ~/tools/seqwish/bin/seqwish-ccfefb016fcfc9937817ce61dc06bbcf382be75e -t 48 -s /lizardfs/guarracino/seqwish-paper/hprc_plus/assemblies/hprcplus38.fasta.gz -p /lizardfs/guarracino/seqwish-paper/hprc_plus/alignment/hprcplus38.s100k.l300k.p98.n38.k16.paf.gz -k '$k' -B 50M -g hprcplus38.s100k.l300k.p98.n38.k'$k'.B50M.gfa -P && mv hprcplus38.s100k.l300k.p98.n38.k'$k'.B50M.gfa /lizardfs/guarracino/seqwish-paper/hprc_plus/graphs/';
+for p in 98 95; do
+    PAF=/lizardfs/guarracino/seqwish-paper/hprc_plus/alignment/hprcplus38.s100k.l300k.p$p.n38.k16.paf.gz
   
-  sbatch -p 386mem -c 48 --job-name hprcplus --wrap 'bash /lizardfs/guarracino/seqwish-paper/scripts/seqwish_with_logging.sh '$ASSEMBLIES' '$PAF' '$GFA' '$k' 50M '$LOG' 10; mv '$GFA' /lizardfs/guarracino/seqwish-paper/hprc_plus/graphs/; mv '$LOG' /lizardfs/guarracino/seqwish-paper/logs/'
+    (echo 311; echo 229; echo 179; echo 127; echo 79; echo 49; echo 29; echo 11; echo 0;) | while read k; do
+      GFA=/scratch/hprcplus38.s100k.l300k.p$p.n38.k$k.B50M.gfa
+      LOG=/scratch/hprcplus38.s100k.l300k.p$p.n38.k$k.B50M.size.log
+      #sbatch -p 386mem -c 48 --job-name seqwk$k --wrap 'hostname; cd /scratch && \time -v ~/tools/seqwish/bin/seqwish-ccfefb016fcfc9937817ce61dc06bbcf382be75e -t 48 -s /lizardfs/guarracino/seqwish-paper/hprc_plus/assemblies/hprcplus38.fasta.gz -p /lizardfs/guarracino/seqwish-paper/hprc_plus/alignment/hprcplus38.s100k.l300k.p98.n38.k16.paf.gz -k '$k' -B 50M -g hprcplus38.s100k.l300k.p98.n38.k'$k'.B50M.gfa -P && mv hprcplus38.s100k.l300k.p98.n38.k'$k'.B50M.gfa /lizardfs/guarracino/seqwish-paper/hprc_plus/graphs/';
+      
+      sbatch -p 386mem -c 48 --job-name hprcplus --wrap 'bash /lizardfs/guarracino/seqwish-paper/scripts/seqwish_with_logging.sh '$ASSEMBLIES' '$PAF' '$GFA' '$k' 50M '$LOG' 10; mv '$GFA' /lizardfs/guarracino/seqwish-paper/hprc_plus/graphs/; mv '$LOG' /lizardfs/guarracino/seqwish-paper/logs/'
+    done
 done
 ```
 
 ## Statistics
 
 ```shell
-(echo 311; echo 229; echo 179; echo 127; echo 79; echo 49; echo 29; echo 11; echo 0) | while read k; do
-  GFA=/lizardfs/guarracino/seqwish-paper/hprc_plus/graphs/hprcplus38.s100k.l300k.p98.n38.k$k.B50M.gfa
-  sbatch -p workers -c 24 --job-name hprcplus_stats --wrap 'hostname; cd /scratch && ~/tools/odgi/bin/odgi-67a7e5bb2f328888e194845a362cef9c8ccc488f stats -i '$GFA' -S -b -L -W -t 24 -P > '$GFA'.og.stats.txt';
+for p in 98 95; do
+    (echo 311; echo 229; echo 179; echo 127; echo 79; echo 49; echo 29; echo 11; echo 0) | while read k; do
+      GFA=/lizardfs/guarracino/seqwish-paper/hprc_plus/graphs/hprcplus38.s100k.l300k.p$p.n38.k$k.B50M.gfa
+      sbatch -p workers -c 24 --job-name hprcplus_stats --wrap 'hostname; cd /scratch && ~/tools/odgi/bin/odgi-67a7e5bb2f328888e194845a362cef9c8ccc488f stats -i '$GFA' -S -b -L -W -t 24 -P > '$GFA'.og.stats.txt';
+    done
 done
 
 # Compress GFA files

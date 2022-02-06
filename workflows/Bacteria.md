@@ -223,7 +223,7 @@ Helicobacter pylori
 Mapping:
 
 ```shell
-for genus_species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumoniae" "Helicobacter pylori"; do
+for genus_species in "Helicobacter pylori" ; do
   echo $genus_species
   
   genus_species_lower=$(echo $genus_species | tr '[:upper:]' '[:lower:]')
@@ -239,7 +239,7 @@ for genus_species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumo
   FILENAME=$(basename $ASSEMBLIES .fasta.gz)
 
   for s in 5k 10k; do
-      for p in 95; do
+      for p in 98 95 90; do
           s_no_k=${s::-1}
           l_no_k=$(echo $s_no_k '*' 3 | bc)
           l=${l_no_k}k
@@ -254,7 +254,7 @@ done
 Split mappings:
 
 ```shell
-for genus_species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumoniae" "Helicobacter pylori"; do
+for genus_species in "Helicobacter pylori" ; do
   echo $genus_species
   
   genus_species_lower=$(echo $genus_species | tr '[:upper:]' '[:lower:]')
@@ -268,7 +268,7 @@ for genus_species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumo
   FILENAME=$(basename $ASSEMBLIES .fasta.gz)
 
   for s in 5k 10k; do
-      for p in 95; do
+      for p in 98 95 90; do
           s_no_k=${s::-1}
           l_no_k=$(echo $s_no_k '*' 3 | bc)
           l=${l_no_k}k
@@ -283,7 +283,7 @@ done
 Alignment:
 
 ```shell
-for genus_species in "Helicobacter pylori" "Klebsiella pneumoniae" "Salmonella enterica" "Escherichia coli" ; do
+for genus_species in "Helicobacter pylori" ; do
   echo $genus_species
   
   genus_species_lower=$(echo $genus_species | tr '[:upper:]' '[:lower:]')
@@ -297,7 +297,7 @@ for genus_species in "Helicobacter pylori" "Klebsiella pneumoniae" "Salmonella e
   FILENAME=$(basename $ASSEMBLIES .fasta.gz)
 
   for s in 5k 10k; do
-      for p in 95; do
+      for p in 98 95 90; do
           s_no_k=${s::-1}
           l_no_k=$(echo $s_no_k '*' 3 | bc)
           l=${l_no_k}k
@@ -315,7 +315,7 @@ done
 Filtering:
 
 ```shell
-for genus_species in "Helicobacter pylori" "Klebsiella pneumoniae" "Salmonella enterica" "Escherichia coli" ; do
+for genus_species in "Helicobacter pylori" ; do
   echo $genus_species
   
   genus_species_lower=$(echo $genus_species | tr '[:upper:]' '[:lower:]')
@@ -329,7 +329,7 @@ for genus_species in "Helicobacter pylori" "Klebsiella pneumoniae" "Salmonella e
   FILENAME=$(basename $ASSEMBLIES .fasta.gz)
 
   for s in 5k 10k; do
-      for p in 95; do
+      for p in 98 95 90; do
           s_no_k=${s::-1}
           l_no_k=$(echo $s_no_k '*' 3 | bc)
           l=${l_no_k}k
@@ -351,7 +351,7 @@ done
 ## Graph induction
 
 ```shell
-for genus_species in "Helicobacter pylori" "Klebsiella pneumoniae" "Salmonella enterica" "Escherichia coli" ; do
+for genus_species in "Helicobacter pylori" ; do
   echo $genus_species
   
   genus_species_lower=$(echo $genus_species | tr '[:upper:]' '[:lower:]')
@@ -372,9 +372,8 @@ for genus_species in "Helicobacter pylori" "Klebsiella pneumoniae" "Salmonella e
   NUM_HAPLOTYPES=$(cut -f 1 -d '#' $ASSEMBLIES.fai | sort | uniq | wc -l)
   FILENAME=$(basename $ASSEMBLIES .fasta.gz)
 
-  for s in 10k; do
-  # for s in 10k 5k; do
-      for p in 95; do
+  for s in 10k 5k; do
+      for p in 98 95 90; do
           s_no_k=${s::-1}
           l_no_k=$(echo $s_no_k '*' 3 | bc)
           l=${l_no_k}k
@@ -416,9 +415,8 @@ for genus_species in "Helicobacter pylori" ; do
   NUM_HAPLOTYPES=$(cut -f 1 -d '#' $ASSEMBLIES.fai | sort | uniq | wc -l)
   FILENAME=$(basename $ASSEMBLIES .fasta.gz)
 
-  for s in 10k; do
-  # for s in 10k 5k; do
-      for p in 95; do
+  for s in 10k 5k; do
+      for p in 98 95 90; do
           s_no_k=${s::-1}
           l_no_k=$(echo $s_no_k '*' 3 | bc)
           l=${l_no_k}k

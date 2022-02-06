@@ -3,7 +3,7 @@
 
 ## building the manuscript
 
-```bash
+```shell
 # Dependencies
 sudo apt-get -y install texlive texlive-latex-recommended \
         texlive-pictures texlive-latex-extra texlive-fonts-extra \
@@ -50,7 +50,19 @@ mv bin/odgi bin/odgi-9e9c4811169760f64690e86619dbd1b088ec5955
 cd ..
 ```
 
-# instructions to get statistics
+
+# workflows
+
+[Link to the `Arabidopsis_thaliana.md` workflow](workflows/Arabidopsis_thaliana.md).
+
+[Link to the `Bacteria.md` workflow](workflows/Bacteria.md).
+
+[Link to the `HPRC_plus.md` workflow](workflows/HPRC_plus.md).
+
+[Link to the `Zea_mays.md` workflow](workflows/Zea_mays.md).
+
+
+# instructions to get the statistics
 
 ```shell
 mkdir -p /lizardfs/guarracino/seqwish-paper/statistics
@@ -98,7 +110,7 @@ for s in 50k 20k; do
     (echo -n "$PAFS_NAME "; zcat $PAFS | awk '{ alignments += 1; matches += $10 } END { print alignments"\t"matches }') | tr ' ' '\t' >> /lizardfs/guarracino/seqwish-paper/statistics/input_paf.tsv
   done
 done
-for genus_species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumoniae" "Helicobacter pylori"; do
+for genus_species in "Helicobacter pylori"; do
   echo $genus_species
   
   genus_species_lower=$(echo $genus_species | tr '[:upper:]' '[:lower:]')
@@ -112,7 +124,7 @@ for genus_species in "Escherichia coli" "Salmonella enterica" "Klebsiella pneumo
   FILENAME=$(basename $ASSEMBLIES .fasta.gz)
 
   for s in 10k 5k; do
-      for p in 95; do
+      for p in 98 95 90; do
           s_no_k=${s::-1}
           l_no_k=$(echo $s_no_k '*' 3 | bc)
           l=${l_no_k}k
@@ -152,7 +164,6 @@ done) > /lizardfs/guarracino/seqwish-paper/statistics/output_gfa.tsv
   NUM_COMPONENTS=$(grep '##num_weakly_connected_components' $TXT | cut -f 2 -d ' ')
   (echo -n $GFA_NAME " "; (sed -n '2 p' $TXT | tr '\n' ' '); echo $NUM_COMPONENTS) | awk -v OFS='\t' '{print $1,$2/1000/1000/1000,$3,$4,$5,$6}' | tr ' ' '\t';
 done) > /lizardfs/guarracino/seqwish-paper/statistics/graph_statistics.tsv
-
 ```
 
 
@@ -177,12 +188,17 @@ join <(sed 1,1d output_gfa.tsv | sort -k 1) <(sed 1,1d graph_statistics.tsv | so
   -1 17 -2 1 | sort -k 2,2 -k 14,14 -k 16,16nr -k 18,18nr) | tr ' ' '\t' > all_statistics.tsv
 
 rm input_fasta+graph_induction.tmp.tsv output_gfa+graph_statistics.tmp.tsv
+
+
+
+(head all_statistics.tsv -n 1; grep k49 all_statistics.tsv | grep 'athaliana16.s20k.l60k.p90.n16.k49.B50M\|fish12.s50k.l150k.p80.n12.k49.B50M\|hprcplus38.s100k.l300k.p95.n38.k49.B50M\|zmays41.s20k.l60k.p95.n41.k49.B50M\|hpylori250.s5k.l15k.p90.n250.k49.B10M') | cut -f 2,3,4,5,18,20,21,22,24,28 | tr '\t' ',' 
 ```
 
 processing all_statistics.tsv to break apart some of its fields
 
 ```shell
 paste all_statistics.tsv <(echo group seg.len min.mapping.len map.ident map.n seqwish.k seqwish.B | tr ' ' '\t'; cat /lizardfs/guarracino/seqwish-paper/statistics/all_statistics.tsv | cut -f 1 | tr '.' '\t' | tail -n+2 ) >stats.tsv
+Rscript scripts/experiment_plot.R
 ```
 
 ## Bioinformatics - Instructions to Authors

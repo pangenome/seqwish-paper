@@ -12,7 +12,7 @@ Install `sudo apt install ncbi-entrez-direct` and then get all the links for the
 bash genbank2url.sh assembly_results.arabidopsis_thaliana.txt arabidopsis_thaliana.ftp_links.txt
 ```
 
-Download the assemblies on `Octopus`:
+Download the assemblies:
 
 ```shell
 mkdir -p /lizardfs/guarracino/seqwish-paper/athaliana/assemblies
