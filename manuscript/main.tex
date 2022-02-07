@@ -68,10 +68,10 @@ $^\ast$To whom correspondence should be addressed. \\
 
 \abstract{
 \textbf{Motivation:}
-Pangenome graphs, often formally encoded as variation graphs, model the mutual alignment of collections of genomes.
-A set of pairwise alignments implies a variation graph, but there are no scalable methods to generate such a graph or lossless string graph from these alignments.
-Existing approaches depend on a single reference or a specific ordering of genomes, and do not provide base-level information about the mapping of genomes into the pangenome.
-A scalable method to build pangenome graphs without such limitations would be a key step in pangenome construction and manipulation pipelines. \\
+Pangenome variation graphs model the mutual alignment of collections of DNA sequences.
+A set of pairwise alignments implies a variation graph, but there are no scalable methods to generate such a graph from these alignments.
+Existing related approaches depend on a single reference, a specific ordering of genomes, and do not provide base-level information about the mapping of genomes into the pangenome.
+A scalable, self-contained method to build pangenome graphs without such limitations would be a key step in pangenome construction and manipulation pipelines. \\
 \textbf{Results:}
 We design the \textit{seqwish} algorithm, which builds a variation graph from a set of sequences and alignments between them.
 We first transform the alignment set into an implicit interval tree.
@@ -104,7 +104,7 @@ This lets us avoid the problem of reference bias, which can be understood as the
 
 An unbiased pangenome graph would represent the alignment of all included genomes to all others.
 Existing methods approximate this relationship by progressive alignment to a graph initially based on a reference genome \citep{Li:2020}, or through a global structuring of the genome relationships in a neighbor joining phylogenetic tree \citep{Armstrong:2020}.
-These methods limit computational costs by reducing the number of pairwise comparisons, but in turn their results depend on input genome order, selected reference, and guide-tree topology.
+These methods limit computational costs by reducing the number of pairwise comparisons, but in turn their results depend on input genome order, selected reference, or guide-tree topology.
 
 We consider the problem of building a pangenome graph without these potential sources of bias.
 Such a graph would be an ideal system to represent variation between two or more high-quality genomes.
@@ -184,7 +184,7 @@ The resulting variation graph fully embeds both the sequences and all pairwise r
 This follows from \ref{def:vg}.
 Our input $Q = S \vee \bar{S}$ is a set of $N$ DNA sequences $S = g_1 \ldots g_N$ and their reverse complements $\bar{S} = \bar{g_1} \ldots \bar{g_N}$.
 %Assume that $i$ and $j$ are coordinates in $Q$.
-A match $m = (i, j)$ asserts the evolutionary equivalence of two characters in sequences in $Q$.
+A match $m = (i, j)$ asserts the aligned equivalence of two characters in sequences in $Q$.
 %$\forall_{(i, j) : j = |g| - i} g[i] = \bar{g}[j]$.
 Pairwise alignments between sequences in $Q$ are a set of matches $A = \{ m_1 \ldots m_{|A|} \}$.
 By standard definition, each sequence matches its own reverse complement, that is $g[i] = \bar{g}[j]$ for all $j = |g| - i$, and we assume these matches are included in $A$.
