@@ -222,7 +222,7 @@ However, by definition of $\mathcal{V}$, it cannot contain \textit{less} match i
 For the sake of time and space complexity analysis, we consider a simple algorithm to implement the induction process.
 The induction depends on our ability to compute transitive closures of matches $m^+$.
 If $A$ is sorted, we can find the matches of a given character in $Q$ using binary search, which allows us to compute $m^+$ for each character.
-We do so non-redundantly by marking each used character in $Q$ in an auxiliary data structure (e.g. a bitvector of $|Q|$).
+We do so non-redundantly by marking each used character in $Q$ in an auxiliary data structure $\mathcal{X}$, which could be encoded as a bitvector of length $|Q|$.
 As we compute the transitive closures, we emit both the nodes (single characters) of the graph $\mathcal{N}$ and the sequence-to-graph mapping $Z$, which, like $A$, consists of match pairs, but rather than mapping $Q \to Q$, maps $Q \to \mathcal{N}$.
 As with $A$, we can sort $Z$ to obtain random access via binary search.
 Finally, we derive elements in $\mathcal{P}$ by iterating through the characters of $Q$ and looking up their mapping in $Z$ using binary search.
@@ -239,11 +239,12 @@ Take $\mathcal{Q} = |S|$.
 Although our identifier space $\mathcal{Q}$ must include all of $Q$, in practice, we only store $S$, as $\bar{S}$ can be trivially computed.
 Assume an all-to-all alignment of $N$ sequences in $A$ as input, and that all sequences are approximately identical, so that the induced variation graph has $\mathcal{Q}/N$ nodes.
 The induction must maintain reference to all characters in all input sequences $O(\mathcal{Q})$, all character-to-character matches $O(|A|) \approx O(\mathcal{Q}N^2)$, the mapping of $Q$ into the graph $O(|Z|) \approx O(\mathcal{Q})$, the nodes of the graph $O(|\mathcal{N}|) \approx O(\mathcal{Q}/N)$, the size of the edge set $O(|\mathcal{E}|) \approx O(\mathcal{Q})$, and the set of paths $O(|\mathcal{P}|) \approx O(\mathcal{Q})$.
-In total, na\"{i}ve theorem \ref{thm:seqwish}-based induction would require approximately $O(\mathcal{Q}N^2 + 4\mathcal{Q} + \mathcal{Q}/N)$ space.
+We also maintain the bitvector $\mathcal{X}$ to mark seen characters of $Q$ during graph induction, which requires $O(\mathcal{Q})$ bits, equivalent to $O(\mathcal{Q} / \log_2\mathcal{Q})$ integer identifiers.
+In total, na\"{i}ve theorem \ref{thm:seqwish}-based induction would require approximately $O(\mathcal{Q}(N^2 + 1/N + 1/log_2{Q} + 4))$ space.
 
-Assuming that we want to build a graph, e.g., 100 haploid human genomes of $\num{3e9}$ bp, where $N=100$ and $\mathcal{Q} \approx \num{e11}$, we might expect to use $\approx O(\num{e15})$ identifiers to store the full model.
+Assuming that we want to build a graph of 100 haploid human genomes of $\num{3e9}$ bp, where $N=100$ and $\mathcal{Q} \approx \num{e11}$, we might expect to use $\approx \num{e15}$ identifiers to store the full model.
 Such a design is almost infeasible for inputs larger than a handful of genomes.
-For instance, we would need $O(\num{3e12})$ identifiers for just 5 human genomes.
+For instance, we would need $\approx \num{3e12}$ identifiers for just 5 human genomes.
 Although it is feasible to compute such a graph using external memory, the approximately 200-fold increase in space relative to the input renders this clearly impractical.
 
 Considering the time complexity of induction, we anticipate $O(|A|\log|A|)$ time to sort the match set and $O(\mathcal{N} \log |A|)$ to query it and compute our $\mathcal{N}$ transitive closures.
