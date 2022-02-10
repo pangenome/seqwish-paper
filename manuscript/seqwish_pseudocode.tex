@@ -13,7 +13,7 @@
 \Input{sequences $S$ and their alignment $A$}
 \Output{variation graph $\mathcal{V} = (\mathcal{N}, \mathcal{E}, \mathcal{P})$}
 $\mathcal{A}\gets$ \MakeMatchIITree{$A$} \tcp{alignment matches}
-$\mathcal{N}\gets \emptyset$ \tcp{the graph vector or set of nodes}
+$\mathcal{N}\gets \emptyset$ \tcp{vector containing the set of nodes}
 $\mathcal{X}\gets$ \BitVector{$0, |S|$} \tcp{seen characters of $S$}
 \tcp{for each character in the input}
 \For{$i\leftarrow 1$ \KwTo $|S|$}{
@@ -44,7 +44,7 @@ $\mathcal{N}' \gets \emptyset$ ; $l \gets \emptyset$ ; $b \gets 0$ ; $\mathcal{B
   $\mathcal{N}' \gets $ \AddNode{$\mathcal{N}'$, $\mathcal{N}[b\ldots i]$} \\
   $b \gets i$ \tcp{record last node boundary}
   }
-  $m \gets l$ \tcp{our last set of matching ranges}
+  $l \gets m$ \tcp{our last set of matching ranges}
 }
 $\mathcal{P}\gets \emptyset$;
 $\mathcal{E}\gets \emptyset$ \tcp{paths and edges}
@@ -67,5 +67,5 @@ $q \gets 1$ \tcp{for each sequence in the input}
 \Return{$\mathcal{V} \gets (\mathcal{N}', \mathcal{E}, \mathcal{P})$} \\
 \vspace{2mm}
 \caption{The \textit{seqwish} graph induction algorithm.
-We omit the details of several query algorithms that interact with the input alignments, the transitive match closure, implicit interval tree construction and query, node generation, and bitvector rank queries used in node compaction.}
+For the sake of simplicity, we omit the details of several query algorithms that interact with the input alignments, the transitive match closure, implicit interval tree construction and query, node generation, and bitvector rank queries used in node compaction.}
 \end{algorithm}
