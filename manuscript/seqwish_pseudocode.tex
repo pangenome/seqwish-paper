@@ -1,0 +1,71 @@
+\begin{algorithm}[hb!]
+
+\SetKwFunction{MakeMatchIITree}{MakeMatchIITree}
+\SetKwFunction{MakeIITree}{MakeIITree}
+\SetKwFunction{GetTransitiveMatches}{GetTransitiveMatches}
+\SetKwFunction{AddNode}{AddNode}
+\SetKwFunction{BitVector}{BitVector}
+\SetKwFunction{ExtendRanges}{ExtendRanges}
+\SetKwFunction{FirstOverlap}{FirstOverlap}
+\SetKwFunction{Overlaps}{Overlaps}
+\SetKwFunction{NodeMatching}{NodeMatching}
+\SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
+\Input{sequences $S$ and their alignment $A$}
+\Output{variation graph $\mathcal{V} = (\mathcal{N}, \mathcal{E}, \mathcal{P})$}
+$\mathcal{A}\gets$ \MakeMatchIITree{$A$} \tcp{alignment matches}
+$\mathcal{N}\gets \emptyset$ \tcp{the graph vector or set of nodes}
+$\mathcal{X}\gets$ \BitVector{$0, |S|$} \tcp{seen characters of $S$}
+\tcp{for each character in the input}
+\For{$i\leftarrow 1$ \KwTo $|S|$}{
+  \tcp{this character is not yet in $\mathcal{V}$}
+  \If{$\mathcal{X}[i] = 0$}
+  {
+    \tcp{characters in $S$ matched to $i$}
+    $m^+_i$ $\gets$ \GetTransitiveMatches{$\mathcal{A}$, $i$} \\
+    $\mathcal{N} \gets $ \AddNode{$\mathcal{N}$, $c(m^+_i)$} \tcp{new node in $\mathcal{V}$}
+    $j \gets |\mathcal{N}|$ \tcp{the node id or rank in $\mathcal{V}$}
+    \For{$z \in m^+_i$}{
+     $X[z] \gets 1$  \tcp{mark seen character}
+     $\mathcal{Z} \gets $ \ExtendRanges{$\mathcal{Z}$, z, j} \tcp{query$\to$graph}
+     $\bar{\mathcal{Z}} \gets $ \ExtendRanges{$\bar{\mathcal{Z}}$, j, z} \tcp{graph$\to$query}
+    }
+  }
+}
+\tcp{set up our $S \to \mathcal{N}$ mappings}
+$\mathcal{Z} \gets $ \MakeIITree{$\mathcal{Z}$};
+$\mathcal{\bar{Z}} \gets $ \MakeIITree{$\mathcal{\bar{Z}}$} \\
+\tcp{compact nodes in $\mathcal{N}$ yielding $\mathcal{N}'$}
+$\mathcal{N}' \gets \emptyset$ ; $l \gets \emptyset$ ; $b \gets 0$ ; $\mathcal{B}\gets$ \BitVector{$0, |\mathcal{N}|$} \\
+%$l \gets \emptset$ \tcp{compacted nodes and }
+\For{$i\leftarrow 1$ \KwTo $|\mathcal{N}|$}{
+  $m \gets $ \Overlaps{$\mathcal{\bar{Z}}$, $i$} \\
+  \If{$m \ne l$}{
+  $B[i] = 1$ \tcp{record a node boundary}
+  $\mathcal{N}' \gets $ \AddNode{$\mathcal{N}'$, $\mathcal{N}[b\ldots i]$} \\
+  $b \gets i$ \tcp{record last node boundary}
+  }
+  $m \gets l$ \tcp{our last set of matching ranges}
+}
+$\mathcal{P}\gets \emptyset$;
+$\mathcal{E}\gets \emptyset$ \tcp{paths and edges}
+$q \gets 1$ \tcp{for each sequence in the input}
+\For{$i\leftarrow 1$ \KwTo $N$}{
+  $p_i \gets \emptyset$ ;
+  $j \gets q$ ;
+  $y \gets 0$ \\
+  \Do{$j < q + |g_i|$}{
+    \tcp{extend our path with the next step}
+    $(a, b) \gets$ \FirstOverlap{$\mathcal{Z}, j$} \\
+    $x \gets$ \NodeMatching{$\mathcal{N}'$, $\mathcal{B}$, $(a, b)$} \\
+    $p_i \gets p_i + x$ \tcp{extend the path}
+    $j \gets j + (b - a)$ \tcp{increment offset in $S$}
+    $\mathcal{E} \gets \mathcal{E} \cup \{(y, x)\}$ \tcp{add to our edge set}
+    $y \gets x$ \tcp{record last step}
+  }
+  $q \gets j$ \tcp{increment our pointer in $S$}
+}
+\Return{$\mathcal{V} \gets (\mathcal{N}', \mathcal{E}, \mathcal{P})$} \\
+\vspace{2mm}
+\caption{The \textit{seqwish} graph induction algorithm.
+We omit the details of several query algorithms that interact with the input alignments, the transitive match closure, implicit interval tree construction and query, node generation, and bitvector rank queries used in node compaction.}
+\end{algorithm}

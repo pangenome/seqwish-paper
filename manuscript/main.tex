@@ -24,6 +24,9 @@
 \newtheorem{corollary}{Corollary}[theorem]
 \newtheorem{lemma}[theorem]{Lemma}
 
+\usepackage{algorithm2e}
+\SetKwRepeat{Do}{do}{while}%
+
 % we squeeze our figures even more together
 \captionsetup{belowskip=-2pt}
 
@@ -78,7 +81,7 @@ We first transform the alignment set into an implicit interval tree.
 To build up the variation graph, we query this tree-based representation of the alignments to reduce transitive matches into single DNA segments in a sequence graph.
 By recording the mapping from input sequence to output graph, we can trace the original paths through this graph, yielding a pangenome graph.
 We present an implementation that operates in external memory, using disk-backed data structures and a lock-free parallel algorithm to drive the core graph induction step.
-We demonstrate that our method scales to very large graph induction problems, and apply our work to build graphs from dozens of genomes from the same or different species in clades throughout the tree of life. \\
+We demonstrate that our method scales to very large graph induction problems, and apply our work to build graphs from dozens of genomes from species in clades throughout the tree of life. \\
 \textbf{Availability:}
 seqwish is published as free software under the MIT open source license.
 Source code and documentation are available at \url{https://github.com/ekg/seqwish}.
@@ -304,6 +307,8 @@ We use $\mathcal{Z}$ to compact unbranching regions of $\mathcal{V}$ into single
 
 %We render this 
 
+\input{seqwish_pseudocode.tex}
+
 \subsection{Node compaction}
 
 For simplicity, we have thus far presented a character-level model of variation graph induction.
@@ -316,7 +321,7 @@ To compact $\mathcal{V}$, we traverse $Q$, finding each entry in $\mathcal{Z}$ i
 %Any position in $\mathcal{G}$ so marked must be the start or end of a node.
 We subsequently use these markings to subdivide $\mathcal{N}$ into a compacted version $\mathcal{N}'$ such that $|n_i| \ge 1 \forall_{i \in 1 \ldots |\mathcal{N}'|}$.
 
-\FIXME{For reasons of computational efficiency, node identifiers are numeric.}
+%\FIXME{For reasons of computational efficiency, node identifiers are numeric.}
 
 \subsection{Induction partitioning}
 
@@ -327,6 +332,7 @@ We induce the related graph for each partition, appending the induction results 
 This partitioning can introduce boundary effects which change the contents of $\mathcal{Z}$ and $\bar{\mathcal{Z}}$ by splitting ranges at the boundaries of our partitions.
 However, while this will affect the compressed node definition $\mathcal{N}'$, it does not affect $\mathcal{N}$, and it can be corrected via a post-processing step to sort and compact the id space.
 Partitioning reduces the working memory limits to be in the order of the size of the largest transitive match closure found in the input.
+
 
 \section{Implementation}
 
