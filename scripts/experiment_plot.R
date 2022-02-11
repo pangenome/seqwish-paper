@@ -9,7 +9,7 @@ ggplot(subset(x, input.fasta=="athaliana16" & min.mapping.len=="l60k" | input.fa
        aes(x=graph.length.Gbps/(Gbps/n), y=time.seconds/3600, shape=map.ident, color=as.factor(k), label=min.mapping.len)) +
 geom_point() +
 facet_wrap(~input.fasta, scales="free") +
-scale_x_continuous("graph length / single genome length") +
+scale_x_continuous("graph length / average genome length") +
 scale_y_continuous("runtime (hours)") +
 scale_color_discrete("seqwish -k") +
 scale_shape_discrete("wfmash -p")
