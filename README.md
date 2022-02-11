@@ -191,7 +191,7 @@ rm input_fasta+graph_induction.tmp.tsv output_gfa+graph_statistics.tmp.tsv
 
 
 
-(head all_statistics.tsv -n 1; grep k49 all_statistics.tsv | grep 'athaliana16.s20k.l60k.p90.n16.k49.B50M\|fish12.s50k.l150k.p80.n12.k49.B50M\|hprcplus38.s100k.l300k.p95.n38.k49.B50M\|zmays41.s20k.l60k.p95.n41.k49.B50M\|hpylori250.s5k.l15k.p90.n250.k49.B10M') | cut -f 2,3,4,5,18,20,21,22,24,28 | tr '\t' ',' 
+(head all_statistics.tsv -n 1; grep k49 all_statistics.tsv | grep 'athaliana16.s20k.l60k.p90.n16.k49.B50M\|fish12.s50k.l150k.p80.n12.k49.B50M\|hprcplus38.s100k.l300k.p95.n38.k49.B50M\|zmays41.s20k.l60k.p95.n41.k49.B50M\|hpylori250.s5k.l15k.p90.n250.k49.B50M') | cut -f 2,3,4,5,18,20,21,22,24,28 | tr '\t' ',' 
 ```
 
 processing all_statistics.tsv to break apart some of its fields

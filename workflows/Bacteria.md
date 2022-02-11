@@ -381,10 +381,12 @@ for genus_species in "Helicobacter pylori" ; do
           PAFS=$(ls /lizardfs/guarracino/seqwish-paper/bacteria/alignment/$gspecies/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.chunk_*.filtered.paf.gz | tr '\n' ',')
           PAFS=${PAFS::-1}
           for k in 0 11 29 49 79 127 179 229 311; do
-              GFA=/scratch/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.k$k.B10M.gfa
-              LOG=/scratch/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.k$k.B10M.size.log
-              
-              sbatch -p 386mem -c 48 --job-name $gspecies --wrap 'bash /lizardfs/guarracino/seqwish-paper/scripts/seqwish_with_logging.sh '$ASSEMBLIES' '$PAFS' '$GFA' '$k' 10M '$LOG' '$LOGSECS'; mv '$GFA' /lizardfs/guarracino/seqwish-paper/bacteria/graphs/'$gspecies'; mv '$LOG' /lizardfs/guarracino/seqwish-paper/logs/'
+              for B in 10M 50M; do
+                  GFA=/scratch/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.k$k.B$B.gfa
+                  LOG=/scratch/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.k$k.B$B.size.log
+                  
+                  sbatch -p 386mem -c 48 --job-name $gspecies --wrap 'bash /lizardfs/guarracino/seqwish-paper/scripts/seqwish_with_logging.sh '$ASSEMBLIES' '$PAFS' '$GFA' '$k' '$B' '$LOG' '$LOGSECS'; mv '$GFA' /lizardfs/guarracino/seqwish-paper/bacteria/graphs/'$gspecies'; mv '$LOG' /lizardfs/guarracino/seqwish-paper/logs/'
+              done
           done
       done
   done
@@ -415,15 +417,17 @@ for genus_species in "Helicobacter pylori" ; do
   NUM_HAPLOTYPES=$(cut -f 1 -d '#' $ASSEMBLIES.fai | sort | uniq | wc -l)
   FILENAME=$(basename $ASSEMBLIES .fasta.gz)
 
-  for s in 10k 5k; do
+  for s in 5k 10k; do
       for p in 98 95 90; do
           s_no_k=${s::-1}
           l_no_k=$(echo $s_no_k '*' 3 | bc)
           l=${l_no_k}k
 
           for k in 0 11 29 49 79 127 179 229 311; do
-              GFA=/lizardfs/guarracino/seqwish-paper/bacteria/graphs/$gspecies/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.k$k.B10M.gfa
-              sbatch -p workers -c 24 --job-name ${gspecies}_stats --wrap 'hostname; cd /scratch && ~/tools/odgi/bin/odgi-67a7e5bb2f328888e194845a362cef9c8ccc488f stats -i '$GFA' -S -b -L -W -t 24 -P > '$GFA'.og.stats.txt';
+              for B in 10M 50M; do
+                  GFA=/lizardfs/guarracino/seqwish-paper/bacteria/graphs/$gspecies/$FILENAME.s$s.l$l.p$p.n${NUM_HAPLOTYPES}.k$k.B$B.gfa
+                  sbatch -p workers -c 24 --job-name ${gspecies}_stats --wrap 'hostname; cd /scratch && ~/tools/odgi/bin/odgi-67a7e5bb2f328888e194845a362cef9c8ccc488f stats -i '$GFA' -S -b -L -W -t 24 -P > '$GFA'.og.stats.txt';
+              done
           done
       done
   done
