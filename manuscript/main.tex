@@ -73,7 +73,7 @@ $^\ast$To whom correspondence should be addressed. \\
 \textbf{Motivation:}
 Pangenome variation graphs model the mutual alignment of collections of DNA sequences.
 A set of pairwise alignments implies a variation graph, but there are no scalable methods to generate such a graph from these alignments.
-Existing related approaches depend on a single reference, a specific ordering of genomes, and do not provide base-level information about the mapping of genomes into the pangenome.
+Existing related approaches depend on a single reference, a specific ordering of genomes, a de Bruijn model, and may not describe the base-level mapping of genomes into the pangenome.
 A scalable, self-contained method to build pangenome graphs without such limitations would be a key step in pangenome construction and manipulation pipelines. \\
 \textbf{Results:}
 We design the \textit{seqwish} algorithm, which builds a variation graph from a set of sequences and alignments between them.
@@ -106,8 +106,8 @@ This lets us avoid the problem of reference bias, which can be understood as the
 %Reference bias distorts an inferred genome to appear more similar to the reference genome than it actually is.
 
 An unbiased pangenome graph would represent the alignment of all included genomes to all others.
-Existing methods approximate this relationship by progressive alignment to a graph initially based on a reference genome \citep{Li:2020}, or through a global structuring of the genome relationships in a neighbor joining phylogenetic tree \citep{Armstrong:2020}.
-These methods limit computational costs by reducing the number of pairwise comparisons, but in turn their results depend on input genome order, selected reference, or guide-tree topology.
+Existing methods approximate this relationship by progressive alignment to a graph initially based on a reference genome \citep{Li:2020}, through a global structuring of the genome relationships in a neighbor joining phylogenetic tree \citep{Armstrong:2020}, or via creation of a \textit{de Bruijn} graph based on a fixed $k$-mer length \citep{Minkin_2016,Yu_2021}.
+These methods limit computational costs by reducing the number of pairwise comparisons, but in turn their results depend on input genome order, selected reference, guide-tree topology, or $k$-mer length.
 
 We consider the problem of building a pangenome graph without these potential sources of bias.
 Such a graph would be an ideal system to represent variation between two or more high-quality genomes.
@@ -319,11 +319,14 @@ Broadly, the size of nodes will be bounded by the average distance between varia
 To compact $\mathcal{V}$, we traverse $Q$, finding each entry in $\mathcal{Z}$ in turn, recording its start and end in $\mathcal{N}$, which can be understood as a character vector or string containing all the sequence in the nodes of $\mathcal{V}$.
 %in a ``graph vector'' $\mathcal{G} = n_1,n_2 \ldots n_{|\mathcal{N}|}$ containing the ordered characters of the graph.
 %Any position in $\mathcal{G}$ so marked must be the start or end of a node.
-We subsequently use these markings to subdivide $\mathcal{N}$ into a compacted version $\mathcal{N}'$ such that $|n_i| \ge 1 \forall_{i \in 1 \ldots |\mathcal{N}'|}$.
+We subsequently use these markings to subdivide $\mathcal{N}$ into a compacted version $\mathcal{N}'$ where compacted node boundaries are marked in a auxilary bitvector $\mathcal{B} : |\mathcal{B}| = |\mathcal{N}|$ where the first character in each compacted node is marked by a $1$ and other characters are marked $0$.
+$\mathcal{B}$ allows us to compute compacted node ids using efficient rank operation \citep{Gog_2014}.
+%such that $\forall_{i \in 1 \ldots |\mathcal{N}'|} |n_i| \ge 1$.
 
 %\FIXME{For reasons of computational efficiency, node identifiers are numeric.}
 
 \subsection{Induction partitioning}
+\label{sec:partitioning}
 
 Although match compression provides an approximate factor $k$ improvement in memory bounds for key data structures used in the induction, the approach we present in section \ref{sec:matchcompression} requires working memory in the order of the set of transitive match closures in the graph.
 A simple approach to reduce this bound is to divide the induction problem into smaller pieces.
@@ -376,6 +379,7 @@ The graph sequence vector $\mathcal{N}$ is simply written by appending character
 We mark nodes to generate $\mathcal{N}'$ using a bitvector kept in main memory, over which we subsequently generate a rank/select dictionary \citep{Gog_2014} for support of the final emission of the graph $\mathcal{V}$.
 
 \subsection{Short match filter}
+\label{sec:filter}
 
 Building a graph from an all-to-all alignment does not guarantee that the local structure of the graph is easy to understand.
 The all-to-all alignment is not coordinated, with each mapping aligned in isolation, and in consequence it fails to resolve the indel alignment normalization problem \citep{Mose_2019}.
@@ -405,14 +409,43 @@ In a pangenomic context, underalignment caused by $k>$ match filtering can be mi
 
 \section{Results}
 \label{sec:results}
-\FIXME{to do}
 
+We evaluate \textit{seqwish} through application to four pangenomes collected from \textit{A. thaliana}, \textit{H. sapiens}, \textit{H. pylori}, and \textit{Z. mays}.
+This limited survey is intended to demonstrate basic scaling properties of the method, and its practicality when applied to real pangenomes.
+We also consider the effect of the minimum match length filter described in section \ref{sec:filter}.
+Experiments were conducted on compute nodes with 386GB of RAM and AMD EPYC 7402P processors with 48 vCPUs.
+
+%\subsection{Alignment and graph induction pipeline}
+
+To construct the graph we first generate alignments with \textit{wfmash} \citep{wfmash}, which is designed specifically for high performance all-to-all alignment of fully-assembled genomes.
+\textit{wfmash} combines an algorithm for generating whole-genome homology maps (\textit{MashMap2}) \citep{Jain_2018} with an extension of the wavefront algorithm (WFA) \citep{Marco_Sola_2020} capable of obtaining base-level alignments for whole chromosomes.
+\textit{MashMap2} allows the user to define a homology length and pairwise divergence, expressed as a percent identity, over which to generate homology maps.
+This is useful when constructing pagnenome graphs, because, in contrast to methods that are based on $k$-mer chaining \citep{Li_2018}, it allows us to query the homology space of input genomes using two easily-interpretable parameters.
+The version of \textit{wfmash} used in these experiments allows us to align sequences with up to 10\% divergence between them, providing highly-sensitive input for our experiments.
+
+%\subsection{Experimental insights}
+
+In table \ref{tab:experiments} we provide input and construced graph parameters for a single parameter setting of \textit{wfmash} and \textit{seqwish}, obtaining graph parameters with the ODGI toolkit \citep{Guarracino_2021}.
+Figure \ref{fig:experiments} provides displays runtime versus graph size relative to the average input assembly length across the range of parameters chosen for each pangenome.
+These provide a consistent set of insights.
+Reducing the sensitivity of alignments by increasing the identity threshold results in a larger graph.
+Filtering short matches results in a larger graph, and for higher divergence collections like \textit{H. pylori} tends to obliterate much of the homology information in the pangenome graph.
+Reducing the size of $\mathcal{A}$ using these changes also greatly reduces runtime.
+In all cases, we find that the initial alignment step takes longer than graph induction.
+
+%\subsection{Limitations}
+
+Although we use disk-backed data structures to represent the graph, the maximum memory requirements of \textit{seqwish} are governed by the largest transitive match closure in the pangenome graph.
+We find that our particular partitioning scheme---we compact the graph in chunks as described in \ref{sec:partitioning}, using 50 Mbp chunks in these experiments---does not allow us to complete the graph induction for $p=95$ and $k=0$ for the \textit{H. sapiens} set, nor for \textit{Z. mays} with $k < 49$, where we run out of working memory.
+In practice, setting the chunk size lower tends to resolve this problem, but will also increase runtime.
+To simplify comparisons between the different parameter settings, we have not re-run these settings with a different partition size.
 
 \begin{table*}[!ht]
     \centering
     \caption{Performance of the graph induction algorithm.
         For each pangenome we report a single experiment with the given \textit{seqwish -k} filter setting of 49bp.
         }
+    \label{tab:experiments}
     \begin{tabular}{|l|l|l|l|l|l|l|l|l|l|}
         \hline
         species & sequences & haplotypes & fasta.Gbps & min.match.bp & time.seconds & memory.Gbytes & disk.Gbytes & graph.Gbps & components \\ \hline
@@ -422,6 +455,8 @@ In a pangenomic context, underalignment caused by $k>$ match filtering can be mi
         \textit{Z. mays} & 46289 & 41 & 90.2491 & 49 & 31043 & 351.1235 & 402.8716 & 13.8838 & 925 \\ \hline
     \end{tabular}
 \end{table*}
+
+
 
 %The alignment is taken as truth, so some of the cross validation things we do for pggb are irrelevant.
 %The one experiment could be graph induction on many graphs, with a 2D/3D plot with input size (alignments) vs induction time and color/shape to show graph output size or something
@@ -436,26 +471,43 @@ In a pangenomic context, underalignment caused by $k>$ match filtering can be mi
 
 \section{Discussion}
 \label{sec:discussion}
-\FIXME{to do}
 
-We can apply our method to various collections of sequences and alignments.
+We have presented a straightforward algorithm to generate a pangenome graph from a collection of genomes and alignments between them.
+By exploiting a simple model of this algorithm, we provide computational bounds that give insight into the complexity of the problem.
+We then make this approach practical by applying the concept of \textit{match compression}, which reduces the expected computational complexity by a factor proportional to the diversity of input sequences.
+Our experimental results domenstrate that we can apply our method to various collections of sequences and alignments.
 It easily scales to some of the largest species pangenome construction problems possible using publicly-available, high-quality genome assemblies.
+%Although we have focused on the problem of building pangenomes,
+\textit{seqwish} is a generic sequence graph inducer of potentially many uses.
+We envision that it can serve as a component in diverse sequence analysis and assembly pipelines, and hope that our thorough description of its core algorithm and functionality will enable its reuse by other researchers.
 
-However, this exposition comes with significant limitations.
-In our experiments, we have not explored the full problem, including alignment.
-These lie outside of the scope of the presented work, wherein whe have focused on a key kernel which is a bottleneck in the pangenome graph construction process.
-Instead, \textit{seqwish} is a generic ``graph inducer'' of potentially many uses.
-But, it is important to note that the graphs which it produces are simply raw representations of an underlying alignment set.
-Due to differences in alignments that arise in regions of lower entropy, in practice, it is necessary to normalize generated graphs to simplify the local alignment structures represented in the graph.
+It is also a potentially novel approach.
+Despite the existence of many methods for pangenome building, we are not aware of any comparable method which can losslessly convert an all-to-all alignment to a variation graph.
+This direct relationship allows users to adjust the shape of the resulting graph by modifying alignment parameters, allowing the design of custom graph construction processes based on domain-specific knowledge and potentially manual curation of assembly alignments.
+In contrast to existing methods, which depend on particular structuring of their input \citep{Li:2020,Armstrong:2020}, \textit{seqwish} is unbiased in that it directly and uniformly represents sequence relationships given on input in the resulting graph.
+Although we did not compare with \textit{de Bruijn} graph methods, which are also unbiased in their uniform treatment of input genomes \citep{Minkin_2016,Yu_2021}, we believe such methods are fundamentally different in that they collapse all exact matches of a given length $k$.
+This prevents high-level structuring of patterns of homology and orthology in the resulting graph, and they furthermore cannot be guided by a specific alignment set.
+
+Our presentation is necessarily limited, so as to focus on and describe the unique problem of variation graph induction.
+Thus, in this manuscript and our experiments, we have not explored the full problem of \textit{pangenome graph building}, which include both the initial alignment step and downstream processing of the resulting graph.
+These topics lie outside of the scope of the presented work, wherein whe have focused on a key kernel which is a bottleneck in the pangenome graph construction process.
+But, they are important for readers to consider.
+Although \textit{seqwish} perfectly represents its input alignments, the problem of generating and filtering an alignment set remains critical, as it determines the structure of the built graph.
+And this lossless property does not guarantee that the resulting graph is easy to work with or navigate---in practice find that downsteam processing is required to normalize the graph for many applications.
+We will cover these topics in future work.
+
+%However, users of \textit{seqwish} should note that although the graph 
+%But, it is important to note that the graphs which it produces are simply raw representations of an underlying alignment set.
+%Due to differences in alignments that arise in regions of lower entropy, in practice, it is necessary to normalize generated graphs to simplify the local alignment structures represented in the graph.
 
 \section*{Acknowledgements}
 
-%We thank Richard Durbin, Benedict Paten, and Simon Puglisi for support and helpful discussions in the development of this algorithm.
-We are grateful to members of the HPRC production teams for their development of resources used in our exposition.
+We are grateful to members of the HGSVC and HPRC production teams for their development of resources used in our exposition.
+We thank the authors of the pangenome resources made available on GenBank which have made our experiments possible.
 
 \section*{Funding}
 
-We gratefully acknowledge support from NIH/NIDA U01DA047638 (EG).
+We gratefully acknowledge support from NIH/NIDA U01DA047638 (EG) and efforts by Dr. Nicole Soranzo to establish a pangenome research unit at the Human Technopole in Milan, Italy (AG).
 \linebreak
 \linebreak
 \textit{Conflict of Interest}: none declared.
