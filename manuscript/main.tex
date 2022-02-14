@@ -152,7 +152,7 @@ Our solution is simple, but experiments on diverse sequence collections demonstr
 
 In this section, we provide a formal definition of variation graph induction.
 We then examine the bounds of a na\"{i}ve implementation of this algorithm.
-Finally, we propose compression and partitioning techniques to reduce the space and working memory complexity of the induction process by a large constant factor modulated by the degree of sequence divengence in the input pangenome.
+Finally, we propose compression and partitioning techniques to reduce the space and working memory complexity of the induction process by a large constant factor modulated by the degree of sequence divergence in the input pangenome.
 This yields a practical algorithm for variation graph induction that can scale to the largest available pangenomes.
 
 \subsection{Variation graph induction}
@@ -298,7 +298,7 @@ The same encoding can be used to replace the sequence-to-graph mapping $Z$, yiel
 Rather than pairs of characters in $Q$ and $\mathcal{N}$, we record runs of matches between them as range matches.
 Although in expectation the length of these matches should be strictly less than $k$, due to the interruption of the graph by variation between genomes, this still allows us to reduce the size of $Z$ using runs of matches between $Q$ and $\mathcal{N}$.
 Additionally, we store the inverse of $\mathcal{Z}$, which maps ranges from $\mathcal{N} \to Q$, as $\bar{\mathcal{Z}}$.
-We use $\mathcal{Z}$ to compact unbranching regions of $\mathcal{V}$ into single nodes, and $\bar{\mathcal{Z}}$ to accelerate our calculation of links in the graph.
+We use $\mathcal{Z}$ to compact non-branching regions of $\mathcal{V}$ into single nodes, and $\bar{\mathcal{Z}}$ to accelerate our calculation of links in the graph.
 
 %We can save $\approx k$ match pairs per recorded range 
 %a pair of ranges $r = [(a_0, a_1), (b_0, b_1)]$ in $Q$ requires twice the space, but we expect it to 
@@ -320,7 +320,7 @@ Broadly, the size of nodes will be bounded by the average distance between varia
 To compact $\mathcal{V}$, we traverse $Q$, finding each entry in $\mathcal{Z}$ in turn, recording its start and end in $\mathcal{N}$, which can be understood as a character vector or string containing all the sequence in the nodes of $\mathcal{V}$.
 %in a ``graph vector'' $\mathcal{G} = n_1,n_2 \ldots n_{|\mathcal{N}|}$ containing the ordered characters of the graph.
 %Any position in $\mathcal{G}$ so marked must be the start or end of a node.
-We subsequently use these markings to subdivide $\mathcal{N}$ into a compacted version $\mathcal{N}'$ where compacted node boundaries are marked in a auxilary bitvector $\mathcal{B} : |\mathcal{B}| = |\mathcal{N}|$ where the first character in each compacted node is marked by a $1$ and other characters are marked $0$.
+We subsequently use these markings to subdivide $\mathcal{N}$ into a compacted version $\mathcal{N}'$ where compacted node boundaries are marked in a auxiliary bitvector $\mathcal{B} : |\mathcal{B}| = |\mathcal{N}|$ where the first character in each compacted node is marked by a $1$ and other characters are marked $0$.
 $\mathcal{B}$ allows us to compute compacted node ids using efficient rank operations \citep{Gog_2014}.
 %such that $\forall_{i \in 1 \ldots |\mathcal{N}'|} |n_i| \ge 1$.
 %In Algorithm \ref{alg:seqwish} we provide a detailed description of the graph induction algorithm.
@@ -481,7 +481,7 @@ To simplify comparisons between the different parameter settings, we have not re
 We have presented a straightforward algorithm to generate a pangenome graph from a collection of genomes and alignments between them.
 By exploiting a simple model of this algorithm, we provide computational bounds that give insight into the complexity of the problem.
 We then make this approach practical by applying the concept of \textit{match compression}, which reduces the expected computational complexity by a factor proportional to the diversity of input sequences.
-Our experimental results demenstrate that we can apply our method to various collections of sequences and alignments.
+Our experimental results demonstrate that we can apply our method to various collections of sequences and alignments.
 It easily scales to some of the largest species pangenome construction problems possible using publicly-available, high-quality genome assemblies.
 %Although we have focused on the problem of building pangenomes,
 \textit{seqwish} is a generic sequence graph inducer of potentially many uses.
@@ -506,7 +506,7 @@ We will cover these topics in future work.
 %But, it is important to note that the graphs which it produces are simply raw representations of an underlying alignment set.
 %Due to differences in alignments that arise in regions of lower entropy, in practice, it is necessary to normalize generated graphs to simplify the local alignment structures represented in the graph.
 
-\section*{Acknowledgements}
+\section*{Acknowledgments}
 
 We are grateful to members of the HGSVC and HPRC production teams for their development of resources used in our exposition.
 We thank the authors of the pangenome resources made available on GenBank which have made our experiments possible.
