@@ -5,7 +5,7 @@ require(ggrepel)
 
 x <- read.delim('stats/stats.tsv')
 
-ggplot(subset(x, input.fasta=="athaliana16" & min.mapping.len=="l60k" | input.fasta=="hprcplus38" | input.fasta=="hpylori250" & min.mapping.len=="l15k" | input.fasta=="zmays41" & min.mapping.len=="l60k"),
+ggplot(subset(x, input.fasta=="athaliana16" & min.mapping.len=="l60k" | input.fasta=="hprcplus38" | input.fasta=="hpylori250" & min.mapping.len=="l15k" & seqwish.B=="B50M" | input.fasta=="zmays41" & min.mapping.len=="l60k"),
        aes(x=graph.length.Gbps/(Gbps/n), y=time.seconds/3600, shape=map.ident, color=as.factor(k), label=min.mapping.len)) +
 geom_point() +
 facet_wrap(~input.fasta, scales="free") +

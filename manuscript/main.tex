@@ -1,9 +1,7 @@
 \PassOptionsToPackage{utf8}{inputenc}
 \documentclass{bioinfo}
 
-\usepackage[draft]{hyperref}
 \usepackage{makecell}
-\usepackage{comment}
 
 \usepackage{floatrow}
 
@@ -14,7 +12,6 @@
 % singlelinecheck=false puts subcaptions on the left
 \usepackage[singlelinecheck=false]{subcaption}
 
-\usepackage{algorithm2e}
 \usepackage[usenames,dvipsnames]{xcolor}
 
 \usepackage{amsthm}
@@ -37,6 +34,10 @@
 \newcommand{\red}[1]{{\textcolor{Red}{#1}}}
 \newcommand{\FIXME}[1]{\red{[FIXME: #1]}}
 
+\usepackage{orcidlink}
+\hypersetup{hidelinks}
+
+
 \def\labelitemi{--}
 
 \copyrightyear{2022} \pubyear{XXXX}
@@ -51,8 +52,8 @@
 
 \title[Unbiased pangenome graphs]{Unbiased pangenome graphs}
 \author[Garrison \textit{et~al}.]{
-Erik~Garrison\,$^{\text{\sfb 1}*}$,
-Andrea~Guarracino\,$^{\text{\sfb 2}}$
+Erik~Garrison\,$^{\orcidlink{0000-0003-3821-631X}\text{\sfb 1}*}$,
+Andrea~Guarracino\,$^{\orcidlink{0000-0001-9744-131X}\text{\sfb 2}}$
 }
 
 \address{
@@ -437,7 +438,7 @@ In all cases, we find that the initial alignment step takes longer than graph in
 %\subsection{Limitations}
 
 Although we use disk-backed data structures to represent the graph, the maximum memory requirements of \textit{seqwish} are governed by the largest transitive match closure in the pangenome graph.
-We find that our particular partitioning scheme (we compact the graph in chunks as described in~\ref{sec:partitioning}, using 50 Mbps chunks in all the experiments except for \textit{H. pylori} where we used chunks 10 Mbps long) does not allow us to complete the graph induction for $p=95$ and $k=0$ for the \textit{H. sapiens} set, nor for \textit{Z. mays} with $k \leq 29$, where we run out of working memory.
+We find that our particular partitioning scheme (we compact the graph in chunks as described in~\ref{sec:partitioning}, using 50 Mbps chunks in all the experiments) does not allow us to complete the graph induction for $p=95$ and $k=0$ for the \textit{H. sapiens} set, nor for \textit{Z. mays} with $k \leq 29$, where we run out of working memory.
 In practice, setting the chunk size lower tends to resolve this problem, but will also increase runtime.
 To simplify comparisons between the different parameter settings, we have not re-run these settings with a different partition size nor on computer nodes with a larger, then different, amount of RAM.
 
@@ -453,10 +454,11 @@ To simplify comparisons between the different parameter settings, we have not re
         species & sequences & haplotypes & fasta.Gbps & min.match.bps & time.seconds & memory.Gbytes & disk.Gbytes & graph.Gbps & components \\ \hline
         \textit{A. thaliana} & 922 & 16 & 1.90251 & 49 & 468 & 43.1287 & 7.1218 & 0.234284 & 100 \\ \hline
         \textit{H. sapiens} & 17478 & 38 & 114.627 & 49 & 46268 & 347.4983 & 604.4261 & 4.47126 & 474 \\ \hline
-        \textit{H. pylori} & 292 & 250 & 0.407782 & 49 & 790 & 75.7514 & 20.2070 & 0.01421 & 5 \\ \hline
+        \textit{H. pylori} & 292 & 250 & 0.407782 & 49 & 777 & 74.9484 & 20.2070 & 0.01421 & 5 \\ \hline
         \textit{Z. mays} & 46289 & 41 & 90.2491 & 49 & 31043 & 351.1235 & 402.8716 & 13.8838 & 925 \\ \hline
     \end{tabular}
 \end{table*}
+
 
 
 
