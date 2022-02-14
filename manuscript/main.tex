@@ -81,7 +81,7 @@ We design the \textit{seqwish} algorithm, which builds a variation graph from a 
 We first transform the alignment set into an implicit interval tree.
 To build up the variation graph, we query this tree-based representation of the alignments to reduce transitive matches into single DNA segments in a sequence graph.
 By recording the mapping from input sequence to output graph, we can trace the original paths through this graph, yielding a pangenome variation graph.
-We present an implementation that operates in external memory, using disk-backed data structures and a lock-free parallel algorithm to drive the core graph induction step.
+We present an implementation that operates in external memory, using disk-backed data structures and lock-free parallel methods to drive the core graph induction step.
 We demonstrate that our method scales to very large graph induction problems by applying it to build pangenome graphs for several species. \\
 \textbf{Availability:}
 \textit{seqwish} is published as free software under the MIT open source license.
