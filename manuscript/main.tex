@@ -332,10 +332,11 @@ $\mathcal{B}$ allows us to compute compacted node ids using efficient rank opera
 Although match compression provides an approximate factor $k$ improvement in memory bounds for key data structures used in the induction, the approach we present in section \ref{sec:matchcompression} requires working memory in the order of the set of transitive match closures in the graph.
 A simple approach to reduce this bound is to divide the induction problem into smaller pieces.
 We do so by computing the graph induction for a collection of initial characters in $Q$.
-We induce the related graph for each partition, appending the induction results to the appropriate data structures.
+%We induce the related graph for each partition, appending the induction results to the appropriate data structures.
+In each partition, we apply a lock-free parallel union-find algorithm to derive the match closures \citep{anderson1991wait}, appending results to appropriate data structures.
 This partitioning can introduce boundary effects which change the contents of $\mathcal{Z}$ and $\bar{\mathcal{Z}}$ by splitting ranges at the boundaries of our partitions.
 However, while this will affect the compressed node definition $\mathcal{N}'$, it does not affect $\mathcal{N}$, and it can be corrected via a post-processing step to sort and compact the id space.
-Partitioning reduces the working memory limits to be in the order of the size of the largest transitive match closure found in the input.
+%Partitioning reduces the working memory limits to be in the order of the size of the largest transitive match closure found in the input.
 
 
 \section{Implementation}
