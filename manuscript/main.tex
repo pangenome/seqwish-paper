@@ -323,6 +323,7 @@ To compact $\mathcal{V}$, we traverse $Q$, finding each entry in $\mathcal{Z}$ i
 We subsequently use these markings to subdivide $\mathcal{N}$ into a compacted version $\mathcal{N}'$ where compacted node boundaries are marked in a auxilary bitvector $\mathcal{B} : |\mathcal{B}| = |\mathcal{N}|$ where the first character in each compacted node is marked by a $1$ and other characters are marked $0$.
 $\mathcal{B}$ allows us to compute compacted node ids using efficient rank operations \citep{Gog_2014}.
 %such that $\forall_{i \in 1 \ldots |\mathcal{N}'|} |n_i| \ge 1$.
+%In Algorithm \ref{alg:seqwish} we provide a detailed description of the graph induction algorithm.
 
 %\FIXME{For reasons of computational efficiency, node identifiers are numeric.}
 
@@ -341,7 +342,7 @@ However, while this will affect the compressed node definition $\mathcal{N}'$, i
 
 \section{Implementation}
 
-We have presented a complete model for variation graph induction from sequences and their pairwise alignments.
+We have presented a complete model for variation graph induction from sequences and their pairwise alignments (Algorithm \ref{alg:seqwish}).
 Here, we describe our specific implementation of this algorithm: \textit{seqwish}.
 In general, our approach uses external memory to elaborate the graph, taking advantage of the availability of low-latency storage media, like solid-state drives (SSDs), to maximize the performance of this approach.
 
