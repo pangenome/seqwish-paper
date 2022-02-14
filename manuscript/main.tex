@@ -420,7 +420,7 @@ Experiments were conducted on compute nodes with 386GB of RAM and AMD EPYC 7402P
 To construct the graph we first generate alignments with \textit{wfmash} \citep{wfmash}, a DNA sequence aligner designed specifically for high performance all-to-all alignment of fully-assembled genomes.
 \textit{wfmash} combines an algorithm for generating whole-genome homology maps (\textit{MashMap2}) \citep{Jain_2018} with an extension of the wavefront algorithm (WFA) \citep{Marco_Sola_2020} capable of obtaining base-level alignments for whole chromosomes.
 \textit{MashMap2} allows the user to define a homology length and pairwise divergence, expressed as a percent identity, over which to generate homology maps.
-This is useful when constructing pangenome graphs, because, in contrast to methods that are based on $k$-mer chaining \citep{Li_2018}, it allows us to query the homology space of input genomes using two easily-interpretable parameters.
+This is useful when constructing pangenome graphs, because, in contrast to methods that are based on $k$-mer chaining \citep{harris2007lastz,Li_2018}, it allows us to query the homology space of input genomes using two easily-interpretable parameters.
 The version of \textit{wfmash} used in these experiments allows us to align sequences with up to 10\% divergence between them, providing highly-sensitive input for our experiments.
 
 %\subsection{Experimental insights}
