@@ -239,26 +239,25 @@ The edge set $\mathcal{E}$ are the unique pairs of steps found in $\mathcal{P}$,
 
 The inductive proof of theorem \ref{thm:seqwish} demonstrates how to build a variation graph from sequences and their pairwise alignments.
 However, a na\"{i}ve algorithm based on this model would require a very large amount of space.
-Take $\mathcal{Q} = |S|$.
-Although our identifier space $\mathcal{Q}$ must include all of $Q$, in practice, we only store $S$, as $\bar{S}$ can be trivially computed.
-Assume an all-to-all alignment of $N$ sequences in $A$ as input, and that all sequences are approximately identical, so that the induced variation graph has $\mathcal{Q}/N$ nodes.
-The induction must maintain reference to all characters in all input sequences $O(\mathcal{Q})$, all character-to-character matches $O(|A|) \approx O(\mathcal{Q}N^2)$, the mapping of $Q$ into the graph $O(|Z|) \approx O(\mathcal{Q})$, the nodes of the graph $O(|\mathcal{V}|) \approx O(\mathcal{Q}/N)$, the size of the edge set $O(|\mathcal{E}|) \approx O(\mathcal{Q})$, and the set of paths $O(|\mathcal{P}|) \approx O(\mathcal{Q})$.
-We also maintain the bitvector $\mathcal{X}$ to mark seen characters of $Q$ during graph induction, which requires $O(\mathcal{Q})$ bits, equivalent to $O(\mathcal{Q} / \log_2\mathcal{Q})$ integer identifiers.
-In total, na\"{i}ve theorem \ref{thm:seqwish}-based induction would require approximately $O(\mathcal{Q}(N^2 + 1/N + 1/log_2{Q} + 4))$ space.
+Although our identifier space $|S|$ must include all of $Q$, in practice, we only store $S$, as $\bar{S}$ can be trivially computed.
+Assume an all-to-all alignment of $N$ sequences in $A$ as input, and that all sequences are approximately identical, so that the induced variation graph has $|S|/N$ nodes.
+The induction must maintain reference to all characters in all input sequences $O(|S|)$, all character-to-character matches $O(|A|) \approx O(|S| N^2)$, the mapping of $Q$ into the graph $O(|Z|) \approx O(|S|)$, the nodes of the graph $O(|\mathcal{V}|) \approx O(|S|/N)$, the size of the edge set $O(|\mathcal{E}|) \approx O(|S|)$, and the set of paths $O(|\mathcal{P}|) \approx O(|S|)$.
+We also maintain the bitvector $\mathcal{X}$ to mark seen characters of $Q$ during graph induction, which requires $O(|S|)$ bits, equivalent to $O(|S| / \log_2 |S|)$ integer identifiers.
+In total, na\"{i}ve theorem \ref{thm:seqwish}-based induction would require approximately $O(|S|(N^2 + 1/N + 1/log_2{Q} + 4))$ space.
 
-Assuming that we want to build a graph of 100 haploid human genomes of $\num{3e9}$ bp, where $N=100$ and $\mathcal{Q} \approx \num{e11}$, we might expect to use $\approx \num{e15}$ identifiers to store the full model.
+Assuming that we want to build a graph of 100 haploid human genomes of $\num{3e9}$ bp, where $N=100$ and $|S| \approx \num{e11}$, we might expect to use $\approx \num{e15}$ identifiers to store the full model.
 Such a design is almost infeasible for inputs larger than a handful of genomes.
 For instance, we would need $\approx \num{3e12}$ identifiers for just 5 human genomes.
 Although it is feasible to compute such a graph using external memory, the approximately 200-fold increase in space relative to the input renders this clearly impractical.
 
 Considering the time complexity of induction, we anticipate $O(|A|\log|A|)$ time to sort the match set and $O(\mathcal{V} \log |A|)$ to query it and compute our $\mathcal{V}$ transitive closures.
 Computing the variation graph paths $\mathcal{P}$ involves converting sequences in $S$ to walks through $\mathcal{V}$.
-We first sort the sequence-to-graph mapping array $Z$ in $O(\mathcal{Q} \log \mathcal{Q})$ operations, and then compute $\mathcal{P}$ in $O(\mathcal{Q})$ queries which each cost $O(\log \mathcal{Q})$.
+We first sort the sequence-to-graph mapping array $Z$ in $O(|S| \log |S|)$ operations, and then compute $\mathcal{P}$ in $O(|S|)$ queries which each cost $O(\log |S|)$.
 To obtain unique edges and generate $\mathcal{E}$, we must build and sort an array of size $O(2|P|)$, and then iterate through it for $O(2|P| \log 2|P| + 2|P|)$ operations.
-In sum, we would expect to require $O(|A|\log|A| + \mathcal{V} \log |A| + 2(\mathcal{Q} \log \mathcal{Q}) + 2(|P| \log 2|P| + |P|))$.
-Using our approximate relationships to $\mathcal{Q}$ given previously and simplifying, we arrive at $O[\mathcal{Q}(2N^2 \log N / \log \mathcal{Q} + (1/N + 4)\log \mathcal{Q} + 2 + \log(4))]$.
+In sum, we would expect to require $O(|A|\log|A| + \mathcal{V} \log |A| + 2(|S| \log |S|) + 2(|P| \log 2|P| + |P|))$.
+Using our approximate relationships to $|S|$ given previously and simplifying, we arrive at $O[|S|(2N^2 \log N / \log |S| + (1/N + 4)\log |S| + 2 + \log(4))]$.
 
-Due to our dependence on sorting, and the logarithmic-time cost of queries, growth in $\mathcal{Q}$ drives $\Omega(\mathcal{Q} \log \mathcal{Q})$ growth in overall complexity.
+Due to our dependence on sorting, and the logarithmic-time cost of queries, growth in $|S|$ drives $\Omega(|S| \log |S|)$ growth in overall complexity.
 As $N$ grows, both time and space complexity are dominated by the number of alignments, which in the case of our example is $O(N^2)$.
 For large numbers of highly-similar genomes, we may not require all pairs of alignments to build a graph that contains all pairwise alignments.
 Various approaches could be used to reduce the size of $A$ without disrupting the induced graph.
@@ -270,8 +269,8 @@ We leave these to later work.
 
 %we likely  a true all pairs alignment, but limiting this requires heuristic schemes to generate a set of alignments that does not cause any match transitive closures to be partitioned. This topic lies outside the scope of this work.
 
-%$O[(\mathcal{Q}/N + 5\mathcal{Q}) \log \mathcal{Q} + \mathcal{Q}(2 + log(4))]$.
-%$O(\mathcal{Q} \log \mathcal{Q} + \mathcal{Q}/N \log \mathcal{Q} + 2(\mathcal{Q} \log \mathcal{Q}) + 2(\mathcal{Q} \log 2\mathcal{Q} + \mathcal{Q}))$.
+%$O[(|S|/N + 5|S|) \log |S| + |S|(2 + log(4))]$.
+%$O(|S| \log |S| + |S|/N \log |S| + 2(|S| \log |S|) + 2(|S| \log 2|S| + |S|))$.
 
 %(note that this would 
 %To enable random access to match elements between $A$
