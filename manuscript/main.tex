@@ -160,8 +160,8 @@ This yields a practical algorithm for variation graph induction that can scale t
 \begin{definition}
 \label{def:vg}
 Variation graphs are a common formalism to encode pangenome graphs \citep{Garrison_2019_thesis}.
-In the variation graph $\mathcal{V} = (\mathcal{N}, \mathcal{E}, \mathcal{P})$, nodes $\mathcal{N} = n_1\ldots n_{|\mathcal{N}|}$ contain sequences of DNA.
-Each node $n_i$ has a unique identifier $i$ and an implicit reverse complement $\bar{n_i}$.
+In the variation graph $\mathcal{G} = (\mathcal{V}, \mathcal{E}, \mathcal{P})$, nodes (or vertices) $\mathcal{V} = v_1\ldots v_{|\mathcal{V}|}$ contain sequences of DNA.
+Each node $v_i$ has a unique identifier $i$ and an implicit reverse complement $\bar{v_i}$.
 A node strand $s$ corresponds to one node orientation.
 Edges $\mathcal{E} = e_1\ldots e_{|\mathcal{E}|}$ connect ordered pairs of node strands ($e_i = ( s_a, s_b )$), encoding the base topology of the graph.
 Paths $\mathcal{P} = p_1\ldots p_{|\mathcal{P}|}$ describe walks over node strands ($p_i = s_1 \ldots s_{|p_i|}$), representing the collection of genomes embedded in the graph.
@@ -196,13 +196,13 @@ By standard definition, each sequence matches its own reverse complement, that i
 The transitive closure of a match, $m^+ = \{ i \ldots j \}$, is a set of characters in $Q$ that are transitively linked together by other matches.
 By definition of $m$, each $m^+$ implies a single, identical character $c(m^+)$.
 
-We build a graph $\mathcal{V}$ inductively.
+We build a graph $\mathcal{G}$ inductively.
 We take the first match in $A$, $m_1$, and execute a union-find operation to obtain $m_1^+$.
-We add the character of the match $c(m_1^+)$ as a node $n_1$ in $\mathcal{V}$, and record the mapping from $m_1^+ \to n_1$.
-To induce the graph, we take the next unused match in $A : m_i \notin \forall_{j < i} m_j^+$, obtain $m_i^+$, and add $c(m_i^+)$ to $\mathcal{V}$.
-To allow the annotation of paths, we record the set of characters in $Q$ that match to a given node in $\mathcal{V}$ in mapping $Z = Q \to \mathcal{N} = m_1 \ldots m_{|\mathcal{N}|}$.
+We add the character of the match $c(m_1^+)$ as a node $v_1$ in $\mathcal{G}$, and record the mapping from $m_1^+ \to v_1$.
+To induce the graph, we take the next unused match in $A : m_i \notin \forall_{j < i} m_j^+$, obtain $m_i^+$, and add $c(m_i^+)$ to $\mathcal{G}$.
+To allow the annotation of paths, we record the set of characters in $Q$ that match to a given node in $\mathcal{G}$ in mapping $Z = Q \to \mathcal{V} = m_1 \ldots m_{|\mathcal{V}|}$.
 We continue until all matches have been used.
-Finally, we establish paths ($\mathcal{P}$) by walking them in $\mathcal{V}$ using $Z$, and record edges ($\mathcal{E}$) where nodes occur successively in paths.
+Finally, we establish paths ($\mathcal{P}$) by walking them in $\mathcal{G}$ using $Z$, and record edges ($\mathcal{E}$) where nodes occur successively in paths.
 
 \begin{proof}
 After the first step of induction, the graph represents all pairwise matches in $m_1^+$.
@@ -214,7 +214,7 @@ Each subsequent step includes progressively more of $A$, until at completion, al
 The set of alignments represented by a variation graph may be strictly larger than the set of alignments used to induce it.
 The graph must contain at least the set of alignments given in input.
 It may also contain new implied pairwise relationships that arise due to transitive match relationships, as shown in Figure \ref{fig:induction} for closures 1 and 6.
-However, by definition of $\mathcal{V}$, it cannot contain \textit{less} match information than represented in the set of matches ($A$).
+However, by definition of $\mathcal{G}$, it cannot contain \textit{less} match information than represented in the set of matches ($A$).
 
 \input{fig_from_alignment_to_variation_graph.tex}
 
@@ -227,7 +227,7 @@ For the sake of time and space complexity analysis, we consider a simple algorit
 The induction depends on our ability to compute transitive closures of matches $m^+$.
 If $A$ is sorted, we can find the matches of a given character in $Q$ using binary search, which allows us to compute $m^+$ for each character.
 We do so non-redundantly by marking each used character in $Q$ in an auxiliary data structure $\mathcal{X}$, which could be encoded as a bitvector of length $|Q|$.
-As we compute the transitive closures, we emit both the nodes (single characters) of the graph $\mathcal{N}$ and the sequence-to-graph mapping $Z$, which, like $A$, consists of match pairs, but rather than mapping $Q \to Q$, maps $Q \to \mathcal{N}$.
+As we compute the transitive closures, we emit both the nodes (single characters) of the graph $\mathcal{V}$ and the sequence-to-graph mapping $Z$, which, like $A$, consists of match pairs, but rather than mapping $Q \to Q$, maps $Q \to \mathcal{V}$.
 As with $A$, we can sort $Z$ to obtain random access via binary search.
 Finally, we derive elements in $\mathcal{P}$ by iterating through the characters of $Q$ and looking up their mapping in $Z$ using binary search.
 The edge set $\mathcal{E}$ are the unique pairs of steps found in $\mathcal{P}$, and can be computed by sorting pairs of steps in $\mathcal{P}$.
@@ -242,7 +242,7 @@ However, a na\"{i}ve algorithm based on this model would require a very large am
 Take $\mathcal{Q} = |S|$.
 Although our identifier space $\mathcal{Q}$ must include all of $Q$, in practice, we only store $S$, as $\bar{S}$ can be trivially computed.
 Assume an all-to-all alignment of $N$ sequences in $A$ as input, and that all sequences are approximately identical, so that the induced variation graph has $\mathcal{Q}/N$ nodes.
-The induction must maintain reference to all characters in all input sequences $O(\mathcal{Q})$, all character-to-character matches $O(|A|) \approx O(\mathcal{Q}N^2)$, the mapping of $Q$ into the graph $O(|Z|) \approx O(\mathcal{Q})$, the nodes of the graph $O(|\mathcal{N}|) \approx O(\mathcal{Q}/N)$, the size of the edge set $O(|\mathcal{E}|) \approx O(\mathcal{Q})$, and the set of paths $O(|\mathcal{P}|) \approx O(\mathcal{Q})$.
+The induction must maintain reference to all characters in all input sequences $O(\mathcal{Q})$, all character-to-character matches $O(|A|) \approx O(\mathcal{Q}N^2)$, the mapping of $Q$ into the graph $O(|Z|) \approx O(\mathcal{Q})$, the nodes of the graph $O(|\mathcal{V}|) \approx O(\mathcal{Q}/N)$, the size of the edge set $O(|\mathcal{E}|) \approx O(\mathcal{Q})$, and the set of paths $O(|\mathcal{P}|) \approx O(\mathcal{Q})$.
 We also maintain the bitvector $\mathcal{X}$ to mark seen characters of $Q$ during graph induction, which requires $O(\mathcal{Q})$ bits, equivalent to $O(\mathcal{Q} / \log_2\mathcal{Q})$ integer identifiers.
 In total, na\"{i}ve theorem \ref{thm:seqwish}-based induction would require approximately $O(\mathcal{Q}(N^2 + 1/N + 1/log_2{Q} + 4))$ space.
 
@@ -251,11 +251,11 @@ Such a design is almost infeasible for inputs larger than a handful of genomes.
 For instance, we would need $\approx \num{3e12}$ identifiers for just 5 human genomes.
 Although it is feasible to compute such a graph using external memory, the approximately 200-fold increase in space relative to the input renders this clearly impractical.
 
-Considering the time complexity of induction, we anticipate $O(|A|\log|A|)$ time to sort the match set and $O(\mathcal{N} \log |A|)$ to query it and compute our $\mathcal{N}$ transitive closures.
-Computing the variation graph paths $\mathcal{P}$ involves converting sequences in $S$ to walks through $\mathcal{N}$.
+Considering the time complexity of induction, we anticipate $O(|A|\log|A|)$ time to sort the match set and $O(\mathcal{V} \log |A|)$ to query it and compute our $\mathcal{V}$ transitive closures.
+Computing the variation graph paths $\mathcal{P}$ involves converting sequences in $S$ to walks through $\mathcal{V}$.
 We first sort the sequence-to-graph mapping array $Z$ in $O(\mathcal{Q} \log \mathcal{Q})$ operations, and then compute $\mathcal{P}$ in $O(\mathcal{Q})$ queries which each cost $O(\log \mathcal{Q})$.
 To obtain unique edges and generate $\mathcal{E}$, we must build and sort an array of size $O(2|P|)$, and then iterate through it for $O(2|P| \log 2|P| + 2|P|)$ operations.
-In sum, we would expect to require $O(|A|\log|A| + \mathcal{N} \log |A| + 2(\mathcal{Q} \log \mathcal{Q}) + 2(|P| \log 2|P| + |P|))$.
+In sum, we would expect to require $O(|A|\log|A| + \mathcal{V} \log |A| + 2(\mathcal{Q} \log \mathcal{Q}) + 2(|P| \log 2|P| + |P|))$.
 Using our approximate relationships to $\mathcal{Q}$ given previously and simplifying, we arrive at $O[\mathcal{Q}(2N^2 \log N / \log \mathcal{Q} + (1/N + 4)\log \mathcal{Q} + 2 + \log(4))]$.
 
 Due to our dependence on sorting, and the logarithmic-time cost of queries, growth in $\mathcal{Q}$ drives $\Omega(\mathcal{Q} \log \mathcal{Q})$ growth in overall complexity.
@@ -295,10 +295,10 @@ To obtain our match transitive closures ($m^+$), we query $\mathcal{A}$ for the 
 Match compression thus reduces our alignment storage memory bounds by a factor of $k$ without affecting our time complexity bounds.
 
 The same encoding can be used to replace the sequence-to-graph mapping $Z$, yielding $\mathcal{Z}$.
-Rather than pairs of characters in $Q$ and $\mathcal{N}$, we record runs of matches between them as range matches.
-Although in expectation the length of these matches should be strictly less than $k$, due to the interruption of the graph by variation between genomes, this still allows us to reduce the size of $Z$ using runs of matches between $Q$ and $\mathcal{N}$.
-Additionally, we store the inverse of $\mathcal{Z}$, which maps ranges from $\mathcal{N} \to Q$, as $\bar{\mathcal{Z}}$.
-We use $\mathcal{Z}$ to compact non-branching regions of $\mathcal{V}$ into single nodes, and $\bar{\mathcal{Z}}$ to accelerate our calculation of links in the graph.
+Rather than pairs of characters in $Q$ and $\mathcal{V}$, we record runs of matches between them as range matches.
+Although in expectation the length of these matches should be strictly less than $k$, due to the interruption of the graph by variation between genomes, this still allows us to reduce the size of $Z$ using runs of matches between $Q$ and $\mathcal{V}$.
+Additionally, we store the inverse of $\mathcal{Z}$, which maps ranges from $\mathcal{V} \to Q$, as $\bar{\mathcal{Z}}$.
+We use $\mathcal{Z}$ to compact non-branching regions of $\mathcal{G}$ into single nodes, and $\bar{\mathcal{Z}}$ to accelerate our calculation of links in the graph.
 
 %We can save $\approx k$ match pairs per recorded range 
 %a pair of ranges $r = [(a_0, a_1), (b_0, b_1)]$ in $Q$ requires twice the space, but we expect it to 
@@ -315,14 +315,14 @@ We use $\mathcal{Z}$ to compact non-branching regions of $\mathcal{V}$ into sing
 For simplicity, we have thus far presented a character-level model of variation graph induction.
 However, range (or run) compression can also reduce the representation size of the graph.
 Rather than recording an identifier for each character in a sequence graph, it is useful to compact characters that form trivial linear components in the graph into single nodes.
-Broadly, the size of nodes will be bounded by the average distance between variants, which, for pangenomes built from \textasciitilde100 individuals of the same species, often provides a great reduction in the total number of nodes (and thus identifiers) required for $\mathcal{V}$ and its components.
+Broadly, the size of nodes will be bounded by the average distance between variants, which, for pangenomes built from \textasciitilde100 individuals of the same species, often provides a great reduction in the total number of nodes (and thus identifiers) required for $\mathcal{G}$ and its components.
 
-To compact $\mathcal{V}$, we traverse $Q$, finding each entry in $\mathcal{Z}$ in turn, recording its start and end in $\mathcal{N}$, which can be understood as a character vector or string containing all the sequence in the nodes of $\mathcal{V}$.
-%in a ``graph vector'' $\mathcal{G} = n_1,n_2 \ldots n_{|\mathcal{N}|}$ containing the ordered characters of the graph.
+To compact $\mathcal{G}$, we traverse $Q$, finding each entry in $\mathcal{Z}$ in turn, recording its start and end in $\mathcal{V}$, which can be understood as a character vector or string containing all the sequence in the nodes of $\mathcal{G}$.
+%in a ``graph vector'' $\mathcal{G} = v_1,v_2 \ldots v_{|\mathcal{V}|}$ containing the ordered characters of the graph.
 %Any position in $\mathcal{G}$ so marked must be the start or end of a node.
-We subsequently use these markings to subdivide $\mathcal{N}$ into a compacted version $\mathcal{N}'$ where compacted node boundaries are marked in a auxiliary bitvector $\mathcal{B} : |\mathcal{B}| = |\mathcal{N}|$ where the first character in each compacted node is marked by a $1$ and other characters are marked $0$.
+We subsequently use these markings to subdivide $\mathcal{V}$ into a compacted version $\mathcal{V}'$ where compacted node boundaries are marked in a auxiliary bitvector $\mathcal{B} : |\mathcal{B}| = |\mathcal{V}|$ where the first character in each compacted node is marked by a $1$ and other characters are marked $0$.
 $\mathcal{B}$ allows us to compute compacted node ids using efficient rank operations \citep{Gog_2014}.
-%such that $\forall_{i \in 1 \ldots |\mathcal{N}'|} |n_i| \ge 1$.
+%such that $\forall_{i \in 1 \ldots |\mathcal{V}'|} |v_i| \ge 1$.
 %In Algorithm \ref{alg:seqwish} we provide a detailed description of the graph induction algorithm.
 
 %\FIXME{For reasons of computational efficiency, node identifiers are numeric.}
@@ -336,7 +336,7 @@ We do so by computing the graph induction for a collection of initial characters
 %We induce the related graph for each partition, appending the induction results to the appropriate data structures.
 In each partition, we apply a lock-free parallel union-find algorithm to derive the match closures \citep{anderson1991wait}, appending results to appropriate data structures.
 This partitioning can introduce boundary effects which change the contents of $\mathcal{Z}$ and $\bar{\mathcal{Z}}$ by splitting ranges at the boundaries of our partitions.
-However, while this will affect the compressed node definition $\mathcal{N}'$, it does not affect $\mathcal{N}$, and it can be corrected via a post-processing step to sort and compact the id space.
+However, while this will affect the compressed node definition $\mathcal{V}'$, it does not affect $\mathcal{V}$, and it can be corrected via a post-processing step to sort and compact the id space.
 %Partitioning reduces the working memory limits to be in the order of the size of the largest transitive match closure found in the input.
 
 
@@ -361,10 +361,10 @@ This \textit{seqidx} avoids the overheads associated with a hash table on string
 To enable highly-efficient random access, we cache the input sequences in a disk-backed version of $Q$, into which our queries of sequence name and offset point.
 This trades time that might be spent accessing a compressed representation of the input for space in external memory.
 
-For output in GFA, we iterate over nodes in $\mathcal{N}'$, writing each as a node record.
+For output in GFA, we iterate over nodes in $\mathcal{V}'$, writing each as a node record.
 Edges are similarly produced from the disk-backed multiset representing $\mathcal{E}$.
 The most computationally expensive part of graph emission is the rendering of the input sequences $S$ as paths $\mathcal{P}$ through the graph.
-For each input sequence in the \textit{seqidx}, we walk through the offsets in $S$ contained in the sequence and look up their mapping into $\mathcal{N}'$ using $\mathcal{Z}$.
+For each input sequence in the \textit{seqidx}, we walk through the offsets in $S$ contained in the sequence and look up their mapping into $\mathcal{V}'$ using $\mathcal{Z}$.
 Range compression allows us to complete one lookup per range.
 By definition, each character in $S$ is covered by only one range in $\mathcal{Z}$.
 We can thus iterate through the ranges in $\mathcal{Z}$ without considering each character.
@@ -377,9 +377,9 @@ To reduce working memory requirements to an absolute minimum, we use a disk-back
 Indexing the implicit interval tree requires a sorting step which dominates the runtime of our algorithm.
 We adapt the current best-performing in-place parallel sorting algorithm, In-place Parallel Super Scalar Samplesort (IPS$^4$o), to work on a disk-backed, memory-mapped array \citep{axtmann2017}.
 This allows us work with $\mathcal{A}$, $\mathcal{Z}$, and $\bar{\mathcal{Z}}$ in external memory.
-By storing pairs of numerical identifiers in the backing array, we are able to generate a disk-backed multiset model which we use to compute the unique set of edges $\mathcal{E}$ in terms of offsets in $\mathcal{N}$.
-The graph sequence vector $\mathcal{N}$ is simply written by appending characters to a file.
-We mark nodes to generate $\mathcal{N}'$ using a bitvector kept in main memory, over which we subsequently generate a rank/select dictionary \citep{Gog_2014} for support of the final emission of the graph $\mathcal{V}$.
+By storing pairs of numerical identifiers in the backing array, we are able to generate a disk-backed multiset model which we use to compute the unique set of edges $\mathcal{E}$ in terms of offsets in $\mathcal{V}$.
+The graph sequence vector $\mathcal{V}$ is simply written by appending characters to a file.
+We mark nodes to generate $\mathcal{V}'$ using a bitvector kept in main memory, over which we subsequently generate a rank/select dictionary \citep{Gog_2014} for support of the final emission of the graph $\mathcal{G}$.
 
 \subsection{Short match filter}
 \label{sec:filter}
