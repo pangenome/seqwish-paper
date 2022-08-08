@@ -48,6 +48,13 @@ git checkout 9e9c4811169760f64690e86619dbd1b088ec5955
 cmake -H. -Bbuild && cmake --build build -- -j 48
 mv bin/odgi bin/odgi-9e9c4811169760f64690e86619dbd1b088ec5955
 cd ..
+
+git clone --recursive https://github.com/lh3/minigraph.git
+cd minigraph
+git checkout 86192499e80377df47993cb376e4773d4a7a76db
+make
+mv minigraph minigraph-86192499e80377df47993cb376e4773d4a7a76db
+cd ..
 ```
 
 

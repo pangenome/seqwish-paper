@@ -155,3 +155,16 @@ done
 # Compress GFA files
 ls /lizardfs/guarracino/seqwish-paper/athaliana/graphs/*.gfa | while read f; do echo $f; pigz $f; done
 ```
+
+## minigraph
+
+```shell
+cd /lizardfs/guarracino/seqwish-paper/athaliana/
+
+ASSEMBLIES=/lizardfs/guarracino/seqwish-paper/athaliana/assemblies/athaliana16.fasta.gz
+
+samtools faidx $ASSEMBLIES $(grep '^GCA_000001735.2' $ASSEMBLIES.fai | cut -f 1) > ref.fa
+samtools faidx $ASSEMBLIES $(grep '^GCA_000001735.2' $ASSEMBLIES.fai -v | cut -f 1) > seqs.fa
+
+/home/guarracino/tools/minigraph/minigraph-86192499e80377df47993cb376e4773d4a7a76db -t 48 -cxggs -l 20k ref.fa seqs.fa > out.gfa
+```

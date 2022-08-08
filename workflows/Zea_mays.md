@@ -19,7 +19,6 @@ mkdir -p /lizardfs/guarracino/seqwish-paper/zmays/assemblies
 cd /lizardfs/guarracino/seqwish-paper/zmays/assemblies
 
 # scp the `assembly_results.zea_mays.txt` and `zea_mays.ftp_links.txt` files
-cat 
 grep -f <(cut -f 1 assembly_results.zea_mays.txt) zea_mays.ftp_links.txt | while read f; do
   echo $f
   wget -c $f
