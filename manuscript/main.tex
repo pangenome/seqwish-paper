@@ -243,7 +243,7 @@ Although our identifier space $|S|$ must include all of $Q$, in practice, we onl
 Assume an all-to-all alignment of $N$ sequences in $A$ as input, and that all sequences are approximately identical, so that the induced variation graph has $|S|/N$ nodes.
 The induction must maintain reference to all characters in all input sequences $O(|S|)$, all character-to-character matches $O(|A|) \approx O(|S| N^2)$, the mapping of $Q$ into the graph $O(|Z|) \approx O(|S|)$, the nodes of the graph $O(|\mathcal{V}|) \approx O(|S|/N)$, the size of the edge set $O(|\mathcal{E}|) \approx O(|S|)$, and the set of paths $O(|\mathcal{P}|) \approx O(|S|)$.
 We also maintain the bitvector $\mathcal{X}$ to mark seen characters of $Q$ during graph induction, which requires $O(|S|)$ bits, equivalent to $O(|S| / \log_2 |S|)$ integer identifiers.
-In total, na\"{i}ve theorem \ref{thm:seqwish}-based induction would require approximately $O(|S|(N^2 + 1/N + 1/log_2{Q} + 4))$ space.
+In total, na\"{i}ve theorem \ref{thm:seqwish}-based induction would require approximately $O(|S|(N^2 + 1/N + 1/log_2{Q} + 4))$ space, or simply $O(|S| N^2)$.
 
 Assuming that we want to build a graph of 100 haploid human genomes of $\num{3e9}$ bp, where $N=100$ and $|S| \approx \num{e11}$, we might expect to use $\approx \num{e15}$ identifiers to store the full model.
 Such a design is almost infeasible for inputs larger than a handful of genomes.
