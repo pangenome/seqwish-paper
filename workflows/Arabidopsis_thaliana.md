@@ -19,7 +19,7 @@ mkdir -p /lizardfs/guarracino/seqwish-paper/athaliana/assemblies
 cd /lizardfs/guarracino/seqwish-paper/athaliana/assemblies
 
 # scp the `assembly_results.arabidopsis_thaliana.txt` and `arabidopsis_thaliana.ftp_links.txt` files
-grep -f <(cut -f 1 assembly_results.arabidopsis_thaliana.txt) arabidopsis_thaliana.ftp_links.txt) | while read f; do
+grep -f <(cut -f 1 assembly_results.arabidopsis_thaliana.txt) arabidopsis_thaliana.ftp_links.txt | while read f; do
   echo $f
   wget -c $f
 done
