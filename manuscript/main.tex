@@ -139,13 +139,13 @@ Our solution is simple, but experiments on diverse sequence collections demonstr
 
 %Our approach is both highly generic and scalable.
 %Not only is our approach highly generic,but it also efficiently scales to both large and complex pangenomes.
-%with \textit{any} collection of alignments and sequences, 
+%with \textit{any} collection of alignments and sequences,
 
 
 %Given recent advances in genome sequencing and assembly, we expect that soon, many species will have multiple reference-quality genomes.
-%To build a pangenome model from such genomes that is truly unbiased, we need an approach to build a multi-reference 
-%Motivated by the current availability of two reference-quality human genome assemblies 
-%The inability to build pangenome graphs from 
+%To build a pangenome model from such genomes that is truly unbiased, we need an approach to build a multi-reference
+%Motivated by the current availability of two reference-quality human genome assemblies
+%The inability to build pangenome graphs from
 
 \section{Algorithm}
 \label{sec:algorithm}
@@ -264,7 +264,7 @@ Various approaches could be used to reduce the size of $A$ without disrupting th
 We leave these to later work.
 
 %In practice, it is likely that this can be considerably reduced with minimal effect , particularly for
-%In practice, for large numbers of highly similar genomes, it a true all-pairs alignment may be unnecessary, but the construction of a graph that represents all-pairwise alignments 
+%In practice, for large numbers of highly similar genomes, it a true all-pairs alignment may be unnecessary, but the construction of a graph that represents all-pairwise alignments
 %In practical applications, it is unlikely that we will need a true all-pairs alignments for highly similar genomes, and this could be considerably reduced with heuristics that
 
 %we likely  a true all pairs alignment, but limiting this requires heuristic schemes to generate a set of alignments that does not cause any match transitive closures to be partitioned. This topic lies outside the scope of this work.
@@ -272,10 +272,10 @@ We leave these to later work.
 %$O[(|S|/N + 5|S|) \log |S| + |S|(2 + log(4))]$.
 %$O(|S| \log |S| + |S|/N \log |S| + 2(|S| \log |S|) + 2(|S| \log 2|S| + |S|))$.
 
-%(note that this would 
+%(note that this would
 %To enable random access to match elements between $A$
-%Continuing our assumed graph context, with quasi-identical genomes and an all-to-all alignment between them, we can compute each match closure operation 
-%The cost of each transitive closure operation should be 
+%Continuing our assumed graph context, with quasi-identical genomes and an all-to-all alignment between them, we can compute each match closure operation
+%The cost of each transitive closure operation should be
 
 \subsection{Match compression}
 \label{sec:matchcompression}
@@ -299,13 +299,13 @@ Although in expectation the length of these matches should be strictly less than
 Additionally, we store the inverse of $\mathcal{Z}$, which maps ranges from $\mathcal{V} \to Q$, as $\bar{\mathcal{Z}}$.
 We use $\mathcal{Z}$ to compact non-branching regions of $\mathcal{G}$ into single nodes, and $\bar{\mathcal{Z}}$ to accelerate our calculation of links in the graph.
 
-%We can save $\approx k$ match pairs per recorded range 
-%a pair of ranges $r = [(a_0, a_1), (b_0, b_1)]$ in $Q$ requires twice the space, but we expect it to 
+%We can save $\approx k$ match pairs per recorded range
+%a pair of ranges $r = [(a_0, a_1), (b_0, b_1)]$ in $Q$ requires twice the space, but we expect it to
 
 %The dominance of alignments in our space costs make
 %In practice, the cost of
 
-%We render this 
+%We render this
 
 \input{seqwish_pseudocode.tex}
 
@@ -319,7 +319,7 @@ Broadly, the size of nodes will be bounded by the average distance between varia
 To compact $\mathcal{G}$, we traverse $Q$, finding each entry in $\mathcal{Z}$ in turn, recording its start and end in $\mathcal{V}$, which can be understood as a character vector or string containing all the sequence in the nodes of $\mathcal{G}$.
 %in a ``graph vector'' $\mathcal{G} = v_1,v_2 \ldots v_{|\mathcal{V}|}$ containing the ordered characters of the graph.
 %Any position in $\mathcal{G}$ so marked must be the start or end of a node.
-We subsequently use these markings to subdivide $\mathcal{V}$ into a compacted version $\mathcal{V}'$ where compacted node boundaries are marked in a auxiliary bitvector $\mathcal{B} : |\mathcal{B}| = |\mathcal{V}|$ where the first character in each compacted node is marked by a $1$ and other characters are marked $0$.
+We subsequently use these markings to subdivide $\mathcal{V}$ into a compacted version $\mathcal{V}'$ where compacted node boundaries are marked in a auxiliary bitvector $\mathcal{B} : |\mathcal{B}| = |\mathcal{V}|$ such that the first character in each compacted node is marked by a $1$ and other characters are marked $0$.
 $\mathcal{B}$ allows us to compute compacted node ids using efficient rank operations \citep{Gog_2014}.
 %such that $\forall_{i \in 1 \ldots |\mathcal{V}'|} |v_i| \ge 1$.
 %In Algorithm \ref{alg:seqwish} we provide a detailed description of the graph induction algorithm.
@@ -501,7 +501,7 @@ Although \textit{seqwish} perfectly represents its input alignments, the problem
 And this lossless property does not guarantee that the resulting graph is easy to work with or navigate; in practice, downstream processing is usually required to normalize the graph for many applications.
 We will cover these topics in future work.
 
-%However, users of \textit{seqwish} should note that although the graph 
+%However, users of \textit{seqwish} should note that although the graph
 %But, it is important to note that the graphs which it produces are simply raw representations of an underlying alignment set.
 %Due to differences in alignments that arise in regions of lower entropy, in practice, it is necessary to normalize generated graphs to simplify the local alignment structures represented in the graph.
 
