@@ -11,19 +11,19 @@
 \SetKwFunction{NodeMatching}{NodeMatching}
 \SetKwInOut{Input}{input}\SetKwInOut{Output}{output}
 \Input{sequences $S$ and their alignment $A$}
-\Output{variation graph $\mathcal{V} = (\mathcal{N}, \mathcal{E}, \mathcal{P})$}
+\Output{variation graph $\mathcal{G} = (\mathcal{V}, \mathcal{E}, \mathcal{P})$}
 $\mathcal{A}\gets$ \MakeMatchIITree{$A$} \tcp{alignment matches}
-$\mathcal{N}\gets \emptyset$ \tcp{vector containing the set of nodes}
+$\mathcal{V}\gets \emptyset$ \tcp{vector containing the set of nodes}
 $\mathcal{X}\gets$ \BitVector{$0, |S|$} \tcp{seen characters of $S$}
 \tcp{for each character in the input}
 \For{$i\leftarrow 1$ \KwTo $|S|$}{
-  \tcp{this character is not yet in $\mathcal{V}$}
+  \tcp{this character is not yet in $\mathcal{G}$}
   \If{$\mathcal{X}[i] = 0$}
   {
     \tcp{characters in $S$ matched to $i$}
     $m^+_i$ $\gets$ \GetTransitiveMatches{$\mathcal{A}$, $i$} \\
-    $\mathcal{N} \gets $ \AddNode{$\mathcal{N}$, $c(m^+_i)$} \tcp{new node in $\mathcal{V}$}
-    $j \gets |\mathcal{N}|$ \tcp{the node id or rank in $\mathcal{V}$}
+    $\mathcal{V} \gets $ \AddNode{$\mathcal{V}$, $c(m^+_i)$} \tcp{new node in $\mathcal{G}$}
+    $j \gets |\mathcal{V}|$ \tcp{the node id or rank in $\mathcal{G}$}
     \For{$z \in m^+_i$}{
      $X[z] \gets 1$  \tcp{mark seen character}
      $\mathcal{Z} \gets $ \ExtendRanges{$\mathcal{Z}$, z, j} \tcp{query$\to$graph}
@@ -31,17 +31,17 @@ $\mathcal{X}\gets$ \BitVector{$0, |S|$} \tcp{seen characters of $S$}
     }
   }
 }
-\tcp{set up our $S \to \mathcal{N}$ mappings}
+\tcp{set up our $S \to \mathcal{V}$ mappings}
 $\mathcal{Z} \gets $ \MakeIITree{$\mathcal{Z}$};
 $\mathcal{\bar{Z}} \gets $ \MakeIITree{$\mathcal{\bar{Z}}$} \\
-\tcp{compact nodes in $\mathcal{N}$ yielding $\mathcal{N}'$}
-$\mathcal{N}' \gets \emptyset$ ; $l \gets \emptyset$ ; $b \gets 0$ ; $\mathcal{B}\gets$ \BitVector{$0, |\mathcal{N}|$} \\
+\tcp{compact nodes in $\mathcal{V}$ yielding $\mathcal{V}'$}
+$\mathcal{V}' \gets \emptyset$ ; $l \gets \emptyset$ ; $b \gets 0$ ; $\mathcal{B}\gets$ \BitVector{$0, |\mathcal{V}|$} \\
 %$l \gets \emptset$ \tcp{compacted nodes and }
-\For{$i\leftarrow 1$ \KwTo $|\mathcal{N}|$}{
+\For{$i\leftarrow 1$ \KwTo $|\mathcal{V}|$}{
   $m \gets $ \Overlaps{$\mathcal{\bar{Z}}$, $i$} \\
   \If{$m \ne l$}{
   $B[i] = 1$ \tcp{record a node boundary}
-  $\mathcal{N}' \gets $ \AddNode{$\mathcal{N}'$, $\mathcal{N}[b\ldots i]$} \\
+  $\mathcal{V}' \gets $ \AddNode{$\mathcal{V}'$, $\mathcal{V}[b\ldots i]$} \\
   $b \gets i$ \tcp{record last node boundary}
   }
   $l \gets m$ \tcp{our last set of matching ranges}
@@ -56,7 +56,7 @@ $q \gets 1$ \tcp{for each sequence in the input}
   \Do{$j < q + |g_i|$}{
     \tcp{extend our path with the next step}
     $(a, b) \gets$ \FirstOverlap{$\mathcal{Z}, j$} \\
-    $x \gets$ \NodeMatching{$\mathcal{N}'$, $\mathcal{B}$, $(a, b)$} \\
+    $x \gets$ \NodeMatching{$\mathcal{V}'$, $\mathcal{B}$, $(a, b)$} \\
     $p_i \gets p_i + x$ \tcp{extend the path}
     $j \gets j + (b - a)$ \tcp{increment offset in $S$}
     $\mathcal{E} \gets \mathcal{E} \cup \{(y, x)\}$ \tcp{add to our edge set}
@@ -64,7 +64,7 @@ $q \gets 1$ \tcp{for each sequence in the input}
   }
   $q \gets j$ \tcp{increment our pointer in $S$}
 }
-\Return{$\mathcal{V} \gets (\mathcal{N}', \mathcal{E}, \mathcal{P})$} \\
+\Return{$\mathcal{G} \gets (\mathcal{V}', \mathcal{E}, \mathcal{P})$} \\
 \vspace{2mm}
 \caption{The \textit{seqwish} graph induction algorithm.
   For the sake of simplicity, we omit the details of several query algorithms that interact with the input alignments, the transitive match closure, implicit interval tree construction and query, node generation, and bitvector rank queries used in node compaction.
