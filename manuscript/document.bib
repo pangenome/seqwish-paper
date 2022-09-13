@@ -1601,7 +1601,7 @@ numpages = {9},
 location = {Lake Tahoe, Nevada},
 series = {NIPS'13}
 }
-  
+
 @article{Suzuki_2018,
   title={Introducing difference recurrence relations for faster semi-global alignment of long sequences},
   volume={19},
@@ -2517,17 +2517,6 @@ series = {NIPS'13}
   pages={410–421}
 }
 
-@InProceedings{axtmann2017,
-  author =	{Michael Axtmann and
-                Sascha Witt and
-                Daniel Ferizovic and
-                Peter Sanders},
-  title =	{{In-Place Parallel Super Scalar Samplesort (IPSSSSo)}},
-  booktitle =	{25th Annual European Symposium on Algorithms (ESA 2017)},
-  year =	{2017},
-  doi =		{10.4230/LIPIcs.ESA.2017.9},
-}
-
 @article{Gog_2014,
   title={From Theory to Practice: Plug and Play with Succinct Data Structures},
   ISBN={9783319079592},
@@ -2576,4 +2565,57 @@ series = {NIPS'13}
   author={Yu, Changong and Mao, Keming and Zhao, Yuhai and Chang, Cheng and Wang, Guoren},
   year={2021},
   pages={1–1}
+}
+
+@ARTICLE{Sheikhizadeh_2016,
+  title    = "{PanTools}: representation, storage and exploration of
+              pan-genomic data",
+  author   = "Sheikhizadeh, Siavash and Schranz, M Eric and Akdel, Mehmet and
+              de Ridder, Dick and Smit, Sandra",
+  abstract = "MOTIVATION: Next-generation sequencing technology is generating a
+              wealth of highly similar genome sequences for many species,
+              paving the way for a transition from single-genome to pan-genome
+              analyses. Accordingly, genomics research is going to switch from
+              reference-centric to pan-genomic approaches. We define the
+              pan-genome as a comprehensive representation of multiple
+              annotated genomes, facilitating analyses on the similarity and
+              divergence of the constituent genomes at the nucleotide, gene and
+              genome structure level. Current pan-genomic approaches do not
+              thoroughly address scalability, functionality and usability.
+              RESULTS: We introduce a generalized De Bruijn graph as a
+              pan-genome representation, as well as an online algorithm to
+              construct it. This representation is stored in a Neo4j graph
+              database, which makes our approach scalable to large eukaryotic
+              genomes. Besides the construction algorithm, our software
+              package, called PanTools, currently provides functionality for
+              annotating pan-genomes, adding sequences, grouping genes,
+              retrieving gene sequences or genomic regions, reconstructing
+              genomes and comparing and querying pan-genomes. We demonstrate
+              the performance of the tool using datasets of 62 E. coli genomes,
+              93 yeast genomes and 19 Arabidopsis thaliana genomes.
+              AVAILABILITY AND IMPLEMENTATION: The Java implementation of
+              PanTools is publicly available at http://www.bif.wur.nl CONTACT:
+              sandra.smit@wur.nl.",
+  journal  = "Bioinformatics",
+  volume   =  32,
+  number   =  17,
+  pages    = "i487--i493",
+  month    =  sep,
+  year     =  2016,
+  language = "en"
+}
+
+@InProceedings{axtmann2017,
+  author =	{Michael Axtmann and
+                Sascha Witt and
+                Daniel Ferizovic and
+                Peter Sanders},
+  title =	{{In-Place Parallel Super Scalar Samplesort (IPSSSSo)}},
+  booktitle =	{25th Annual European Symposium on Algorithms (ESA 2017)},
+  pages =	{9:1--9:14},
+  series =	{Leibniz International Proceedings in Informatics (LIPIcs)},
+  year =	{2017},
+  volume =	{87},
+  publisher =	{Schloss Dagstuhl--Leibniz-Zentrum fuer Informatik},
+  doi =		{10.4230/LIPIcs.ESA.2017.9},
 }

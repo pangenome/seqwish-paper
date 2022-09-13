@@ -107,7 +107,7 @@ This lets us avoid the problem of reference bias, which can be understood as the
 %Reference bias distorts an inferred genome to appear more similar to the reference genome than it actually is.
 
 An unbiased pangenome graph would represent the alignment of all included genomes to all others.
-Existing methods approximate this relationship by progressive alignment to a graph initially based on a reference genome \citep{Li:2020}, through a global structuring of the genome relationships in a neighbor joining phylogenetic tree \citep{Armstrong:2020}, or via creation of a \textit{de Bruijn} graph based on a fixed $k$-mer length \citep{Minkin_2016,Yu_2021}.
+Existing methods approximate this relationship by progressive alignment to a graph initially based on a reference genome \citep{Li:2020}, through a global structuring of the genome relationships in a neighbor joining phylogenetic tree \citep{Armstrong:2020}, or via creation of a \textit{de Bruijn} graph based on a fixed $k$-mer length \citep{Minkin_2016,Sheikhizadeh_2016,Yu_2021}.
 These methods limit computational costs by reducing the number of pairwise comparisons, but in turn their results depend on input genome order, selected reference, guide-tree topology, or $k$-mer length.
 
 We consider the problem of building a pangenome graph without these potential sources of bias.
