@@ -83,17 +83,33 @@ x <- read.delim('results.tsv')
 x$method <- as.factor(x$method)
 summary(x)
 require(tidyverse)
-ggplot(subset(x, method!="twopaco.k19"), aes(y=length, x=method)) + geom_boxplot() + geom_quasirandom(alpha=I(1/5)) + theme(axis.text.x = element_text(angle = 90))
+ggplot(subset(x, method!="twopaco.k19" & method!="seqwish.wfava" & method!="seqwish.biwfl"), aes(y=length, x=method)) + geom_boxplot() + geom_quasirandom(alpha=I(1/5)) + theme(axis.text.x = element_text(angle = 45, vjust=1, hjust=1)) ; ggsave("yeast_chrV_length_vs_100orders.png", height=2.67, width=3)
 ggsave("yeast_chrV_length_vs_100orders.pdf", height=4, width=4)
 ```
 
-<img src="https://raw.githubusercontent.com/pangenome/seqwish-paper/master/manuscript/yeast_chrV_length_vs_100orders.png" alt="chrV yeast order permutation results" height=50% width=50%>
+<img src="https://raw.githubusercontent.com/pangenome/seqwish-paper/master/manuscript/yeast_chrV_length_vs_100orders.png" alt="chrV yeast order permutation results" height=30% width=30%>
+
+We can also summarize the variance by category.
+
+```R
+subset(x, method!="seqwish.wfava" & method!="seqwish.biwfl") %>% group_by(method) %>% summarise(m = mean(length), sd = sqrt(var(length)))
+```
+
+This shows that the `minigraph` set has a standard deviation of 8112bp, which corresponds to about 1.2% of the graph length.
+In contrast, both `TwoPaCo` and `seqwish`+`wfmash` are perfectly stable with respect to input genome order.
+Curiously, the `minimap2`+`seqwish` graphs are also not stable to input genome order, indicating some dependence on order in the mapping step, although this effect is very small (sd=4bp).
+
+```txt
+  method             m      sd
+  <fct>          <dbl>   <dbl>
+1 minigraph    648967. 8112.
+2 seqwish.mm2  609039.    4.08
+3 seqwish.wfm  683470     0
+4 twopaco.k19 1270115     0
+```
 
 The result shows that `minigraph`'s total length changes significantly based on which genome we begin with, and also with respect to the particular permutation of all genomes.
 
-In contrast, there is no (seqwish.wfava, seqwish.biwfl), or very little variation in length (seqwish.mm2, seqwish.wfm) depending on order of input for the alignment and seqwish graph construction pipelines.
-
-TwoPaCo also is also unbiased with respect to input genome order, but it returns a 1,270,115bp graph, while the other methods are less than 700kbp.
-
-The difference in length in the wfmash-v0.9.2 and minimap2-v2.24 based seqwish graphs is minimal, but reflects dependence on input genome order in the FASTA file provided to these methods.
-We can eliminate this dependence by running all pairs of wfmash alignments (seqwish.wfava) or by using a development branch of wfmash with a new base-level alignment algorithm based on a generalization of [bidirectional WFA](https://doi.org/10.1101/2022.04.14.488380) (seqwish.biwfl).
+Both `seqwish` and `TwoPaCo` appear unbiased with respect to genome order.
+`seqwish` is only unbiased if the input alignments are invariant with respect to the order of sequences in the FASTA given to the aligner.
+`TwoPaCo` is also is also unbiased with respect to input genome order, but it returns a 1,270,115bp graph, while the other methods are less than 700kbp.
