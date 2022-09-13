@@ -87,7 +87,7 @@ ggplot(subset(x, method!="twopaco.k19"), aes(y=length, x=method)) + geom_boxplot
 ggsave("yeast_chrV_length_vs_100orders.pdf", height=4, width=4)
 ```
 
-<img src="https://raw.githubusercontent.com/pangenome/seqwish-paper/master/manuscript/yeast_chrV_length_vs_100orders.png" alt="chrV yeast order permutation results" style="max-width: 40%;">
+<img src="https://raw.githubusercontent.com/pangenome/seqwish-paper/master/manuscript/yeast_chrV_length_vs_100orders.png" alt="chrV yeast order permutation results" height=50% width=50%>
 
 The result shows that `minigraph`'s total length changes significantly based on which genome we begin with, and also with respect to the particular permutation of all genomes.
 
