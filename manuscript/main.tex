@@ -470,17 +470,17 @@ In typical applications, we expect \textit{seqwish} to be applied as part of a l
 \subsection{Comparison to related graph building methods}
 \label{sec:comparison}
 
-We have so far described our method for graph induction, provided detail on its implementation, and demonstrated its behavior over a set of pangenome graph building problems.
+We have so far described our method for graph induction, provided detail on its implementation, and demonstrated its performance over a set of pangenome graph building problems.
 These provide intuition about \textit{seqwish} and its behavior.
 However, the reader may wonder how the method compares to other similar methods for graph construction, or what variation might be caused by changes in the alignment method used.
 
-To focus on this questions, we examine the case of a single chromosome (chrV) of \textit{S. cerevisiae} for which we have 7 assemblies \citep{Yue_2017}.
+To focus on these questions, we examine the case of a single chromosome (chrV) of \textit{S. cerevisiae} for which we have 7 assemblies \citep{Yue_2017}.
 We compute 100 random permutations \citep{Williams2009-ou} of these assemblies and provide them to several graph construction methods, including \textit{minigraph} \citep{Li:2020}, \textit{TwoPaCo} \citep{Minkin_2016}, and \textit{seqwish} based on \textit{minimap2} \citep{Li_2018} or \textit{wfmash} \citep{wfmash} alignments.
 
 Of existing methods, \textit{TwoPaCo} provides a graph in a form that is similar to \textit{seqwish}'s.
-However, it is based on a De Bruijn Graph that must have a relatively low $k$-mer length, leading to complex topologies that in our experience cannot be resolved easily by increasing $k$.
+However, it is based on a de Bruijn graph that must have a relatively low $k$-mer length, leading to complex topologies that in our experience cannot be resolved easily by increasing $k$.
 Furthermore, the overlaps between nodes are incompatible with the variation graph model, and must be reduced or ``bluntified'' with additional processing steps to be usable as input to variation graph tools \citep{Eizenga2021-yg}.
-Because it is based on a De Bruijn Graph, which is symmetrically constructed from a set of $k$-mers and not the sequences themselves, we do not expect \textit{TwoPaCo} to be biased with respect to input genome order.
+Because it is based on a de Bruijn graph, which is symmetrically constructed from a set of $k$-mers and not the sequences themselves, we do not expect \textit{TwoPaCo} to be biased with respect to input genome order.
 
 In contrast, \textit{minigraph} develops a kind of partial order alignment \citep{Lee_2002} over the minimizers (sparse $k$-mer set) of input genomes, and it progressively builds the graph by adding new variation from each genome in order.
 We do expect it be order and reference (first input) biased, although the degree of bias requires experimentation to establish.
@@ -555,7 +555,7 @@ This direct relationship allows users to adjust the shape of the resulting graph
 In contrast to existing methods, which depend on particular structuring of their input \citep{Li:2020,Armstrong:2020}, \textit{seqwish} is unbiased in that as it directly and uniformly represents sequence relationships given on input in the resulting graph.
 Our comparison with related pangenome graph-building methods demonstrates that these effects can be significant.
 \textit{minigraph}'s output varies substantially, with $\sigma \approx 1.25\%$ of graph length for a 7-chromosome input with $\approx 99.3\%$ pairwise identity.
-De Bruijn Graph methods, which are also unbiased with their treatment of input genomes \citep{Minkin_2016,Sheikhizadeh_2016,Yu_2021}.
+De Bruijn graph methods, which are also unbiased with their treatment of input genomes \citep{Minkin_2016,Sheikhizadeh_2016,Yu_2021}.
 %However, our approach is different than these, and allows the direct
 
 Our presentation is necessarily limited, in order to focus on and describe the unique problem of variation graph induction.
@@ -564,7 +564,18 @@ These topics lie outside of the scope of the presented work, wherein we have foc
 But, they are important for readers to consider.
 Although \textit{seqwish} perfectly represents its input alignments, the problem of generating and filtering an alignment set remains critical, as it determines the structure of the built graph.
 And this lossless property does not guarantee that the resulting graph is easy to work with or navigate; in practice, downstream processing is usually required to normalize the graph for many applications.
-We expect to cover these topics in future work.
+We expect to cover these topics in future work, some of which are ongoing \citep{Liao_2022,Garrison2022_pggb}.
+
+Despite its apparently high costs, the symmetric pangenome construction modality that \textit{seqwish} presents provides key advantages over progressive approaches.
+Although a complete all-vs-all alignment of a set of genomes is costly, it is trivial to run in parallel.
+This feature is unavailable to progressive construction methods, which necessarily involve a serial introduction of new information into the graph.
+Although the total costs of a symmetric alignment and pangenome graph construction modality are high, they are in some sense more manageable.
+The modular, independent nature of the hardest part of the computation---the derivation of the alignments---can be scaled out to large compute clusters as well as cached for incremental construction and update of large pangenomes.
+
+We furthermore expect that local giant components will tend to arise in the alignment graph without requiring a complete pairwise alignment, suggesting that lessons from graph theory may help to guide a justified sparsification, or downsampling, of the input \citep{Janson1993-ac}.
+This suggests that simple random sampling of alignments may evoke minimal changes in graph structure, provided that there are many homologous copies of each locus in the pangenome.
+It will also be possible to apply \textit{seqwish} to measure at what level of mapping sparsification we observe changes in the induced graph.
+Although this may be infeasible for very large problems, it will allow us to develop an empirical understanding of how to reduce the complexity of the initial alignment step without affecting the resulting pangenome graph.
 
 %However, users of \textit{seqwish} should note that although the graph
 %But, it is important to note that the graphs which it produces are simply raw representations of an underlying alignment set.
