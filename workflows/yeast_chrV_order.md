@@ -77,6 +77,7 @@ Finally, we'll bring all these outputs together, measuring graph properties such
 
 We plot the distribution of length across the different methods (excluding TwoPaCo, which is much larger than the others for reasons unclear).
 Although two graphs can be different topologically and yet have the same length, this metric should show us gross changes in graph size that might correlate with the addition or subtraction of structural variant alleles.
+For simplicity, we focus just on `minigraph`, `seqwish`+`minimap2`, and `seqwish`+`wfmash`.
 
 ```R
 x <- read.delim('results.tsv')
