@@ -441,6 +441,7 @@ To construct the graph we first generate alignments with \textit{wfmash} \citep{
 \textit{MashMap2} allows the user to define a homology length and pairwise divergence, expressed as a percent identity, over which to generate homology maps.
 This is useful when constructing pangenome graphs, because, in contrast to methods that are based on $k$-mer chaining \citep{harris2007lastz,Li_2018}, it allows us to query the homology space of input genomes using two easily-interpretable parameters.
 The version of \textit{wfmash} used in these experiments allows us to align sequences with up to 10\% divergence between them, providing highly-sensitive input for our experiments.
+Our use of \textit{wfmash} is pragmatic, and any mapping method capable of generating PAF with base-level alignments in CIGAR strings is capable of being used as input to \textit{seqwish}.
 
 %\subsection{Experimental insights}
 
@@ -460,9 +461,13 @@ We find that our particular partitioning scheme (we compact the graph in chunks 
 In practice, setting the chunk size lower tends to resolve this problem, but will also increase runtime.
 To simplify comparisons between the different parameter settings, we have not re-run these settings with a different partition size nor on computer nodes with a larger, then different, amount of RAM.
 
+Our results with these four species-specific pangenomes give a basic demonstration of how pangenome graphs can be adjusted through key parameters of alignment and match filtering.
+These results are demonstrative of graph induction.
+In typical applications, we expect \textit{seqwish} to be applied as part of a larger process to build and refine a pangenome graph \citep{Garrison2022_pggb,Liao_2022}.
+
 \input{fig_experiments.tex}
 
-\subsection{Comparison to similar graph building methods}
+\subsection{Comparison to related graph building methods}
 \label{sec:comparison}
 
 We have so far described our method for graph induction, provided detail on its implementation, and demonstrated its behavior over a set of pangenome graph building problems.
@@ -472,17 +477,29 @@ However, the reader may wonder how the method compares to other similar methods 
 To focus on this questions, we examine the case of a single chromosome (chrV) of \textit{S. cerevisiae} for which we have 7 assemblies \citep{Yue_2017}.
 We compute 100 random permutations \citep{Williams2009-ou} of these assemblies and provide them to several graph construction methods, including \textit{minigraph} \citep{Li:2020}, \textit{TwoPaCo} \citep{Minkin_2016}, and \textit{seqwish} based on \textit{minimap2} \citep{Li_2018} or \textit{wfmash} \citep{wfmash} alignments.
 
-Of existing methods, \textit{TwoPaCo} is the only that provides a variation graph in the same form as \textit{seqwish}.
+Of existing methods, \textit{TwoPaCo} provides a graph in a form that is similar to \textit{seqwish}'s.
 However, it is based on a De Bruijn Graph that must have a relatively low $k$-mer length, leading to complex topologies that in our experience cannot be resolved easily by increasing $k$.
-We do not expect \textit{TwoPaCo} to be biased with respect to input genome order.
+Furthermore, the overlaps between nodes are incompatible with the variation graph model, and must be reduced or ``bluntified'' with additional processing steps to be usable as input to variation graph tools \citep{Eizenga2021-yg}.
+Because it is based on a De Bruijn Graph, which is symmetrically constructed from a set of $k$-mers and not the sequences themselves, we do not expect \textit{TwoPaCo} to be biased with respect to input genome order.
+
 In contrast, \textit{minigraph} develops a kind of partial order alignment over the minimizers (sparse $k$-mer set) of input genomes, and it progressively builds the graph by adding new variation from each genome in order.
 We do expect it be order and reference (first input) biased, although the degree of bias requires experimentation to establish.
-Finally, \textit{seqwish} itself is by definition unbiased with respect to input order, but if the alignments are biased due to changes in order, we should see effects on the resulting graph.
 
-We use ODGI to compute the size of the resulting graphs \citep{Guarracino2022}, and use this as a proxy for graph identity.
+Finally, \textit{seqwish} itself is by definition unbiased with respect to input order, but if the alignments are affected by changes in order, the resulting graph will also change.
+
+We use ODGI to compute the size of the resulting graphs \citep{Guarracino2022}.
 When the graph length changes, it provides a clear indication that the graph itself has changed.
 It also gives an indication of the scale of the differences, which may indicate how large an effect of a different construction approach might be.
 Conversely, if the graph length is the same for two large graphs, we assume that in most cases they really do have the same topology and sequence space, even if they may have different node identifiers and ordering in the serialization of the graph.
+
+As we observe in Figure \ref{fig:yeast}, \textit{minigraph} indeed generates a distribution of graph lengths with clusters that apparently correspond to similar regions of the permutation space.
+However, this is not the case for the \textit{seqwish} builds based on \textit{minimap2} and \textit{wfmash}, which appear to have almost exactly the same length across all permutations.
+We further consider variance in the length, node count, and edge count of all graphs.
+This shows that, as expected, \textit{minigraph}'s output depends markedly on input genome order.
+We also find that \textit{minimap2} configuration we used is not order-independent, and can produce slightly different outputs when the reference and query sequences are ordered differently, demonstrating that \textit{seqwish} is only ``unbiased'' insofar as the input mappings are.
+For \textit{TwoPaCo} and \textit{wfmash}+\textit{seqwish}, we observe no variation in length.
+The length of \textit{TwoPaCo} graphs is significantly larger due to the repetition in node sequences, which overlap by $k-1$ base pairs.
+%, when considering the variance of the length, node count, and edge count of the graphs
 
 \input{fig_chrV_yeast.tex}
 

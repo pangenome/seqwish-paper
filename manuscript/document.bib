@@ -2681,3 +2681,92 @@ series = {NIPS'13}
   month     =  jan,
   year      =  2009
 }
+
+
+@INPROCEEDINGS{Eizenga2021-yg,
+  title     = "{Walk-Preserving} Transformation of Overlapped Sequence Graphs
+               into Blunt Sequence Graphs with {GetBlunted}",
+  booktitle = "Connecting with Computability",
+  author    = "Eizenga, Jordan M and Lorig-Roach, Ryan and Meredith, Melissa M
+               and Paten, Benedict",
+  abstract  = "Sequence graphs have emerged as an important tool in two
+               distinct areas of computational genomics: genome assembly and
+               pangenomics. However, despite this shared basis, subtly
+               different graph formalisms have hindered the flow of
+               methodological advances from pangenomics into genome assembly.
+               In genome assembly, edges typically indicate overlaps between
+               sequences, with the overlapping sequence expressed redundantly
+               on both nodes. In pangenomics, edges indicate adjacency between
+               sequences with no overlap---often called blunt adjacencies.
+               Algorithms and software developed for blunt sequence graphs
+               often do not generalize to overlapped sequence graphs. This
+               effectively silos pangenomics methods that could otherwise
+               benefit genome assembly. In this paper, we attempt to dismantle
+               this silo. We have developed an algorithm that transforms an
+               overlapped sequence graph into a blunt sequence graph that
+               preserves walks from the original graph. Moreover, the algorithm
+               accomplishes this while also eliminating most of the redundant
+               representation of sequence in the overlap graph. The algorithm
+               is available as a software tool, GetBlunted, which uses little
+               enough time and memory to virtually guarantee that it will not
+               be a bottleneck in any genome assembly pipeline.",
+  publisher = "Springer International Publishing",
+  pages     = "169--177",
+  year      =  2021
+}
+
+
+@MISC{Garrison2022_pggb,
+  title  = "pggb: the {PanGenome} Graph Builder",
+  author = "Garrison, Erik and Guarracino, Andrea and Heumos, Simon and
+            Hagmann, Joerg and Sudmant, Peter and Prins, Pjotr",
+  month  =  aug,
+  year   =  2022
+}
+
+
+@UNPUBLISHED{Liao_2022,
+  title    = "A Draft Human Pangenome Reference",
+  author   = "Liao, Wen-Wei and Asri, Mobin and Ebler, Jana and Doerr, Daniel
+              and Haukness, Marina and Hickey, Glenn and Lu, Shuangjia and
+              Lucas, Julian K and Monlong, Jean and Abel, Haley J and
+              Buonaiuto, Silvia and Chang, Xian H and Cheng, Haoyu and Chu,
+              Justin and Colonna, Vincenza and Eizenga, Jordan M and Feng,
+              Xiaowen and Fischer, Christian and Fulton, Robert S and Garg,
+              Shilpa and Groza, Cristian and Guarracino, Andrea and Harvey,
+              William T and Heumos, Simon and Howe, Kerstin and Jain, Miten and
+              Lu, Tsung-Yu and Markello, Charles and Martin, Fergal J and
+              Mitchell, Matthew W and Munson, Katherine M and Mwaniki, Moses
+              Njagi and Novak, Adam M and Olsen, Hugh E and Pesout, Trevor and
+              Porubsky, David and Prins, Pjotr and Sibbesen, Jonas A and
+              Tomlinson, Chad and Villani, Flavia and Vollger, Mitchell R and
+              {Human Pangenome Reference Consortium} and Bourque, Guillaume and
+              Chaisson, Mark J P and Flicek, Paul and Phillippy, Adam M and
+              Zook, Justin M and Eichler, Evan E and Haussler, David and
+              Jarvis, Erich D and Miga, Karen H and Wang, Ting and Garrison,
+              Erik and Marschall, Tobias and Hall, Ira and Li, Heng and Paten,
+              Benedict",
+  abstract = "The Human Pangenome Reference Consortium (HPRC) presents a first
+              draft human pangenome reference. The pangenome contains 47
+              phased, diploid assemblies from a cohort of genetically diverse
+              individuals. These assemblies cover more than 99\% of the
+              expected sequence and are more than 99\% accurate at the
+              structural and base-pair levels. Based on alignments of the
+              assemblies, we generated a draft pangenome that captures known
+              variants and haplotypes, reveals novel alleles at structurally
+              complex loci, and adds 119 million base pairs of euchromatic
+              polymorphic sequence and 1,529 gene duplications relative to the
+              existing reference, GRCh38. Roughly 90 million of the additional
+              base pairs derive from structural variation. Using our draft
+              pangenome to analyze short-read data reduces errors when
+              discovering small variants by 34\% and boosts the detected
+              structural variants per haplotype by 104\% compared to
+              GRCh38-based workflows, and by 34\% compared to using previous
+              diversity sets of genome assemblies. \#\#\# Competing Interest
+              Statement The authors have declared no competing interest.",
+  journal  = "bioRxiv",
+  pages    = "2022.07.09.499321",
+  month    =  jul,
+  year     =  2022,
+  language = "en"
+}

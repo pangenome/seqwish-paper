@@ -71,6 +71,7 @@ Finally, we'll bring all these outputs together, measuring graph properties such
 
 ```shell
 ( echo 'method length nodes edges paths steps' | tr ' ' '\t'; seq 100 | while read i; do echo minigraph $(sed 's/\ts/\t/g' minigraph_order$i.gfa >x.gfa && odgi build -g x.gfa -o - | odgi stats -i - -S | tail -n+2); done ; seq 100 | while read i ; do echo seqwish.mm2 $(odgi build -g seqwish_mm2_order$i.gfa -o - | odgi stats -i - -S | tail -n+2); done ; seq 100 | while read i ; do echo seqwish.wfm $(odgi build -g seqwish_wf_order$i.gfa -o - | odgi stats -i - -S | tail -n+2); done  ; seq 100 | while read i ; do echo seqwish.wfava $(odgi build -g seqwish_wf-ava_order$i.gfa -o - | odgi stats -i - -S | tail -n+2); done  ;  seq 100 | while read i ; do echo seqwish.biwfl $(odgi build -g seqwish-biwfaλ_order$i.gfa -o - | odgi stats -i - -S | tail -n+2); done; seq 100 | while read i ; do echo twopaco.k19 $(odgi build -g twopaco_order$i.gfa -o - | odgi stats -i - -S | tail -n+2); done ) | tr ' ' '\t' >results.tsv
+paste results.tsv <(echo ref; for i in 1 2 3 4 5 6; do cat 100_orders.txt | cut -f 1 -d\  | awk '{ print $0 }' ; done ) >x.tsv
 ```
 
 ## plotting results
@@ -80,11 +81,11 @@ Although two graphs can be different topologically and yet have the same length,
 For simplicity, we focus just on `minigraph`, `seqwish`+`minimap2`, and `seqwish`+`wfmash`.
 
 ```R
-x <- read.delim('results.tsv')
+x <- read.delim('x.tsv')
 x$method <- as.factor(x$method)
 summary(x)
 require(tidyverse)
-ggplot(subset(x, method!="twopaco.k19" & method!="seqwish.wfava" & method!="seqwish.biwfl"), aes(y=length, x=method)) + geom_boxplot() + geom_quasirandom(alpha=I(1/5)) + theme(axis.text.x = element_text(angle = 45, vjust=1, hjust=1)) ; ggsave("yeast_chrV_length_vs_100orders.png", height=2.67, width=3)
+ggplot(subset(x, method!="twopaco.k19" & method!="seqwish.wfava" & method!="seqwish.biwfl"), aes(y=length, x=method, color=ref)) + geom_boxplot() + geom_quasirandom(alpha=I(1/5)) + scale_color_discrete("first genome (reference)") + theme(axis.text.x = element_text(angle = 45, vjust=1, hjust=1)) ; ggsave("yeast_chrV_length_vs_100orders.png", height=4, width=6)
 ggsave("yeast_chrV_length_vs_100orders.pdf", height=4, width=4)
 ```
 
