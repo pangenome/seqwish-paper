@@ -409,6 +409,23 @@ In a pangenomic context, underalignment caused by $k>$ match filtering can be mi
 %    finally emitting the resulting graph in the standard Graphical Fragment Assembly (GFA) format~\citep{GFA}.
 
 
+\begin{table*}[!ht]
+    \centering
+    \caption{Performance of the graph induction algorithm.
+        For each pangenome we report a single experiment with \textit{seqwish -k} filter set to 49bp.
+        From left to right, the columns indicate the species, the number of sequences (that is, the number of contigs), number of haplotypes (that is, number of individuals), the sum of the length of all sequences in Gbp, the length of the short match filter applied in bp, the time in seconds and the amount of memory and disk space in Gbytes required for the graph induction, the length of the resulting graph in Gbp and the number its connected components.
+        }
+    \label{tab:experiments}
+    \begin{tabular}{|l|l|l|l|l|l|l|l|l|l|}
+        \hline
+        species & sequences & haplotypes & fasta.Gbp & min.match.bp & time.seconds & memory.Gbytes & disk.Gbytes & graph.Gbp & components \\ \hline
+        \textit{A. thaliana} & 922 & 16 & 1.90251 & 49 & 468 & 43.1287 & 7.1218 & 0.234284 & 100 \\ \hline
+        \textit{H. sapiens} & 17478 & 38 & 114.627 & 49 & 46268 & 347.4983 & 604.4261 & 4.47126 & 474 \\ \hline
+        \textit{H. pylori} & 292 & 250 & 0.407782 & 49 & 777 & 74.9484 & 20.2070 & 0.01421 & 5 \\ \hline
+        \textit{Z. mays} & 46289 & 41 & 90.2491 & 49 & 31043 & 351.1235 & 402.8716 & 13.8838 & 925 \\ \hline
+    \end{tabular}
+\end{table*}
+
 \section{Results}
 \label{sec:results}
 
@@ -443,25 +460,48 @@ We find that our particular partitioning scheme (we compact the graph in chunks 
 In practice, setting the chunk size lower tends to resolve this problem, but will also increase runtime.
 To simplify comparisons between the different parameter settings, we have not re-run these settings with a different partition size nor on computer nodes with a larger, then different, amount of RAM.
 
-\begin{table*}[!ht]
+\input{fig_experiments.tex}
+
+\subsection{Comparison to similar graph building methods}
+\label{sec:comparison}
+
+We have so far described our method for graph induction, provided detail on its implementation, and demonstrated its behavior over a set of pangenome graph building problems.
+These provide intuition about \textit{seqwish} and its behavior.
+However, the reader may wonder how the method compares to other similar methods for graph construction, or what variation might be caused by changes in the alignment method used.
+
+To focus on this questions, we examine the case of a single chromosome (chrV) of \textit{S. cerevisiae} for which we have 7 assemblies \citep{Yue_2017}.
+We compute 100 random permutations \citep{Williams2009-ou} of these assemblies and provide them to several graph construction methods, including \textit{minigraph} \citep{Li:2020}, \textit{TwoPaCo} \citep{Minkin_2016}, and \textit{seqwish} based on \textit{minimap2} \citep{Li_2018} or \textit{wfmash} \citep{wfmash} alignments.
+
+Of existing methods, \textit{TwoPaCo} is the only that provides a variation graph in the same form as \textit{seqwish}.
+However, it is based on a De Bruijn Graph that must have a relatively low $k$-mer length, leading to complex topologies that in our experience cannot be resolved easily by increasing $k$.
+We do not expect \textit{TwoPaCo} to be biased with respect to input genome order.
+In contrast, \textit{minigraph} develops a kind of partial order alignment over the minimizers (sparse $k$-mer set) of input genomes, and it progressively builds the graph by adding new variation from each genome in order.
+We do expect it be order and reference (first input) biased, although the degree of bias requires experimentation to establish.
+Finally, \textit{seqwish} itself is by definition unbiased with respect to input order, but if the alignments are biased due to changes in order, we should see effects on the resulting graph.
+
+We use ODGI to compute the size of the resulting graphs \citep{Guarracino2022}, and use this as a proxy for graph identity.
+When the graph length changes, it provides a clear indication that the graph itself has changed.
+It also gives an indication of the scale of the differences, which may indicate how large an effect of a different construction approach might be.
+Conversely, if the graph length is the same for two large graphs, we assume that in most cases they really do have the same topology and sequence space, even if they may have different node identifiers and ordering in the serialization of the graph.
+
+\input{fig_chrV_yeast.tex}
+
+\begin{table}[!h]
     \centering
-    \caption{Performance of the graph induction algorithm.
-        For each pangenome we report a single experiment with \textit{seqwish -k} filter set to 49bp.
-        From left to right, the columns indicate the species, the number of sequences (that is, the number of contigs), number of haplotypes (that is, number of individuals), the sum of the length of all sequences in Gbp, the length of the short match filter applied in bp, the time in seconds and the amount of memory and disk space in Gbytes required for the graph induction, the length of the resulting graph in Gbp and the number its connected components.
+    \caption{Variance in graph properties across genome input order permutations.
+    We report the mean ($\mu$) and variance ($\sigma^2$) in standard deviations ($\sigma$) for graph length (bp), node count (node), and edge count (edge).
+    We show results from \textit{minigraph}, \textit{TwoPacCo} with $k=19$ (\textit{twopaco.k19}), \textit{seqwish} using \textit{minimap2} alignments (\textit{seqwish.mm2}), and \textit{seqwish} using \textit{wfmash} alignments (\textit{seqwish.wfm}).
         }
     \label{tab:experiments}
-    \begin{tabular}{|l|l|l|l|l|l|l|l|l|l|}
+    \begin{tabular}{|l|l|l|l|l|l|l|}
         \hline
-        species & sequences & haplotypes & fasta.Gbp & min.match.bp & time.seconds & memory.Gbytes & disk.Gbytes & graph.Gbp & components \\ \hline
-        \textit{A. thaliana} & 922 & 16 & 1.90251 & 49 & 468 & 43.1287 & 7.1218 & 0.234284 & 100 \\ \hline
-        \textit{H. sapiens} & 17478 & 38 & 114.627 & 49 & 46268 & 347.4983 & 604.4261 & 4.47126 & 474 \\ \hline
-        \textit{H. pylori} & 292 & 250 & 0.407782 & 49 & 777 & 74.9484 & 20.2070 & 0.01421 & 5 \\ \hline
-        \textit{Z. mays} & 46289 & 41 & 90.2491 & 49 & 31043 & 351.1235 & 402.8716 & 13.8838 & 925 \\ \hline
+        method & $\mu$.bp & $\sigma$.bp & $\mu$.node & $\sigma$.node & $\mu$.edge & $\sigma$.edge \\ \hline
+        \textit{minigraph} &  648967 & 8112 & 190 & 11.6 & 267 & 15.9 \\ \hline
+        \textit{seqwish.mm2}  & 609039  &  4.08 & 30692 &  2.89 &  41723  &  6.32 \\ \hline
+        \textit{seqwish.wfm}  & 683470 & 0 & 28756 & 0 & 39080 & 0 \\ \hline
+        \textit{twopaco.k19} & 1270115 & 0 & 26383 & 0 & 35284 & 0 \\ \hline
     \end{tabular}
-\end{table*}
-
-
-
+\end{table}
 
 %The alignment is taken as truth, so some of the cross validation things we do for pggb are irrelevant.
 %The one experiment could be graph induction on many graphs, with a 2D/3D plot with input size (alignments) vs induction time and color/shape to show graph output size or something
@@ -471,8 +511,6 @@ To simplify comparisons between the different parameter settings, we have not re
 %    \subsection{subsection 1}
 %\label{subsec:subsec1}
 %\FIXME{to do}
-
-\input{fig_experiments.tex}
 
 \section{Discussion}
 \label{sec:discussion}
