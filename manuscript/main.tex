@@ -482,24 +482,25 @@ However, it is based on a De Bruijn Graph that must have a relatively low $k$-me
 Furthermore, the overlaps between nodes are incompatible with the variation graph model, and must be reduced or ``bluntified'' with additional processing steps to be usable as input to variation graph tools \citep{Eizenga2021-yg}.
 Because it is based on a De Bruijn Graph, which is symmetrically constructed from a set of $k$-mers and not the sequences themselves, we do not expect \textit{TwoPaCo} to be biased with respect to input genome order.
 
-In contrast, \textit{minigraph} develops a kind of partial order alignment over the minimizers (sparse $k$-mer set) of input genomes, and it progressively builds the graph by adding new variation from each genome in order.
+In contrast, \textit{minigraph} develops a kind of partial order alignment \citep{Lee_2002} over the minimizers (sparse $k$-mer set) of input genomes, and it progressively builds the graph by adding new variation from each genome in order.
 We do expect it be order and reference (first input) biased, although the degree of bias requires experimentation to establish.
 
-Finally, \textit{seqwish} itself is by definition unbiased with respect to input order, but if the alignments are affected by changes in order, the resulting graph will also change.
+Finally, \textit{seqwish} itself is by definition unbiased with respect to input order.
+But, if the alignments are affected by changes in order, the resulting graph will also change.
 
-We use ODGI to compute the size of the resulting graphs \citep{Guarracino2022}.
-When the graph length changes, it provides a clear indication that the graph itself has changed.
+We use ODGI to compute the size, node count, and edge count of the resulting graphs \citep{Guarracino2022}.
+Changes in these statistics indicate changes in graphs.
 It also gives an indication of the scale of the differences, which may indicate how large an effect of a different construction approach might be.
-Conversely, if the graph length is the same for two large graphs, we assume that in most cases they really do have the same topology and sequence space, even if they may have different node identifiers and ordering in the serialization of the graph.
+If graph parameters are the same for two large graphs, we consider them equivalent, which is not formally correct but provides a sufficient approximation for this analysis.
 
 As we observe in Figure \ref{fig:yeast}, \textit{minigraph} indeed generates a distribution of graph lengths with clusters corresponding to permutations beginning with the same genome.
 This suggests that most of the variation in \textit{minigraph}'s graph derives from the first genome which is picked.
 The graphs are thus biased towards the chosen base reference.
 However, this is not the case for the \textit{seqwish} builds based on \textit{minimap2} and \textit{wfmash}, which appear to have almost exactly the same length across all permutations.
 
-We further consider variance in the length, node count, and edge count of all graphs.
+In Table \ref{tab:yeast}, we further consider variance in the length, node count, and edge count of all graphs.
 This shows that, as expected, \textit{minigraph}'s output depends markedly on input genome order.
-We also find that \textit{minimap2} configuration we used is not order-independent, and can produce slightly different outputs when the reference and query sequences are ordered differently, demonstrating that \textit{seqwish} is only ``unbiased'' insofar as the input mappings are.
+We also find that \textit{minimap2} configuration we used is not order-independent, and can produce slightly different outputs when the reference and query sequences are ordered differently, demonstrating that \textit{seqwish} is only ``unbiased'' insofar as its input mappings are.
 For \textit{TwoPaCo} and \textit{wfmash}+\textit{seqwish}, we observe no variation in length.
 The length of \textit{TwoPaCo} graphs is significantly larger due to the repetition in node sequences, which overlap by $k-1$ base pairs.
 
@@ -513,10 +514,10 @@ But, other symmetric methods avoid order bias.
 \begin{table}[!h]
     \centering
     \caption{Variance in graph properties across genome input order permutations.
-    We report the mean ($\mu$) and variance ($\sigma^2$) in standard deviations ($\sigma$) for graph length (bp), node count (node), and edge count (edge).
+    We report the mean ($\mu$) and variance in standard deviations ($\sigma$) for graph length (bp), node count (node), and edge count (edge).
     We show results from \textit{minigraph}, \textit{TwoPacCo} with $k=19$ (\textit{twopaco.k19}), \textit{seqwish} using \textit{minimap2} alignments (\textit{seqwish.mm2}), and \textit{seqwish} using \textit{wfmash} alignments (\textit{seqwish.wfm}).
         }
-    \label{tab:experiments}
+    \label{tab:yeast}
     \begin{tabular}{|l|l|l|l|l|l|l|}
         \hline
         method & $\mu$.bp & $\sigma$.bp & $\mu$.node & $\sigma$.node & $\mu$.edge & $\sigma$.edge \\ \hline
@@ -552,7 +553,9 @@ It is also a potentially novel approach.
 Despite the existence of many methods for pangenome building, we are not aware of any comparable method which can losslessly convert an all-to-all alignment to a variation graph.
 This direct relationship allows users to adjust the shape of the resulting graph by modifying alignment parameters, allowing the design of custom graph construction processes based on domain-specific knowledge and potentially manual curation of assembly alignments.
 In contrast to existing methods, which depend on particular structuring of their input \citep{Li:2020,Armstrong:2020}, \textit{seqwish} is unbiased in that as it directly and uniformly represents sequence relationships given on input in the resulting graph.
-Although we did not compare with \textit{de Bruijn} graph methods, which are also unbiased in their uniform treatment of input genomes \citep{Minkin_2016,Yu_2021}, we believe such methods are fundamentally different in that because they collapse all exact matches of a given length $k$.
+Our comparison with related pangenome graph-building methods demonstrates that these effects can be significant.
+\textit{minigraph}'s output varies substantially, with $\sigma \approx 1.25\%$ of graph length for a 7-chromosome input with $\approx 99.3\%$ pairwise identity.
+%Although we did not compare with \textit{de Bruijn} graph methods, which are also unbiased in their uniform treatment of input genomes \citep{Minkin_2016,Yu_2021}, we believe such methods are fundamentally different in that because they collapse all exact matches of a given length $k$.
 This prevents high-level structuring of patterns of homology and orthology in the resulting graph, and they furthermore cannot be guided by a specific alignment set.
 
 Our presentation is necessarily limited, in order to focus on and describe the unique problem of variation graph induction.

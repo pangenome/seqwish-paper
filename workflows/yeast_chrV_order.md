@@ -7,6 +7,20 @@ wget http://hypervolu.me/~erik/yeast/cerevisiae.chrV.fa
 samtools faidx cerevisiae.chrV.fa
 ```
 
+## divergence estimate
+
+These have relatively low pairwise divergence:
+
+```shell
+ls *.fa | while read f; do mash sketch $f; done
+mash triangle *.msh  | column -t  | tr ' ' '\n'  | grep ^0 | awk '{ sum += $1 } END { print sum/NR }'
+# 0.00676819
+```
+
+We can estimate that the pairwise identity is ~99.32%.
+
+## permutations
+
 You'll also want to build the [multipermute](https://github.com/ekg/multipermute) command line tool.
 
 We use this to make all possible permutations of cerevisiae chrVs.
