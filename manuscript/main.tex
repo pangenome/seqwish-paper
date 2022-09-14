@@ -492,14 +492,21 @@ When the graph length changes, it provides a clear indication that the graph its
 It also gives an indication of the scale of the differences, which may indicate how large an effect of a different construction approach might be.
 Conversely, if the graph length is the same for two large graphs, we assume that in most cases they really do have the same topology and sequence space, even if they may have different node identifiers and ordering in the serialization of the graph.
 
-As we observe in Figure \ref{fig:yeast}, \textit{minigraph} indeed generates a distribution of graph lengths with clusters that apparently correspond to similar regions of the permutation space.
+As we observe in Figure \ref{fig:yeast}, \textit{minigraph} indeed generates a distribution of graph lengths with clusters corresponding to permutations beginning with the same genome.
+This suggests that most of the variation in \textit{minigraph}'s graph derives from the first genome which is picked.
+The graphs are thus biased towards the chosen base reference.
 However, this is not the case for the \textit{seqwish} builds based on \textit{minimap2} and \textit{wfmash}, which appear to have almost exactly the same length across all permutations.
+
 We further consider variance in the length, node count, and edge count of all graphs.
 This shows that, as expected, \textit{minigraph}'s output depends markedly on input genome order.
 We also find that \textit{minimap2} configuration we used is not order-independent, and can produce slightly different outputs when the reference and query sequences are ordered differently, demonstrating that \textit{seqwish} is only ``unbiased'' insofar as the input mappings are.
 For \textit{TwoPaCo} and \textit{wfmash}+\textit{seqwish}, we observe no variation in length.
 The length of \textit{TwoPaCo} graphs is significantly larger due to the repetition in node sequences, which overlap by $k-1$ base pairs.
-%, when considering the variance of the length, node count, and edge count of the graphs
+
+Although this particular study focuses on only a single small eukaryotic chromosome, it reveals that our basic understanding of reference bias in thes graph construction methods is correct.
+By design, progressive pangenome graph construction methods will be affected by input genome order.
+But, other symmetric methods avoid order bias.
+%This leads to difficulty in building and designing pangenomes that is avoided by unbiased methods.
 
 \input{fig_chrV_yeast.tex}
 
