@@ -555,16 +555,16 @@ This direct relationship allows users to adjust the shape of the resulting graph
 In contrast to existing methods, which depend on particular structuring of their input \citep{Li:2020,Armstrong:2020}, \textit{seqwish} is unbiased in that as it directly and uniformly represents sequence relationships given on input in the resulting graph.
 Our comparison with related pangenome graph-building methods demonstrates that these effects can be significant.
 \textit{minigraph}'s output varies substantially, with $\sigma \approx 1.25\%$ of graph length for a 7-chromosome input with $\approx 99.3\%$ pairwise identity.
-%Although we did not compare with \textit{de Bruijn} graph methods, which are also unbiased in their uniform treatment of input genomes \citep{Minkin_2016,Yu_2021}, we believe such methods are fundamentally different in that because they collapse all exact matches of a given length $k$.
-This prevents high-level structuring of patterns of homology and orthology in the resulting graph, and they furthermore cannot be guided by a specific alignment set.
+De Bruijn Graph methods, which are also unbiased with their treatment of input genomes \citep{Minkin_2016,Sheikhizadeh_2016,Yu_2021}.
+%However, our approach is different than these, and allows the direct
 
 Our presentation is necessarily limited, in order to focus on and describe the unique problem of variation graph induction.
-Thus, in this manuscript and our experiments, we have not explored the full problem of \textit{pangenome graph building}, which include both the initial alignment step and downstream processing of the resulting graph.
+Thus, in this manuscript and our experiments, we have not explored the full problem of \textit{pangenome graph building}, which include both the initial alignment step and downstream processing of the resulting graph \citep{Liao_2022}.
 These topics lie outside of the scope of the presented work, wherein we have focused on a key kernel which is a bottleneck in the pangenome graph construction process.
 But, they are important for readers to consider.
 Although \textit{seqwish} perfectly represents its input alignments, the problem of generating and filtering an alignment set remains critical, as it determines the structure of the built graph.
 And this lossless property does not guarantee that the resulting graph is easy to work with or navigate; in practice, downstream processing is usually required to normalize the graph for many applications.
-We will cover these topics in future work.
+We expect to cover these topics in future work.
 
 %However, users of \textit{seqwish} should note that although the graph
 %But, it is important to note that the graphs which it produces are simply raw representations of an underlying alignment set.
