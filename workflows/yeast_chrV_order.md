@@ -3,7 +3,8 @@
 Get the data, which consist of chrV from S. cerevisiae assembled in [Yue et. al. 2017](https://doi.org/10.1038/ng.3847).
 
 ```shell
-wget http://hypervolu.me/~erik/yeast/cerevisiae.chrV.fa
+wget https://github.com/pangenome/seqwish-paper/raw/main/data/cerevisiae.chrV.fa.gz
+gunzip cerevisiae.chrV.fa.gz
 samtools faidx cerevisiae.chrV.fa
 ```
 
