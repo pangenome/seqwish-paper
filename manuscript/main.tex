@@ -556,7 +556,8 @@ This direct relationship allows users to adjust the shape of the resulting graph
 In contrast to existing methods, which depend on particular structuring of their input \citep{Li:2020,Armstrong:2020}, \textit{seqwish} is unbiased in that as it directly and uniformly represents sequence relationships given on input in the resulting graph.
 Our comparison with related pangenome graph-building methods demonstrates that these effects can be significant.
 \textit{minigraph}'s output varies substantially, with $\sigma \approx 1.25\%$ of graph length for a 7-chromosome input with approximately $99.3\%$ pairwise identity.
-De Bruijn graph methods, which are also unbiased with their treatment of input genomes \citep{Minkin_2016,Sheikhizadeh_2016,Yu_2021}.
+Although we did not compare with de Bruijn graph methods, which are also unbiased with their treatment of input genomes \citep{Minkin_2016,Sheikhizadeh_2016,Yu_2021}, we believe such methods are fundamentally different in that because they collapse all exact matches of a given length k.
+This prevents high-level structuring of patterns of homology and orthology in the resulting graph, and they furthermore cannot be guided by a specific alignment set.
 %However, our approach is different than these, and allows the direct
 
 Our presentation is necessarily limited, in order to focus on and describe the unique problem of variation graph induction.
