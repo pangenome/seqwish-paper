@@ -500,7 +500,8 @@ However, this is not the case for the \textit{seqwish} builds based on \textit{m
 
 In Table \ref{tab:yeast}, we further consider variance in the length, node count, and edge count of all graphs.
 This shows that, as expected, \textit{minigraph}'s output depends markedly on input genome order.
-We also find that \textit{minimap2} configuration we used is not order-independent, and can produce slightly different outputs when the reference and query sequences are ordered differently, demonstrating that \textit{seqwish} is only ``unbiased'' insofar as its input mappings are.
+We also find that the \textit{minimap2}+\textit{seqwish} configuration is not order-independent because \textit{minimap2} can produce slightly different outputs when the reference and query sequences are ordered differently.
+This demonstrates that \textit{seqwish} is only ``unbiased'' insofar as its input mappings are.
 For \textit{TwoPaCo} and \textit{wfmash}+\textit{seqwish}, we observe no variation in length.
 The length of \textit{TwoPaCo} graphs is significantly larger due to the repetition in node sequences, which overlap by $k-1$ base pairs.
 
