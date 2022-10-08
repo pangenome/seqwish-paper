@@ -319,7 +319,7 @@ Broadly, the size of nodes will be bounded by the average distance between varia
 To compact $\mathcal{G}$, we traverse $Q$, finding each entry in $\mathcal{Z}$ in turn, recording its start and end in $\mathcal{V}$, which can be understood as a character vector or string containing all the sequence in the nodes of $\mathcal{G}$.
 %in a ``graph vector'' $\mathcal{G} = v_1,v_2 \ldots v_{|\mathcal{V}|}$ containing the ordered characters of the graph.
 %Any position in $\mathcal{G}$ so marked must be the start or end of a node.
-We subsequently use these markings to subdivide $\mathcal{V}$ into a compacted version $\mathcal{V}'$ where compacted node boundaries are marked in a auxiliary bitvector $\mathcal{B} : |\mathcal{B}| = |\mathcal{V}|$ such that the first character in each compacted node is marked by a $1$ and other characters are marked $0$.
+We subsequently use these markings to subdivide $\mathcal{V}$ into a compacted version $\mathcal{V}'$ where compacted node boundaries are marked in an auxiliary bitvector $\mathcal{B} : |\mathcal{B}| = |\mathcal{V}|$ such that the first character in each compacted node is marked by a $1$ and other characters are marked $0$.
 $\mathcal{B}$ allows us to compute compacted node ids using efficient rank operations \citep{Gog_2014}.
 %such that $\forall_{i \in 1 \ldots |\mathcal{V}'|} |v_i| \ge 1$.
 %In Algorithm \ref{alg:seqwish} we provide a detailed description of the graph induction algorithm.
@@ -483,7 +483,7 @@ Furthermore, the overlaps between nodes are incompatible with the variation grap
 Because it is based on a de Bruijn graph, which is symmetrically constructed from a set of $k$-mers and not the sequences themselves, we do not expect \textit{TwoPaCo} to be biased with respect to input genome order.
 
 In contrast, \textit{minigraph} develops a kind of partial order alignment \citep{Lee_2002} over the minimizers (sparse $k$-mer set) of input genomes, and it progressively builds the graph by adding new variation from each genome in order.
-We do expect it be order and reference (first input) biased, although the degree of bias requires experimentation to establish.
+We do expect it to be order and reference (first input) biased, although the degree of bias requires experimentation to establish.
 
 Finally, \textit{seqwish} itself is by definition unbiased with respect to input order.
 But, if the alignments are affected by changes in order, the resulting graph will also change.
