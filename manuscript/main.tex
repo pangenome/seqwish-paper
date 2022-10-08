@@ -245,9 +245,9 @@ The induction must maintain reference to all characters in all input sequences $
 We also maintain the bitvector $\mathcal{X}$ to mark seen characters of $Q$ during graph induction, which requires $O(|S|)$ bits, equivalent to $O(|S| / \log_2 |S|)$ integer identifiers.
 In total, na\"{i}ve theorem \ref{thm:seqwish}-based induction would require approximately $O(|S|(N^2 + 1/N + 1/log_2{Q} + 4))$ space, or simply $O(|S| N^2)$.
 
-Assuming that we want to build a graph of 100 haploid human genomes of $\num{3e9}$ bp, where $N=100$ and $|S| \approx \num{e11}$, we might expect to use $\approx \num{e15}$ identifiers to store the full model.
+Assuming that we want to build a graph of 100 haploid human genomes of $\num{3e9}$ bp, where $N=100$ and $|S| \approx \num{e11}$, we might expect to use approximately $\num{e15}$ identifiers to store the full model.
 Such a design is almost infeasible for inputs larger than a handful of genomes.
-For instance, we would need $\approx \num{3e12}$ identifiers for just 5 human genomes.
+For instance, we would need approximately $\num{3e12}$ identifiers for just 5 human genomes.
 Although it is feasible to compute such a graph using external memory, the approximately 200-fold increase in space relative to the input renders this clearly impractical.
 
 Considering the time complexity of induction, we anticipate $O(|A|\log|A|)$ time to sort the match set and $O(\mathcal{V} \log |A|)$ to query it and compute our $\mathcal{V}$ transitive closures.
@@ -286,7 +286,7 @@ When working with large numbers of genomes, alignments dominate the computationa
 A simple technique is to generalize matches $m = (i, j)$, which are between individual characters, to \textit{range}-matches over pairs of ranges of characters in $Q$.
 For highly-similar sequences, our expectation is that exact matches will occur in long runs.
 If the average pairwise diversity of sequences in our input is $1/k$, we expect exact matches to be around $k$ characters long.
-By encoding matches as pairs of ranges of characters, $r = (a, b) : a, b = (i, j) : i, j \in Q$, we can obtain a $\approx$ $k$-fold compression of $A$, yielding the range-match array $\mathcal{A}$.
+By encoding matches as pairs of ranges of characters, $r = (a, b) : a, b = (i, j) : i, j \in Q$, we can obtain an approximately $k$-fold compression of $A$, yielding the range-match array $\mathcal{A}$.
 
 If sorted, $\mathcal{A}$ can be treated as an \textit{implicit interval tree} \citep{Li_bedtk_2020}, which allows queries of containment and overlap in $O(\log |\mathcal{A}|)$ time.
 This compression requires trivial changes to our graph induction model.
@@ -299,7 +299,7 @@ Although in expectation the length of these matches should be strictly less than
 Additionally, we store the inverse of $\mathcal{Z}$, which maps ranges from $\mathcal{V} \to Q$, as $\bar{\mathcal{Z}}$.
 We use $\mathcal{Z}$ to compact non-branching regions of $\mathcal{G}$ into single nodes, and $\bar{\mathcal{Z}}$ to accelerate our calculation of links in the graph.
 
-%We can save $\approx k$ match pairs per recorded range
+%We can save approximately $k$ match pairs per recorded range
 %a pair of ranges $r = [(a_0, a_1), (b_0, b_1)]$ in $Q$ requires twice the space, but we expect it to
 
 %The dominance of alignments in our space costs make
@@ -554,7 +554,7 @@ Despite the existence of many methods for pangenome building, we are not aware o
 This direct relationship allows users to adjust the shape of the resulting graph by modifying alignment parameters, allowing the design of custom graph construction processes based on domain-specific knowledge and potentially manual curation of assembly alignments.
 In contrast to existing methods, which depend on particular structuring of their input \citep{Li:2020,Armstrong:2020}, \textit{seqwish} is unbiased in that as it directly and uniformly represents sequence relationships given on input in the resulting graph.
 Our comparison with related pangenome graph-building methods demonstrates that these effects can be significant.
-\textit{minigraph}'s output varies substantially, with $\sigma \approx 1.25\%$ of graph length for a 7-chromosome input with $\approx 99.3\%$ pairwise identity.
+\textit{minigraph}'s output varies substantially, with $\sigma \approx 1.25\%$ of graph length for a 7-chromosome input with approximately $99.3\%$ pairwise identity.
 De Bruijn graph methods, which are also unbiased with their treatment of input genomes \citep{Minkin_2016,Sheikhizadeh_2016,Yu_2021}.
 %However, our approach is different than these, and allows the direct
 
