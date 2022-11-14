@@ -349,7 +349,7 @@ In general, our approach uses external memory to elaborate the graph, taking adv
 
 %A practical implementation introduces a new set of problems related to input and output. % that we have not yet introduced.
 Our implementation reads standard data formats, FASTA or FASTQ for the input sequences, and PAF \citep{Li_2018} for pairwise alignments.
-It writes the graph in standard Graphical Fragment Assembly (GFA) format \citep{GFA}.
+It writes the graph in standard Graphical Fragment Assembly (GFA) format (\url{https://github.com/GFA-spec/GFA-spec}).
 
 In PAF, the input set of alignments is not directly expressed in terms of matches between specific characters in $Q$.
 Rather, each record lists the name of the aligned pair of query and target sequences and offsets in each.
@@ -372,7 +372,7 @@ Following the GFA format, we are able to independently generate $\mathcal{P}$, a
 \subsection{Key disk-backed data structures}
 
 In our implementation, we rely on several basic external memory kernels.
-To reduce working memory requirements to an absolute minimum, we use a disk-backed version of the implicit interval tree that memory-maps the sorted array of intervals \citep{mmmulti}.
+To reduce working memory requirements to an absolute minimum, we use a disk-backed version of the implicit interval tree that memory-maps the sorted array of intervals (\url{https://github.com/ekg/mmmulti}).
 Indexing the implicit interval tree requires a sorting step which dominates the runtime of our algorithm.
 We adapt the current best-performing in-place parallel sorting algorithm, In-place Parallel Super Scalar Samplesort (IPS$^4$o), to work on a disk-backed, memory-mapped array \citep{axtmann2017}.
 This allows us work with $\mathcal{A}$, $\mathcal{Z}$, and $\bar{\mathcal{Z}}$ in external memory.
@@ -394,7 +394,7 @@ This filter necessarily increases the size of the induced graph.
 But, it also replaces complex motifs shorter than $k$ with single bubbles.
 In doing so, it also removes short, expensive matches, reducing the overall space requirements for \textit{seqwish}.
 When set very high, this filter can be used to generate a coarse, high-confidence graph built only from very long exact matches which will tend to be unique in the genome.
-Although the application of the $k>$ filter can result in a graph that is relatively ``under-aligned'', we can further refine it through the application of local multiple sequence alignment \citep{Gao_2020}, or graph normalization \citep{Doerr_2021}.
+Although the application of the $k>$ filter can result in a graph that is relatively ``under-aligned'', we can further refine it through the application of local multiple sequence alignment \citep{Gao_2020}, or graph normalization (\url{https://github.com/marschall-lab/GFAffix}).
 In a pangenomic context, underalignment caused by $k>$ match filtering can be mitigated by transitive relationships present in the pangenome.
 
 %Also, short matches are expensive to store, and may not add much to our understanding of variation or our particular use of the graph.
@@ -406,7 +406,7 @@ In a pangenomic context, underalignment caused by $k>$ match filtering can be mi
 %    A lock-free, parallel union-find algorithm \FIXME{Wait-free parallel algorithms for the union-find problem} allows us to, for each base pair of input sequence, collect all other base pairs in the pangenome that are aligned to it.
 %    By processing this transitive closure operation in chunks (e.g. 10Mbp at a time), we limit the maximum working memory (RAM) requirements of the process without affecting the output.
 %    After the transitive closure, we write our final graph on disk in a set of arrays, then augment it with the paths of our input sequences,
-%    finally emitting the resulting graph in the standard Graphical Fragment Assembly (GFA) format~\citep{GFA}.
+%    finally emitting the resulting graph in the standard Graphical Fragment Assembly (GFA) format (\url{https://github.com/GFA-spec/GFA-spec}).
 
 
 \begin{table*}[!ht]
@@ -436,7 +436,7 @@ Experiments were conducted on compute nodes with 386GB of RAM and AMD EPYC 7402P
 
 %\subsection{Alignment and graph induction pipeline}
 
-To construct the graph we first generate alignments with \textit{wfmash} \citep{wfmash}, a DNA sequence aligner designed specifically for high performance all-to-all alignment of fully-assembled genomes.
+To construct the graph we first generate alignments with \textit{wfmash} (\url{https://github.com/waveygang/wfmash}), a DNA sequence aligner designed specifically for high performance all-to-all alignment of fully-assembled genomes.
 \textit{wfmash} combines an algorithm for generating whole-genome homology maps (\textit{MashMap2}) \citep{Jain_2018} with an extension of the wavefront algorithm (WFA) \citep{Marco_Sola_2020} capable of obtaining base-level alignments for whole chromosomes.
 \textit{MashMap2} allows the user to define a homology length and pairwise divergence, expressed as a percent identity, over which to generate homology maps.
 This is useful when constructing pangenome graphs, because, in contrast to methods that are based on $k$-mer chaining \citep{harris2007lastz,Li_2018}, it allows us to query the homology space of input genomes using two easily-interpretable parameters.
@@ -475,7 +475,7 @@ These provide intuition about \textit{seqwish} and its behavior.
 However, the reader may wonder how the method compares to other similar methods for graph construction, or what variation might be caused by changes in the alignment method used.
 
 To focus on these questions, we examine the case of a single chromosome (chrV) of \textit{S. cerevisiae} for which we have 7 assemblies \citep{Yue_2017}.
-We compute 100 random permutations \citep{Williams2009-ou} of these assemblies and provide them to several graph construction methods, including \textit{minigraph} \citep{Li:2020}, \textit{TwoPaCo} \citep{Minkin_2016}, and \textit{seqwish} based on \textit{minimap2} \citep{Li_2018} or \textit{wfmash} \citep{wfmash} alignments.
+We compute 100 random permutations \citep{Williams2009-ou} of these assemblies and provide them to several graph construction methods, including \textit{minigraph} \citep{Li:2020}, \textit{TwoPaCo} \citep{Minkin_2016}, and \textit{seqwish} based on \textit{minimap2} \citep{Li_2018} or \textit{wfmash} (\url{https://github.com/waveygang/wfmash}) alignments.
 
 Of existing methods, \textit{TwoPaCo} provides a graph in a form that is similar to \textit{seqwish}'s.
 However, it is based on a de Bruijn graph that must have a relatively low $k$-mer length, leading to complex topologies that in our experience cannot be resolved easily by increasing $k$.
