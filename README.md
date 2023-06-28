@@ -1,5 +1,8 @@
 # seqwish-paper
 
+## Citation
+
+Erik Garrison , Andrea Guarracino, **Unbiased pangenome graphs**, Bioinformatics, Volume 39, Issue 1, January 2023, btac743, [https://doi.org/10.1093/bioinformatics/btac743]
 
 ## building the manuscript
 
